@@ -5,398 +5,224 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EGAT EV · Total Solution Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════════
-   EGAT EV TOTAL SOLUTION DASHBOARD
-   Design: Industrial Precision · Dark Tech
-   กองธุรกิจติดตั้งและบำรุงรักษาสถานีอัดประจุไฟฟ้า
-═══════════════════════════════════════════════ */
-
 :root {
-  --bg0:        #050d1a;
-  --bg1:        #091628;
-  --bg2:        #0d1e38;
-  --bg3:        #122544;
-  --bg4:        #1a3058;
-  --border:     rgba(77,166,255,0.12);
-  --border2:    rgba(77,166,255,0.22);
-  --glow:       rgba(21,101,232,0.35);
-  --text1:      #e8f0ff;
-  --text2:      #7fa8d4;
-  --text3:      #3d6491;
-  --blue:       #1565e8;
-  --blue-l:     #4da6ff;
-  --blue-ll:    #89c4ff;
-  --gold:       #f5c518;
-  --gold-d:     #c49a10;
-  --red:        #ef4444;
-  --red-l:      #fca5a5;
-  --amber:      #f59e0b;
-  --amber-l:    #fcd34d;
-  --green:      #22c55e;
-  --green-l:    #86efac;
-  --teal:       #06b6d4;
-  --teal-l:     #67e8f9;
-  --purple:     #8b5cf6;
-  --coral:      #f97316;
-  --r: 10px;
-  --r-sm: 6px;
-  --transition: all .18s cubic-bezier(.4,0,.2,1);
+  --bg0:#050d1a;--bg1:#091628;--bg2:#0d1e38;--bg3:#122544;--bg4:#1a3058;
+  --border:rgba(77,166,255,0.11);--border2:rgba(77,166,255,0.22);
+  --text1:#e8f0ff;--text2:#7fa8d4;--text3:#3d6491;
+  --blue:#1565e8;--blue-l:#4da6ff;--blue-ll:#89c4ff;
+  --gold:#f5c518;--red:#ef4444;--red-l:#fca5a5;
+  --amber:#f59e0b;--amber-l:#fcd34d;--green:#22c55e;--green-l:#86efac;
+  --teal:#06b6d4;--teal-l:#67e8f9;--purple:#8b5cf6;--coral:#f97316;
+  --r:10px;--r-sm:6px;--tr:all .18s cubic-bezier(.4,0,.2,1);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg0);color:var(--text1);min-height:100vh;line-height:1.5;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(21,101,232,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(21,101,232,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; scroll-behavior: smooth; }
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(5,13,26,.98),rgba(5,13,26,.92));border-bottom:1px solid var(--border2);backdrop-filter:blur(20px)}
+.topbar-inner{max-width:1680px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:0 24px;height:60px}
+.logo-block{display:flex;align-items:center;gap:12px}
+.logo-icon{width:38px;height:38px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,var(--blue),#0a3fa8);display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;letter-spacing:-.5px;box-shadow:0 0 20px rgba(21,101,232,.6),inset 0 1px 0 rgba(255,255,255,.2);animation:logoPulse 4s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 20px rgba(21,101,232,.6),inset 0 1px 0 rgba(255,255,255,.2)}50%{box-shadow:0 0 34px rgba(77,166,255,.8),inset 0 1px 0 rgba(255,255,255,.2)}}
+.logo-name{font-size:14.5px;font-weight:600;color:var(--text1);letter-spacing:-.2px}
+.logo-sub{font-size:10.5px;color:var(--text3)}
+.nav-tabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px}
+.nav-tab{background:none;border:none;color:var(--text3);padding:6px 16px;border-radius:7px;font-size:12.5px;font-family:inherit;font-weight:500;cursor:pointer;transition:var(--tr);white-space:nowrap;display:flex;align-items:center;gap:5px}
+.nav-tab:hover{color:var(--text2);background:var(--bg3)}
+.nav-tab.active{color:var(--blue-l);background:var(--bg3);box-shadow:0 0 0 1px var(--border2)}
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.clock-pill{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:5px 12px;border-radius:20px}
+.add-btn{background:var(--blue);color:#fff;border:none;padding:7px 16px;border-radius:var(--r-sm);font-size:12.5px;font-family:inherit;font-weight:500;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.add-btn:hover{background:var(--blue-l);box-shadow:0 0 20px rgba(77,166,255,.4)}
 
-body {
-  font-family: 'IBM Plex Sans Thai', sans-serif;
-  background: var(--bg0);
-  color: var(--text1);
-  min-height: 100vh;
-  line-height: 1.5;
-  overflow-x: hidden;
-}
+/* LAYOUT */
+.main{max-width:1680px;margin:0 auto;padding:24px;position:relative;z-index:1}
+.panel{display:none}
+.panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-/* Background grid texture */
-body::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 0;
-  background-image:
-    linear-gradient(rgba(21,101,232,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21,101,232,0.025) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-}
+/* KPI */
+.kpi-strip{display:grid;gap:12px;margin-bottom:20px;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:var(--tr);cursor:default}
+.kpi-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.02),transparent 60%);pointer-events:none}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.kpi-accent{position:absolute;top:0;left:0;right:0;height:2.5px;border-radius:var(--r) var(--r) 0 0}
+.kpi-lbl{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.kpi-val{font-size:28px;font-weight:600;line-height:1;letter-spacing:-1px;margin-bottom:4px}
+.kpi-sub{font-size:10.5px;color:var(--text3)}
+.kpi-icon{position:absolute;right:14px;top:12px;font-size:20px;opacity:.15}
 
-/* ═══ TOPBAR ═══ */
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: linear-gradient(180deg, rgba(5,13,26,.98) 0%, rgba(5,13,26,.92) 100%);
-  border-bottom: 1px solid var(--border2);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-.topbar-inner {
-  max-width: 1680px; margin: 0 auto;
-  display: flex; align-items: center; gap: 20px;
-  padding: 0 24px; height: 60px;
-}
-.logo-block { display: flex; align-items: center; gap: 12px; }
-.logo-icon {
-  width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0;
-  background: linear-gradient(135deg, var(--blue) 0%, #0a3fa8 100%);
-  display: grid; place-items: center;
-  font-size: 13px; font-weight: 700; color: #fff;
-  letter-spacing: -.5px;
-  box-shadow: 0 0 20px rgba(21,101,232,.6), inset 0 1px 0 rgba(255,255,255,.2);
-  animation: logoPulse 4s ease-in-out infinite;
-}
-@keyframes logoPulse {
-  0%,100% { box-shadow: 0 0 20px rgba(21,101,232,.6), inset 0 1px 0 rgba(255,255,255,.2); }
-  50%      { box-shadow: 0 0 34px rgba(77,166,255,.8), inset 0 1px 0 rgba(255,255,255,.2); }
-}
-.logo-texts { display: flex; flex-direction: column; }
-.logo-name { font-size: 14.5px; font-weight: 600; color: var(--text1); letter-spacing: -.2px; }
-.logo-sub  { font-size: 10.5px; color: var(--text3); }
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--blue-l);display:inline-block}
+.sec-count{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
 
-.topbar-center { flex: 1; display: flex; justify-content: center; }
-.nav-tabs { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 4px; }
-.nav-tab {
-  background: none; border: none; color: var(--text3);
-  padding: 6px 16px; border-radius: 7px; font-size: 12.5px;
-  font-family: inherit; font-weight: 500; cursor: pointer;
-  transition: var(--transition); white-space: nowrap; display: flex; align-items: center; gap: 5px;
-}
-.nav-tab:hover { color: var(--text2); background: var(--bg3); }
-.nav-tab.active { color: var(--blue-l); background: var(--bg3); box-shadow: 0 0 0 1px var(--border2); }
+/* FILTER */
+.filter-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar label{font-size:11px;color:var(--text3);white-space:nowrap}
+.filter-inp{background:var(--bg3);color:var(--text1);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-size:12px;font-family:inherit;outline:none;transition:var(--tr)}
+.filter-inp:focus{border-color:var(--blue-l)}
+.search-inp{min-width:180px}
+.filter-gap{flex:1}
 
-.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-.clock-pill {
-  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-  color: var(--text2); background: var(--bg2); border: 1px solid var(--border);
-  padding: 5px 12px; border-radius: 20px;
-}
-.add-btn {
-  background: var(--blue); color: #fff; border: none;
-  padding: 7px 16px; border-radius: var(--r-sm); font-size: 12.5px;
-  font-family: inherit; font-weight: 500; cursor: pointer;
-  transition: var(--transition); display: flex; align-items: center; gap: 6px;
-  white-space: nowrap;
-}
-.add-btn:hover { background: var(--blue-l); box-shadow: 0 0 20px rgba(77,166,255,.4); }
-.add-btn .icon { font-size: 15px; }
+/* TABLE */
+.tbl-wrap{border-radius:var(--r);border:1px solid var(--border);overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead tr{background:var(--bg3)}
+th{padding:9px 12px;text-align:left;color:var(--text3);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+th:hover{color:var(--text2)}
+th.sort-asc::after{content:' ▲';font-size:8px}
+th.sort-desc::after{content:' ▼';font-size:8px}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .12s}
+tbody tr:hover td{background:rgba(77,166,255,.04)}
+.tbl-empty{text-align:center;padding:48px;color:var(--text3)}
 
-/* ═══ MAIN LAYOUT ═══ */
-.main { max-width: 1680px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
+/* ROW HIGHLIGHT — SIM ใน/หมด warranty */
+tbody tr.sim-in-warranty td{border-left:3px solid var(--green)}
+tbody tr.sim-out-warranty td{border-left:3px solid var(--amber)}
+tbody tr.sim-expired td{border-left:3px solid var(--red)}
+tbody tr.sim-no-data td{border-left:3px solid var(--text3)}
 
-/* ═══ PANEL ═══ */
-.panel { display: none; }
-.panel.active { display: block; animation: fadeIn .25s ease; }
-@keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
+/* PILLS */
+.pill{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;line-height:1.6}
+.p-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.p-amber{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+.p-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.p-blue{background:rgba(77,166,255,.15);color:#89c4ff;border:1px solid rgba(77,166,255,.3)}
+.p-teal{background:rgba(6,182,212,.15);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.p-purple{background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)}
+.p-coral{background:rgba(249,115,22,.15);color:#fdba74;border:1px solid rgba(249,115,22,.3)}
+.p-gold{background:rgba(245,197,24,.15);color:#fde68a;border:1px solid rgba(245,197,24,.3)}
+.p-gray{background:rgba(77,100,145,.15);color:var(--text2);border:1px solid var(--border)}
 
-/* ═══ KPI STRIP ═══ */
-.kpi-strip {
-  display: grid; gap: 12px; margin-bottom: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
-}
-.kpi-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 16px 18px;
-  position: relative; overflow: hidden;
-  transition: var(--transition); cursor: default;
-}
-.kpi-card::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
-  pointer-events: none;
-}
-.kpi-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
-.kpi-accent {
-  position: absolute; top: 0; left: 0; right: 0; height: 2.5px; border-radius: var(--r) var(--r) 0 0;
-}
-.kpi-lbl { font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
-.kpi-val { font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: -1px; margin-bottom: 4px; }
-.kpi-sub { font-size: 10.5px; color: var(--text3); }
-.kpi-icon { position: absolute; right: 14px; top: 12px; font-size: 22px; opacity: .15; }
+/* PROGRESS */
+.prog-wrap{display:flex;align-items:center;gap:6px}
+.prog{height:4px;border-radius:2px;background:var(--bg4);min-width:56px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.prog-txt{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text3);white-space:nowrap}
 
-/* ═══ SECTION HEADER ═══ */
-.sec-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.sec-title {
-  font-size: 11px; font-weight: 600; color: var(--text3);
-  text-transform: uppercase; letter-spacing: .7px;
-  display: flex; align-items: center; gap: 8px;
-}
-.sec-title::before { content: ''; width: 3px; height: 14px; border-radius: 2px; background: var(--blue-l); display: inline-block; }
-.sec-count { font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; }
+/* WARRANTY BADGE */
+.w-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.w-in{background:rgba(34,197,94,.12);color:var(--green-l);border:1px solid rgba(34,197,94,.25)}
+.w-out{background:rgba(245,158,11,.12);color:var(--amber-l);border:1px solid rgba(245,158,11,.25)}
+.w-exp{background:rgba(239,68,68,.12);color:var(--red-l);border:1px solid rgba(239,68,68,.25)}
+.w-nd{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
 
-/* ═══ FILTER BAR ═══ */
-.filter-bar {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 12px 16px;
-  display: flex; align-items: center; gap: 10px;
-  flex-wrap: wrap; margin-bottom: 14px;
-}
-.filter-bar label { font-size: 11px; color: var(--text3); white-space: nowrap; }
-.filter-inp {
-  background: var(--bg3); color: var(--text1); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; font-family: inherit;
-  outline: none; transition: var(--transition);
-}
-.filter-inp:focus { border-color: var(--blue-l); }
-.search-inp { min-width: 180px; }
-.filter-gap { flex: 1; }
-.result-ct { font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+/* ICON BTN */
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:3px 6px;border-radius:5px;transition:var(--tr)}
+.icon-btn:hover{color:var(--text1);background:var(--bg3)}
 
-/* ═══ TABLE ═══ */
-.tbl-wrap { border-radius: var(--r); border: 1px solid var(--border); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-thead tr { background: var(--bg3); }
-th {
-  padding: 9px 12px; text-align: left; color: var(--text3); font-weight: 500;
-  font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px;
-  border-bottom: 1px solid var(--border); white-space: nowrap;
-  cursor: pointer; user-select: none; transition: color .15s;
-}
-th:hover { color: var(--text2); }
-th.sort-asc::after  { content: ' ▲'; font-size: 8px; }
-th.sort-desc::after { content: ' ▼'; font-size: 8px; }
-td {
-  padding: 8px 12px; border-bottom: 1px solid var(--border);
-  color: var(--text1); vertical-align: middle;
-}
-tr:last-child td { border-bottom: none; }
-tbody tr { transition: background .12s; }
-tbody tr:hover td { background: rgba(77,166,255,.04); }
-.tbl-empty { text-align: center; padding: 48px; color: var(--text3); }
+/* ALERT */
+.alert-grid{display:flex;flex-direction:column;gap:8px}
+.alert-card{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;border-left:3px solid;transition:var(--tr)}
+.alert-card:hover{background:var(--bg3)}
+.alert-card.al-red{border-left-color:var(--red)}
+.alert-card.al-amber{border-left-color:var(--amber)}
+.alert-card.al-teal{border-left-color:var(--teal)}
+.alert-emoji{font-size:22px;flex-shrink:0}
+.alert-info{flex:1;min-width:0}
+.alert-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alert-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.alert-days{font-size:20px;font-weight:600;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.alert-days.al-red{color:var(--red)}
+.alert-days.al-amber{color:var(--amber)}
+.alert-days.al-teal{color:var(--teal)}
 
-/* ═══ PILLS ═══ */
-.pill {
-  display: inline-block; font-size: 10px; font-weight: 500;
-  padding: 2px 8px; border-radius: 20px; white-space: nowrap; line-height: 1.6;
-}
-.p-red    { background: rgba(239,68,68,.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
-.p-amber  { background: rgba(245,158,11,.15); color: #fcd34d; border: 1px solid rgba(245,158,11,.3); }
-.p-green  { background: rgba(34,197,94,.15);  color: #86efac; border: 1px solid rgba(34,197,94,.3); }
-.p-blue   { background: rgba(77,166,255,.15); color: #89c4ff; border: 1px solid rgba(77,166,255,.3); }
-.p-teal   { background: rgba(6,182,212,.15);  color: #67e8f9; border: 1px solid rgba(6,182,212,.3); }
-.p-purple { background: rgba(139,92,246,.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,.3); }
-.p-coral  { background: rgba(249,115,22,.15); color: #fdba74; border: 1px solid rgba(249,115,22,.3); }
-.p-gold   { background: rgba(245,197,24,.15); color: #fde68a; border: 1px solid rgba(245,197,24,.3); }
-.p-gray   { background: rgba(77,100,145,.15); color: var(--text2); border: 1px solid var(--border); }
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.chart-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px}
+.bar-chart{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-lbl{font-size:11.5px;color:var(--text2);min-width:120px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:13px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.bar-val{font-size:11px;color:var(--text2);min-width:46px;font-family:'IBM Plex Mono',monospace}
 
-/* ═══ PROGRESS BAR ═══ */
-.prog-wrap { display: flex; align-items: center; gap: 6px; }
-.prog { height: 4px; border-radius: 2px; background: var(--bg4); min-width: 56px; overflow: hidden; }
-.prog-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
-.prog-txt { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); white-space: nowrap; }
+/* EXPIRE */
+.expire-cards{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.expire-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;min-width:200px;max-width:260px;border-left:3px solid;transition:var(--tr)}
+.expire-card:hover{background:var(--bg3)}
+.expire-name{font-size:12px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.expire-meta{font-size:10.5px;color:var(--text3);margin-bottom:8px}
 
-/* ═══ ICON BUTTONS ═══ */
-.icon-btn {
-  background: none; border: none; cursor: pointer;
-  color: var(--text3); font-size: 13px; padding: 3px 6px;
-  border-radius: 5px; transition: var(--transition);
-}
-.icon-btn:hover { color: var(--text1); background: var(--bg3); }
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:20px 0}
 
-/* ═══ ALERT CARDS ═══ */
-.alert-grid { display: flex; flex-direction: column; gap: 8px; }
-.alert-card {
-  display: flex; align-items: center; gap: 14px;
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 14px 16px;
-  border-left: 3px solid; transition: var(--transition);
-}
-.alert-card:hover { background: var(--bg3); }
-.alert-card.al-red   { border-left-color: var(--red); }
-.alert-card.al-amber { border-left-color: var(--amber); }
-.alert-card.al-teal  { border-left-color: var(--teal); }
-.alert-emoji { font-size: 24px; flex-shrink: 0; }
-.alert-info { flex: 1; min-width: 0; }
-.alert-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.alert-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.alert-days { font-size: 22px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
-.alert-days.al-red   { color: var(--red); }
-.alert-days.al-amber { color: var(--amber); }
-.alert-days.al-teal  { color: var(--teal); }
+/* LEGEND */
+.legend-bar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm)}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 
-/* ═══ CHARTS GRID ═══ */
-.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.chart-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 20px;
-}
-.chart-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-.chart-canvas-wrap { position: relative; }
+/* NOTE */
+.note-txt{font-size:10.5px;color:var(--text3);margin-top:10px;line-height:1.6}
+.note-txt strong{color:var(--text2)}
 
-/* Bar chart (custom) */
-.bar-chart { display: flex; flex-direction: column; gap: 9px; }
-.bar-row { display: flex; align-items: center; gap: 10px; }
-.bar-lbl { font-size: 11.5px; color: var(--text2); min-width: 120px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar-track { flex: 1; height: 13px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 3px; transition: width .7s cubic-bezier(.4,0,.2,1); }
-.bar-val { font-size: 11px; color: var(--text2); min-width: 46px; font-family: 'IBM Plex Mono', monospace; }
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:26px;width:min(540px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.8);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:none}}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{margin-bottom:12px}
+.form-group label{font-size:10.5px;color:var(--text3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.form-inp{width:100%;font-size:12.5px;padding:8px 10px;background:var(--bg3);color:var(--text1);border:1px solid var(--border);border-radius:var(--r-sm);font-family:inherit;outline:none;transition:var(--tr)}
+.form-inp:focus{border-color:var(--blue-l);box-shadow:0 0 0 3px rgba(77,166,255,.12)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn-cancel{background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:8px 18px;border-radius:var(--r-sm);font-size:12.5px;font-family:inherit;cursor:pointer;transition:var(--tr)}
+.btn-cancel:hover{color:var(--text1)}
+.btn-save{background:var(--blue);color:#fff;border:none;padding:8px 22px;border-radius:var(--r-sm);font-size:12.5px;font-family:inherit;font-weight:500;cursor:pointer;transition:var(--tr)}
+.btn-save:hover{background:var(--blue-l);box-shadow:0 0 20px rgba(77,166,255,.4)}
+.form-hint{font-size:10.5px;color:var(--text3);margin-top:4px}
+.form-separator{grid-column:1/-1;height:1px;background:var(--border);margin:4px 0}
+.form-section-lbl{grid-column:1/-1;font-size:10px;color:var(--blue-l);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-top:4px}
 
-/* ═══ EXPIRE TIMELINE ═══ */
-.expire-cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-.expire-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 12px 14px; min-width: 200px; max-width: 260px;
-  border-left: 3px solid;
-  transition: var(--transition);
-}
-.expire-card:hover { background: var(--bg3); }
-.expire-name { font-size: 12px; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.expire-meta { font-size: 10.5px; color: var(--text3); margin-bottom: 8px; }
+/* PHONE */
+.phone-mono{font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+.no-phone{font-size:10.5px;color:var(--text3);font-style:italic}
 
-/* ═══ DIVIDER ═══ */
-.divider { height: 1px; background: var(--border); margin: 20px 0; }
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
 
-/* ═══ MODAL ═══ */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.7); z-index: 200;
-  align-items: center; justify-content: center;
-  padding: 20px; backdrop-filter: blur(4px);
+/* RESPONSIVE */
+@media(max-width:900px){
+  .charts-grid{grid-template-columns:1fr}
+  .topbar-center{display:none}
+  .mobile-nav{display:flex!important}
 }
-.modal-overlay.open { display: flex; }
-.modal {
-  background: var(--bg2); border: 1px solid var(--border2);
-  border-radius: 14px; padding: 26px; width: min(530px,96vw);
-  max-height: 88vh; overflow-y: auto;
-  box-shadow: 0 32px 80px rgba(0,0,0,.8), 0 0 0 1px var(--border);
-  animation: modalIn .2s ease;
+@media(max-width:600px){
+  .main{padding:12px}
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .logo-sub{display:none}
 }
-@keyframes modalIn { from { opacity:0; transform: scale(.97) translateY(8px); } to { opacity:1; transform: none; } }
-.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-group { margin-bottom: 12px; }
-.form-group label { font-size: 10.5px; color: var(--text3); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
-.form-inp {
-  width: 100%; font-size: 12.5px; padding: 8px 10px;
-  background: var(--bg3); color: var(--text1);
-  border: 1px solid var(--border); border-radius: var(--r-sm);
-  font-family: inherit; outline: none; transition: var(--transition);
-}
-.form-inp:focus { border-color: var(--blue-l); box-shadow: 0 0 0 3px rgba(77,166,255,.12); }
-.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
-.btn-cancel {
-  background: var(--bg3); color: var(--text2); border: 1px solid var(--border);
-  padding: 8px 18px; border-radius: var(--r-sm); font-size: 12.5px;
-  font-family: inherit; cursor: pointer; transition: var(--transition);
-}
-.btn-cancel:hover { color: var(--text1); border-color: var(--border2); }
-.btn-save {
-  background: var(--blue); color: #fff; border: none;
-  padding: 8px 22px; border-radius: var(--r-sm); font-size: 12.5px;
-  font-family: inherit; font-weight: 500; cursor: pointer;
-  transition: var(--transition);
-}
-.btn-save:hover { background: var(--blue-l); box-shadow: 0 0 20px rgba(77,166,255,.4); }
-
-/* ═══ PHONE BADGE ═══ */
-.phone-mono { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; }
-.no-phone { font-size: 10.5px; color: var(--text3); font-style: italic; }
-
-/* ═══ VENDOR COLOR MAP ═══ */
-.v-RPD { color: #89c4ff; } .v-Evolt { color: #c4b5fd; }
-.v-EDS { color: #fdba74; } .v-6plus1 { color: #67e8f9; }
-.v-Innopower { color: #86efac; } .v-ChadeMo { color: #fde68a; }
-
-/* ═══ SCROLLBAR ═══ */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border2); }
-
-/* ═══ RESPONSIVE ═══ */
-@media (max-width: 900px) {
-  .charts-grid { grid-template-columns: 1fr; }
-  .topbar-center { display: none; }
-  .mobile-nav { display: flex !important; }
-}
-@media (max-width: 600px) {
-  .main { padding: 12px; }
-  .kpi-strip { grid-template-columns: repeat(2,1fr); }
-  .logo-sub { display: none; }
-  th:nth-child(n+7), td:nth-child(n+7) { display: none; }
-}
-
-/* Mobile bottom nav */
-.mobile-nav {
-  display: none; position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--bg1); border-top: 1px solid var(--border2);
-  padding: 8px 0; z-index: 90; justify-content: space-around;
-}
-.mob-tab {
-  background: none; border: none; color: var(--text3);
-  font-size: 10px; font-family: inherit;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 4px 12px; cursor: pointer; transition: color .15s;
-}
-.mob-tab.active { color: var(--blue-l); }
-.mob-tab .icon { font-size: 18px; }
-
-/* status dot */
-.status-dot {
-  display: inline-block; width: 7px; height: 7px;
-  border-radius: 50%; margin-right: 4px; flex-shrink: 0;
-}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--border2);padding:8px 0;z-index:90;justify-content:space-around}
+.mob-tab{background:none;border:none;color:var(--text3);font-size:10px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;cursor:pointer;transition:color .15s}
+.mob-tab.active{color:var(--blue-l)}
+.mob-tab .icon{font-size:18px}
 </style>
 </head>
 <body>
 
-<!-- ═══ TOPBAR ═══ -->
 <header class="topbar">
   <div class="topbar-inner">
     <div class="logo-block">
       <div class="logo-icon">EV</div>
-      <div class="logo-texts">
-        <span class="logo-name">EGAT EV · Total Solution</span>
-        <span class="logo-sub">กองธุรกิจติดตั้งและบำรุงรักษาสถานีอัดประจุไฟฟ้า (กธตบ-ธ.)</span>
+      <div>
+        <div class="logo-name">EGAT EV · Total Solution</div>
+        <div class="logo-sub">กองธุรกิจติดตั้งและบำรุงรักษาสถานีอัดประจุไฟฟ้า (กธตบ-ธ.)</div>
       </div>
     </div>
-
-    <nav class="topbar-center">
+    <nav style="flex:1;display:flex;justify-content:center" class="topbar-center">
       <div class="nav-tabs">
         <button class="nav-tab active" data-tab="sim" onclick="switchTab('sim',this)">📡 SIM Card</button>
         <button class="nav-tab" data-tab="alert" onclick="switchTab('alert',this)">🔔 แจ้งเตือน</button>
@@ -404,22 +230,24 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
         <button class="nav-tab" data-tab="summary" onclick="switchTab('summary',this)">📊 ภาพรวม</button>
       </div>
     </nav>
-
     <div class="topbar-right">
       <div class="clock-pill" id="clock">--:--:--</div>
-      <button class="add-btn" onclick="openAdd()"><span class="icon">＋</span>เพิ่มข้อมูล</button>
+      <button class="add-btn" onclick="openAdd()">＋ เพิ่มข้อมูล</button>
     </div>
   </div>
 </header>
 
-<!-- ═══ MAIN ═══ -->
 <main class="main">
-
-  <!-- KPI STRIP (always visible) -->
   <div class="kpi-strip" id="kpi-strip"></div>
 
-  <!-- ── TAB: SIM ── -->
+  <!-- SIM TAB -->
   <section id="panel-sim" class="panel active">
+    <div class="legend-bar">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>อยู่ในประกัน SIM (2 ปีแรก)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>พ้นประกัน SIM แต่สัญญายังอยู่</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>SIM หมดอายุ / เร่งด่วน</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text3)"></div>ยังไม่มีวันเปิดบริการ</div>
+    </div>
     <div class="sec-hdr">
       <span class="sec-title">SIM Card ทั้งหมด</span>
       <span class="sec-count" id="sim-count"></span>
@@ -433,50 +261,55 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
         <option>RPD</option><option>Evolt</option><option>EDS</option>
         <option>6+1</option><option>Innopower</option><option>ChadeMo</option>
       </select>
-      <label>สถานะ:</label>
+      <label>สถานะ SIM:</label>
       <select class="filter-inp" id="sim-s" onchange="renderSIM()">
         <option value="">ทั้งหมด</option>
-        <option value="expired">หมดอายุแล้ว</option>
-        <option value="red">เร่งด่วน (≤30 วัน)</option>
-        <option value="amber">ใกล้หมด (31-90 วัน)</option>
-        <option value="green">ปกติ</option>
-        <option value="nosim">ยังไม่มีเบอร์ SIM</option>
+        <option value="in">อยู่ในประกัน SIM</option>
+        <option value="out">พ้นประกัน SIM</option>
+        <option value="exp">SIM หมดอายุ</option>
+        <option value="nd">ยังไม่มีวันเปิดบริการ</option>
       </select>
       <div class="filter-gap"></div>
     </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th onclick="sort('sim','id')">#</th>
-          <th onclick="sort('sim','name')">ลูกค้า / โครงการ</th>
-          <th onclick="sort('sim','province')">จังหวัด</th>
-          <th onclick="sort('sim','v1')">ผู้รับเหมา</th>
-          <th onclick="sort('sim','pkg')">แพ็กเกจ</th>
-          <th onclick="sort('sim','phone')">เบอร์ SIM</th>
-          <th onclick="sort('sim','accept')">วันตรวจรับ</th>
-          <th onclick="sort('sim','simEnd')">สิ้นสุดสัญญา</th>
-          <th onclick="sort('sim','dL')">เหลือ (วัน)</th>
-          <th>สถานะ</th>
+          <th onclick="srt('sim','id')">#</th>
+          <th onclick="srt('sim','name')">ลูกค้า / โครงการ</th>
+          <th onclick="srt('sim','province')">จังหวัด</th>
+          <th onclick="srt('sim','v1')">ผู้รับเหมา</th>
+          <th onclick="srt('sim','pkg')">แพ็กเกจ</th>
+          <th onclick="srt('sim','phone')">เบอร์ SIM</th>
+          <th onclick="srt('sim','serviceStart')">วันเปิดบริการ</th>
+          <th onclick="srt('sim','simWarrEnd')">SIM ประกัน 2 ปี (ถึง)</th>
+          <th onclick="srt('sim','simDL')">เหลือ SIM (วัน)</th>
+          <th>สถานะ SIM</th>
+          <th onclick="srt('sim','contractEnd')">สิ้นสุดสัญญาเครื่อง</th>
           <th></th>
         </tr></thead>
         <tbody id="tbl-sim-body"></tbody>
       </table>
     </div>
-    <p style="font-size:10.5px;color:var(--text3);margin-top:10px">
-      * วันสิ้นสุดสัญญา = วันอ้างอิงประกันเครื่อง ใช้ติดตามอายุ SIM Card | RPD: อ้างอิงวันเติมเงิน
+    <p class="note-txt">
+      * <strong>SIM ประกัน 2 ปีแรก</strong> = นับจากวันเปิดให้บริการ (Commissioning/วันเปิดสถานี) ไม่ใช่วันสิ้นสุดสัญญาเครื่อง<br>
+      * <strong>สิ้นสุดสัญญาเครื่อง</strong> = วันหมดประกันอุปกรณ์ตามสัญญา Total Solution<br>
+      * RPD SIM: อ้างอิงวันต้องเติมเงินจริง (ไม่ใช่กฎ 2 ปี)
     </p>
   </section>
 
-  <!-- ── TAB: ALERT ── -->
+  <!-- ALERT TAB -->
   <section id="panel-alert" class="panel">
-    <div class="sec-hdr"><span class="sec-title">รายการที่ต้องดำเนินการ (≤ 90 วัน)</span></div>
+    <div class="sec-hdr"><span class="sec-title">SIM ที่ต้องดำเนินการ (≤ 90 วัน)</span></div>
     <div class="alert-grid" id="alert-list"></div>
+    <div class="divider"></div>
+    <div class="sec-hdr"><span class="sec-title">SIM พ้นประกัน 2 ปีแล้ว (ต้องออกค่าใช้จ่ายเอง)</span></div>
+    <div class="alert-grid" id="out-warranty-list"></div>
     <div class="divider"></div>
     <div class="sec-hdr"><span class="sec-title">PM Schedule ครั้งถัดไป (RPD)</span></div>
     <div class="alert-grid" id="pm-list"></div>
   </section>
 
-  <!-- ── TAB: CONTRACT ── -->
+  <!-- CONTRACT TAB -->
   <section id="panel-contract" class="panel">
     <div class="sec-hdr">
       <span class="sec-title">สัญญา Total Solution ทั้งหมด</span>
@@ -503,14 +336,17 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
           <th>#</th><th>ลูกค้า / โครงการ</th><th>จังหวัด</th>
           <th>ผู้รับเหมา 1</th><th>ผู้รับเหมา 2</th>
           <th>แพ็กเกจ</th><th>หมายเหตุ</th>
-          <th>วันติดต่อ</th><th>วันตรวจรับ</th><th>สถานะงาน</th>
+          <th>วันเปิดบริการ</th>
+          <th>SIM ประกัน (2 ปี)</th>
+          <th>สิ้นสุดสัญญาเครื่อง</th>
+          <th>สถานะงาน</th>
         </tr></thead>
         <tbody id="tbl-con-body"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- ── TAB: SUMMARY ── -->
+  <!-- SUMMARY TAB -->
   <section id="panel-summary" class="panel">
     <div class="charts-grid">
       <div class="chart-card">
@@ -531,14 +367,12 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-title">📈 สัญญาหมดอายุใน 180 วัน</div>
+      <div class="chart-title">⚠️ SIM ประกัน 2 ปี หมดภายใน 180 วัน</div>
       <div class="expire-cards" id="expire-wrap"></div>
     </div>
   </section>
-
 </main>
 
-<!-- Mobile Nav -->
 <nav class="mobile-nav">
   <button class="mob-tab active" data-tab="sim" onclick="switchTab('sim',this)"><span class="icon">📡</span>SIM</button>
   <button class="mob-tab" data-tab="alert" onclick="switchTab('alert',this)"><span class="icon">🔔</span>แจ้งเตือน</button>
@@ -564,17 +398,15 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
       <div class="form-group">
         <label>ผู้รับเหมา 1</label>
         <select class="form-inp" id="f-v1">
-          <option value="">-</option>
-          <option>RPD</option><option>Evolt</option><option>EDS</option>
-          <option>6+1</option><option>Innopower</option><option>ChadeMo</option>
+          <option value="">-</option><option>RPD</option><option>Evolt</option>
+          <option>EDS</option><option>6+1</option><option>Innopower</option><option>ChadeMo</option>
         </select>
       </div>
       <div class="form-group">
         <label>ผู้รับเหมา 2</label>
         <select class="form-inp" id="f-v2">
-          <option value="">-</option>
-          <option>RPD</option><option>Evolt</option><option>EDS</option>
-          <option>6+1</option><option>Innopower</option><option>ChadeMo</option>
+          <option value="">-</option><option>RPD</option><option>Evolt</option>
+          <option>EDS</option><option>6+1</option><option>Innopower</option><option>ChadeMo</option>
         </select>
       </div>
     </div>
@@ -582,18 +414,28 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
       <div class="form-group"><label>แพ็กเกจ / อุปกรณ์</label><input class="form-inp" id="f-pkg" type="text"></div>
       <div class="form-group"><label>เบอร์ SIM</label><input class="form-inp" id="f-phone" type="text"></div>
     </div>
+
     <div class="form-row">
-      <div class="form-group"><label>วันตรวจรับ</label><input class="form-inp" id="f-accept" type="date"></div>
-      <div class="form-group"><label>วันสิ้นสุดสัญญา (อ้างอิงประกัน)</label><input class="form-inp" id="f-end" type="date"></div>
+      <div class="form-section-lbl">📅 วันที่สำคัญ</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>วันเปิดให้บริการ (Commissioning)</label>
+        <input class="form-inp" id="f-service" type="date">
+        <div class="form-hint">ใช้คำนวณ SIM ประกัน 2 ปีแรก</div>
+      </div>
+      <div class="form-group">
+        <label>วันสิ้นสุดสัญญาเครื่อง</label>
+        <input class="form-inp" id="f-contract" type="date">
+        <div class="form-hint">วันหมดประกันอุปกรณ์</div>
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label>สถานะงาน</label>
         <select class="form-inp" id="f-stat">
-          <option>ส่งมอบงานแล้ว</option>
-          <option>อยู่ระหว่างติดตั้ง</option>
-          <option>กำลังดำเนินการ</option>
-          <option>อยู่ระหว่างติดต่อ</option>
+          <option>ส่งมอบงานแล้ว</option><option>อยู่ระหว่างติดตั้ง</option>
+          <option>กำลังดำเนินการ</option><option>อยู่ระหว่างติดต่อ</option>
         </select>
       </div>
       <div class="form-group"><label>ค่า SIM/เดือน (฿)</label><input class="form-inp" id="f-fee" type="number" value="0"></div>
@@ -607,446 +449,544 @@ tbody tr:hover td { background: rgba(77,166,255,.04); }
 </div>
 
 <script>
-/* ════════════════════════════════════════════
-   DATA STORE
-════════════════════════════════════════════ */
-const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+/* ═══════════════════════════════════════
+   CORE HELPERS
+═══════════════════════════════════════ */
+const TODAY = (() => { const d=new Date(); d.setHours(0,0,0,0); return d; })();
 
-let DATA = [
-  {id:1,name:'ห้างหุ้นส่วนไตรรัตน์ เซอร์วิส',province:'แพร่',tel:'-',v1:'EDS',v2:'',pkg:'DC 120 kW x2',note:'+ AC 22 kW x2 (evolt)',accept:'2024-09-20',simEnd:'2027-09-20',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:2,name:'บริษัท ทวินโลตัส จำกัด',province:'นครศรีธรรมราช',tel:'-',v1:'Evolt',v2:'Evolt',pkg:'AC 22 kW x2',note:'',accept:'2023-10-21',simEnd:'2026-08-31',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:3,name:'บ. ผลิตไฟฟ้า จำกัด EGCO (ในอาคาร)',province:'นนทบุรี',tel:'-',v1:'6+1',v2:'',pkg:'AC 22kW x5',note:'',accept:'2023-10-22',simEnd:'2026-11-30',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:4,name:'บ. ผลิตไฟฟ้า จำกัด EGCO',province:'นนทบุรี',tel:'-',v1:'EDS',v2:'',pkg:'DC 60 kW',note:'',accept:'2023-10-23',simEnd:'2026-11-30',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:5,name:'บ. ซัมมิท ไพน์เฮิร์สท กอล์ฟ คลับ (Pinehurst Hotel)',province:'ปทุมธานี',tel:'-',v1:'ChadeMo',v2:'',pkg:'DC+AC',note:'',accept:'2023-10-24',simEnd:'2026-10-31',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:6,name:'บ. ซัมมิท ไพน์เฮิร์สท กอล์ฟ (Golf City M1)',province:'ปทุมธานี',tel:'-',v1:'ChadeMo',v2:'',pkg:'DC+AC',note:'',accept:'2023-10-25',simEnd:'2026-10-31',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:7,name:'บ. โรงพยาบาลเชียงใหม่ราม (Complex)',province:'เชียงใหม่',tel:'-',v1:'6+1',v2:'',pkg:'DC 60 kW + AC 22kW x2',note:'',accept:'2023-10-26',simEnd:'2026-02-28',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:8,name:'บ. โรงพยาบาลเชียงใหม่ราม (อาคารจอดรถ)',province:'เชียงใหม่',tel:'-',v1:'6+1',v2:'',pkg:'AC 22kW',note:'',accept:'',simEnd:'2026-02-28',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:9,name:'บริษัท ใหม่ เรสซิเดนซ์ จำกัด',province:'พิษณุโลก',tel:'-',v1:'',v2:'',pkg:'AC 22kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:10,name:'ห้างหุ้นส่วนจำกัด ดีไทย เจนซี่ กรุ๊ป',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'2026-03-31',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:11,name:'บริษัท แทมมารินด์ ระยอง จำกัด',province:'ระยอง',tel:'-',v1:'6+1',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'2026-03-31',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:12,name:'บริษัท อุบลรักษ์ จำกัด',province:'อุบลราชธานี',tel:'-',v1:'6+1',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'2026-06-15',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:13,name:'ห้างหุ้นส่วนจำกัด พี แอนด์ เอ็ม แอลพีจี จ.แพร่',province:'แพร่',tel:'-',v1:'EDS',v2:'',pkg:'DC 120 kW x2',note:'+ ไฟ 120 Spare',accept:'2024-09-20',simEnd:'2027-09-20',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:14,name:'คุณสัญญา ศรีคุณ (ราชพฤกษ์)',province:'นนทบุรี',tel:'-',v1:'EDS',v2:'',pkg:'DC 30 kW',note:'',accept:'2024-09-20',simEnd:'2026-06-30',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:15,name:'บ. พีอาร์ซี คอมปาวเดอร์ (Up Cafe ปทุมธานี)',province:'ปทุมธานี',tel:'-',v1:'EDS',v2:'',pkg:'DC 30 kW',note:'',accept:'2024-09-20',simEnd:'2026-04-30',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:16,name:'บริษัท จีทู กรุ๊ป จำกัด (ราชพฤกษ์)',province:'กทม.',tel:'-',v1:'EDS',v2:'',pkg:'DC 120 kW',note:'',accept:'2024-09-20',simEnd:'2026-08-31',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:17,name:'บมจ. ภัทรลิสซื่ง กทม.',province:'กทม.',tel:'-',v1:'EDS',v2:'',pkg:'DC 30 kW + AC 22kW',note:'',accept:'2024-11-04',simEnd:'2026-09-15',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:18,name:'บริษัท สวารอฟสกี้ ฯ อยุธยา',province:'อยุธยา',tel:'-',v1:'6+1',v2:'',pkg:'AC 22 kW x3',note:'',accept:'2024-09-28',simEnd:'2026-09-30',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:19,name:'Yes Indeed ชุมพร',province:'ชุมพร',tel:'-',v1:'Innopower',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:20,name:'โรงเรียนศรีสุวิช ชลบุรี',province:'ชลบุรี',tel:'-',v1:'Innopower',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'2027-06-27',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:21,name:'สหธนชล ชลบุรี',province:'ชลบุรี',tel:'-',v1:'Innopower',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'2027-06-27',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:22,name:'Tree Room Cafe',province:'กำแพงเพชร',tel:'-',v1:'',v2:'',pkg:'DC 60 kW + AC 22 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:23,name:'อาคารเบญจจินดา',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 125 kW + AC 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:24,name:'โกดัง ยูไนเต็ดพัฒนา',province:'ปทุมธานี',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x3',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:25,name:'ปั๊มเอสโซ่บางกระเจ้า ถนนพระราม 2',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 + 60 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:26,name:'จุดพักรถทางด่วนประชาชื่น',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:27,name:'รพ. อุบลรักษ์ ธนบุรี',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'-',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:28,name:'โรงน้ำตาล ภูเขียว',province:'ชัยภูมิ',tel:'-',v1:'',v2:'',pkg:'DC 60 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:29,name:'The Legend Boutique River Resort and Spa',province:'เชียงราย',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:30,name:'โรงพยาบาล (หาดใหญ่)',province:'สงขลา',tel:'-',v1:'',v2:'',pkg:'DC 60 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:31,name:'วิทยาลัยการอาชีพ (หาดใหญ่)',province:'สงขลา',tel:'-',v1:'',v2:'',pkg:'DC 60 kW + 22 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:32,name:'The Londoner พัฒนาการ',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 30 kW + 7.4 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:33,name:'Fram Salad',province:'นนทบุรี',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:34,name:'C-Port บางปะกง',province:'ฉะเชิงเทรา',tel:'-',v1:'',v2:'',pkg:'DC 320 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:35,name:'สถานีคุณพรพรรษ (สัตหีบ)',province:'ชลบุรี',tel:'-',v1:'',v2:'',pkg:'DC 30 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:36,name:'แยกไฟแดงน้ำอ่าง',province:'อุตรดิตถ์',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:37,name:'โรงไฟฟ้าขนอม EGCO',province:'นครศรีธรรมราช',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:38,name:'สำนักงานเศรษฐกิจการคลัง ชั้นบน',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:39,name:'ที่เปล่าหลังเซนทรัลบางนา',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 kW + DC 60 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:40,name:'ม.กรุงเทพ (Dobedo)',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x12',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:41,name:'ตลาดต้นตาล',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:42,name:'ตลาดอู้ฟู่',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:43,name:'บางจาก ขอนแก่น',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:44,name:'Modernform',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:45,name:'ชวนชื่นโมดัสวิภาวดี ดอนเมือง',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:46,name:'Emsphere',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:47,name:'Laundry Bar เชียงใหม่',province:'เชียงใหม่',tel:'-',v1:'',v2:'',pkg:'DC 30 kW / AC 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:48,name:'สำนักงานเศรษฐกิจการคลัง ชั้นใต้ดิน',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x4',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:49,name:'โชว์รูม Isuzu ชลบุรี',province:'ชลบุรี',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'อยู่ระหว่างติดตั้ง',src:'TS'},
-  {id:50,name:'โรงแรม Isuzu บางแสน ชลบุรี',province:'ชลบุรี',tel:'-',v1:'Evolt',v2:'',pkg:'DC 120 kW',note:'',accept:'2025-08-07',simEnd:'2027-08-15',phone:'',fee:0,status:'อยู่ระหว่างติดตั้ง',src:'TS'},
-  {id:51,name:'The Studer เขาใหญ่',province:'นครราชสีมา',tel:'-',v1:'Evolt',v2:'Innopower',pkg:'DC 120 kW',note:'',accept:'2025-07-24',simEnd:'2028-07-24',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:52,name:'พงพโคน สกลนคร',province:'สกลนคร',tel:'-',v1:'Evolt',v2:'Innopower',pkg:'DC 120 kW',note:'',accept:'2025-05-28',simEnd:'2028-05-28',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS'},
-  {id:53,name:'Coffee Farm',province:'ระยอง',tel:'-',v1:'',v2:'',pkg:'DC 30 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:54,name:'Ratch Group',province:'นนทบุรี',tel:'-',v1:'',v2:'',pkg:'DC 60 kW + 22 kW x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:55,name:'Column Tower',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 / DC 60 / DC 30 x2',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  {id:56,name:'Absolute Twin Sands Resort & Spa',province:'ภูเก็ต',tel:'-',v1:'',v2:'',pkg:'DC 60 kW',note:'',accept:'',simEnd:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS'},
-  // RPD SIM
-  {id:57,name:'EGAT จะนะ',province:'สงขลา',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',accept:'2024-04-08',simEnd:'2025-08-20',phone:'098-5194770',fee:150,status:'ส่งมอบงานแล้ว',src:'RPD',pm:['2025-05-29','2025-11-29','2026-05-29','2026-11-29']},
-  {id:58,name:'EGAT บางประกง',province:'ฉะเชิงเทรา',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',accept:'2024-05-24',simEnd:'2025-08-20',phone:'098-1635350',fee:200,status:'ส่งมอบงานแล้ว',src:'RPD',pm:['2025-05-29','2025-11-29','2026-05-29']},
-  {id:59,name:'ทำเนียบรัฐบาล',province:'กทม.',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',accept:'2024-06-18',simEnd:'2025-08-20',phone:'062-5271840',fee:150,status:'ส่งมอบงานแล้ว',src:'RPD',pm:['2025-06-26','2025-12-26','2026-06-26']},
-  {id:60,name:'ศูนย์การเรียนรู้ EGAT',province:'กทม.',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',accept:'2024-05-10',simEnd:'2025-09-15',phone:'098-4150667',fee:150,status:'ส่งมอบงานแล้ว',src:'RPD',pm:['2025-04-24','2025-10-24','2026-04-24','2026-10-24']},
-  {id:61,name:'Z Pell รังสิต',province:'ปทุมธานี',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',accept:'2025-03-18',simEnd:'2025-08-26',phone:'062-4277104',fee:200,status:'ส่งมอบงานแล้ว',src:'RPD',pm:['2025-09-22']},
-  {id:62,name:'สถานีพังโคลน สกลนคร',province:'สกลนคร',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',accept:'2025-03-29',simEnd:'2025-09-15',phone:'082-1525361',fee:200,status:'ส่งมอบงานแล้ว',src:'RPD',pm:[]}
-];
-
-/* ════════ HELPERS ════════ */
-function daysLeft(d) {
-  if (!d || !d.simEnd) return null;
-  const dt = new Date(d.simEnd); if (isNaN(dt)) return null;
-  dt.setHours(0,0,0,0);
-  return Math.round((dt - TODAY) / 86400000);
+function addYears(dateStr, y) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr); if (isNaN(d)) return null;
+  d.setFullYear(d.getFullYear() + y);
+  return d.toISOString().slice(0,10);
 }
-function stOf(dy) {
-  if (dy === null) return 'nosim';
-  if (dy < 0) return 'expired'; if (dy <= 30) return 'red';
-  if (dy <= 90) return 'amber'; return 'green';
-}
-function stLabel(dy) {
-  if (dy === null) return '-';
-  if (dy < 0) return 'หมดอายุ'; if (dy <= 30) return 'เร่งด่วน';
-  if (dy <= 90) return 'ใกล้หมด'; return 'ปกติ';
+function daysFrom(s) {
+  if (!s) return null;
+  const d = new Date(s); if (isNaN(d)) return null;
+  d.setHours(0,0,0,0);
+  return Math.round((d - TODAY) / 86400000);
 }
 function fmtTH(s) {
   if (!s) return '-';
   const d = new Date(s); if (isNaN(d)) return s;
-  return d.toLocaleDateString('th-TH', {year:'numeric',month:'short',day:'numeric'});
+  return d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
 }
+
+/* SIM warranty: 2 ปีนับจาก serviceStart
+   RPD src ใช้ rpdSimEnd โดยตรง (กฎต่างออกไป) */
+function simWarrEnd(r) {
+  if (r.src === 'RPD') return r.rpdSimEnd || null;
+  return addYears(r.serviceStart, 2);
+}
+function simDL(r) { return daysFrom(simWarrEnd(r)); }
+
+/* Status class */
+function simSt(r) {
+  const dy = simDL(r);
+  if (dy === null) return 'nd';
+  if (dy < 0) return 'exp';
+  if (dy <= 90) return 'soon';
+  return 'in';
+}
+/* Row highlight class */
+function rowCls(r) {
+  const st = simSt(r);
+  if (st === 'nd')  return 'sim-no-data';
+  if (st === 'exp') return 'sim-expired';
+  if (st === 'soon') return 'sim-expired';
+  // check if past warranty but contract still active
+  const cdy = daysFrom(r.contractEnd);
+  if (st === 'in') return 'sim-in-warranty';
+  return 'sim-out-warranty';
+}
+function wBadge(r) {
+  const dy = simDL(r);
+  const end = simWarrEnd(r);
+  if (dy === null) return '<span class="w-badge w-nd">ไม่มีข้อมูล</span>';
+  if (dy < 0)  return `<span class="w-badge w-exp">หมดแล้ว ${Math.abs(dy)} วัน</span>`;
+  if (dy <= 30) return `<span class="w-badge w-exp">เร่งด่วน ${dy} วัน</span>`;
+  if (dy <= 90) return `<span class="w-badge w-out">ใกล้หมด ${dy} วัน</span>`;
+  return `<span class="w-badge w-in">ในประกัน ${dy} วัน</span>`;
+}
+
 function vendorPill(v) {
   if (!v) return '';
-  const cls = {RPD:'p-blue',Evolt:'p-purple',EDS:'p-coral','6+1':'p-teal',Innopower:'p-green',ChadeMo:'p-gold'};
-  return `<span class="pill ${cls[v]||'p-gray'}">${v}</span>`;
+  const c={RPD:'p-blue',Evolt:'p-purple',EDS:'p-coral','6+1':'p-teal',Innopower:'p-green',ChadeMo:'p-gold'};
+  return `<span class="pill ${c[v]||'p-gray'}">${v}</span>`;
 }
 function pkgBadge(p) {
   if (!p||p==='-') return '<span class="pill p-gray">-</span>';
-  if (/120|150|L/.test(p)) return '<span class="pill p-coral">L</span>';
-  if (/30|50|60|M/.test(p)) return '<span class="pill p-purple">M</span>';
+  if (/180|120|150/.test(p)) return '<span class="pill p-coral">L</span>';
+  if (/30|50|60/.test(p))   return '<span class="pill p-purple">M</span>';
   if (/22|7\.4|AC/.test(p)) return '<span class="pill p-teal">S</span>';
-  return `<span class="pill p-gray" style="font-size:9px">${p.substring(0,8)}</span>`;
+  return `<span class="pill p-gray" style="font-size:9px">${p.substring(0,9)}</span>`;
 }
 function stBadge(s) {
   if (!s) return '';
-  if (s.includes('ส่งมอบ')) return `<span class="pill p-green">${s}</span>`;
-  if (s.includes('ติดตั้ง')) return `<span class="pill p-amber">${s}</span>`;
+  if (s.includes('ส่งมอบ'))   return `<span class="pill p-green">${s}</span>`;
+  if (s.includes('ติดตั้ง'))  return `<span class="pill p-amber">${s}</span>`;
   return `<span class="pill p-gray">${s}</span>`;
 }
-function barColor(dy) {
-  return dy <= 30 ? '#ef4444' : dy <= 90 ? '#f59e0b' : '#22c55e';
+
+/* ═══════════════════════════════════════
+   DATA — 57 + 6 RPD + 1 BangEN = 64
+   fields: id, name, province, tel, v1, v2, pkg, note,
+           phone, fee, status, src,
+           serviceStart  ← วันเปิดบริการ (ใช้คำนวณ SIM 2ปี)
+           contractEnd   ← วันสิ้นสุดสัญญาเครื่อง
+           rpdSimEnd     ← RPD เท่านั้น: วันต้องเติมเงิน
+           pm            ← RPD เท่านั้น
+═══════════════════════════════════════ */
+let DATA = [
+  // ── TS 56 รายการ (serviceStart = วันตรวจรับ, contractEnd = วันหมดประกันเครื่อง) ──
+  {id:1,name:'ห้างหุ้นส่วนไตรรัตน์ เซอร์วิส',province:'แพร่',tel:'-',v1:'EDS',v2:'',pkg:'DC 120 kW x2',note:'+ AC 22kW x2 (evolt)',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-09-20',contractEnd:'2027-09-20'},
+  {id:2,name:'บริษัท ทวินโลตัส จำกัด',province:'นครศรีธรรมราช',tel:'-',v1:'Evolt',v2:'Evolt',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-09-01',contractEnd:'2026-08-31'},
+  {id:3,name:'บ. ผลิตไฟฟ้า จำกัด EGCO (ในอาคาร)',province:'นนทบุรี',tel:'-',v1:'6+1',v2:'',pkg:'AC 22kW x5',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-10-22',contractEnd:'2026-11-30'},
+  {id:4,name:'บ. ผลิตไฟฟ้า จำกัด EGCO',province:'นนทบุรี',tel:'-',v1:'EDS',v2:'',pkg:'DC 60 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-11-01',contractEnd:'2026-11-30'},
+  {id:5,name:'บ. ซัมมิท ไพน์เฮิร์สท กอล์ฟ (Pinehurst Hotel)',province:'ปทุมธานี',tel:'-',v1:'ChadeMo',v2:'',pkg:'DC+AC',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-11-01',contractEnd:'2026-10-31'},
+  {id:6,name:'บ. ซัมมิท ไพน์เฮิร์สท กอล์ฟ (Golf City M1)',province:'ปทุมธานี',tel:'-',v1:'ChadeMo',v2:'',pkg:'DC+AC',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-11-01',contractEnd:'2026-10-31'},
+  {id:7,name:'บ. โรงพยาบาลเชียงใหม่ราม (Complex)',province:'เชียงใหม่',tel:'-',v1:'6+1',v2:'',pkg:'DC 60 kW + AC 22kW x2',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-12-01',contractEnd:'2026-02-28'},
+  {id:8,name:'บ. โรงพยาบาลเชียงใหม่ราม (อาคารจอดรถ)',province:'เชียงใหม่',tel:'-',v1:'6+1',v2:'',pkg:'AC 22kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-12-01',contractEnd:'2026-02-28'},
+  {id:9,name:'บริษัท ใหม่ เรสซิเดนซ์ จำกัด',province:'พิษณุโลก',tel:'-',v1:'',v2:'',pkg:'AC 22kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2023-12-16',contractEnd:'2025-12-15'},
+  {id:10,name:'ห้างหุ้นส่วนจำกัด ดีไทย เจนซี่ กรุ๊ป',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-04-01',contractEnd:'2026-03-31'},
+  {id:11,name:'บริษัท แทมมารินด์ ระยอง จำกัด',province:'ระยอง',tel:'-',v1:'6+1',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-04-01',contractEnd:'2026-03-31'},
+  {id:12,name:'บริษัท อุบลรักษ์ จำกัด',province:'อุบลราชธานี',tel:'-',v1:'6+1',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-06-16',contractEnd:'2026-06-15'},
+  {id:13,name:'ห้างหุ้นส่วนจำกัด พี แอนด์ เอ็ม แอลพีจี จ.แพร่',province:'แพร่',tel:'-',v1:'EDS',v2:'',pkg:'DC 120 kW x2',note:'+ ไฟ 120 Spare',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-04-01',contractEnd:'2026-03-31'},
+  {id:14,name:'คุณสัญญา ศรีคุณ (ราชพฤกษ์)',province:'นนทบุรี',tel:'-',v1:'EDS',v2:'',pkg:'DC 30 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-05-01',contractEnd:'2026-06-30'},
+  {id:15,name:'บ. พีอาร์ซี คอมปาวเดอร์ (Up Cafe ปทุมธานี)',province:'ปทุมธานี',tel:'-',v1:'EDS',v2:'',pkg:'DC 30 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-05-01',contractEnd:'2026-04-30'},
+  {id:16,name:'บริษัท จีทู กรุ๊ป จำกัด (ราชพฤกษ์)',province:'กทม.',tel:'-',v1:'EDS',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-09-01',contractEnd:'2026-08-31'},
+  {id:17,name:'บมจ. ภัทรลิสซื่ง กทม.',province:'กทม.',tel:'-',v1:'EDS',v2:'',pkg:'DC 30 kW + AC 22kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-09-16',contractEnd:'2026-09-15'},
+  {id:18,name:'บริษัท สวารอฟสกี้ ฯ อยุธยา',province:'อยุธยา',tel:'-',v1:'6+1',v2:'',pkg:'AC 22 kW x3',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2024-10-01',contractEnd:'2026-09-30'},
+  {id:19,name:'Yes Indeed ชุมพร',province:'ชุมพร',tel:'-',v1:'Innopower',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'',contractEnd:''},
+  {id:20,name:'โรงเรียนศรีสุวิช ชลบุรี',province:'ชลบุรี',tel:'-',v1:'Innopower',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2025-06-27',contractEnd:'2027-06-27'},
+  {id:21,name:'สหธนชล ชลบุรี',province:'ชลบุรี',tel:'-',v1:'Innopower',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2025-06-27',contractEnd:'2027-06-27'},
+  {id:22,name:'Tree Room Cafe',province:'กำแพงเพชร',tel:'-',v1:'',v2:'',pkg:'DC 60 kW + AC 22 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:23,name:'อาคารเบญจจินดา',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 125 kW + AC 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:24,name:'โกดัง ยูไนเต็ดพัฒนา',province:'ปทุมธานี',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x3',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:25,name:'ปั๊มเอสโซ่บางกระเจ้า ถนนพระราม 2',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 + 60 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:26,name:'จุดพักรถทางด่วนประชาชื่น',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:27,name:'รพ. อุบลรักษ์ ธนบุรี',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'-',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:28,name:'โรงน้ำตาล ภูเขียว',province:'ชัยภูมิ',tel:'-',v1:'',v2:'',pkg:'DC 60 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:29,name:'The Legend Boutique River Resort and Spa',province:'เชียงราย',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:30,name:'โรงพยาบาล (หาดใหญ่)',province:'สงขลา',tel:'-',v1:'',v2:'',pkg:'DC 60 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:31,name:'วิทยาลัยการอาชีพ (หาดใหญ่)',province:'สงขลา',tel:'-',v1:'',v2:'',pkg:'DC 60 kW + 22 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:32,name:'The Londoner พัฒนาการ',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 30 kW + 7.4 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:33,name:'Fram Salad',province:'นนทบุรี',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:34,name:'C-Port บางปะกง',province:'ฉะเชิงเทรา',tel:'-',v1:'',v2:'',pkg:'DC 320 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:35,name:'สถานีคุณพรพรรษ (สัตหีบ)',province:'ชลบุรี',tel:'-',v1:'',v2:'',pkg:'DC 30 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:36,name:'แยกไฟแดงน้ำอ่าง',province:'อุตรดิตถ์',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:37,name:'โรงไฟฟ้าขนอม EGCO',province:'นครศรีธรรมราช',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:38,name:'สำนักงานเศรษฐกิจการคลัง ชั้นบน',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:39,name:'ที่เปล่าหลังเซนทรัลบางนา',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 kW + DC 60 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:40,name:'ม.กรุงเทพ (Dobedo)',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x12',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:41,name:'ตลาดต้นตาล',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:42,name:'ตลาดอู้ฟู่',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:43,name:'บางจาก ขอนแก่น',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:44,name:'Modernform',province:'ขอนแก่น',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:45,name:'ชวนชื่นโมดัสวิภาวดี ดอนเมือง',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:46,name:'Emsphere',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:47,name:'Laundry Bar เชียงใหม่',province:'เชียงใหม่',tel:'-',v1:'',v2:'',pkg:'DC 30 kW / AC 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:48,name:'สำนักงานเศรษฐกิจการคลัง ชั้นใต้ดิน',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'AC 22 kW x4',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:49,name:'โชว์รูม Isuzu ชลบุรี',province:'ชลบุรี',tel:'-',v1:'',v2:'',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'อยู่ระหว่างติดตั้ง',src:'TS',serviceStart:'',contractEnd:''},
+  {id:50,name:'โรงแรม Isuzu บางแสน ชลบุรี',province:'ชลบุรี',tel:'-',v1:'Evolt',v2:'',pkg:'DC 120 kW',note:'สัญญา 3000005352-ZLVA',phone:'',fee:0,status:'อยู่ระหว่างติดตั้ง',src:'TS',serviceStart:'2025-08-07',contractEnd:'2027-08-15'},
+  {id:51,name:'The Studer เขาใหญ่',province:'นครราชสีมา',tel:'-',v1:'Evolt',v2:'Innopower',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2025-07-24',contractEnd:'2028-07-24'},
+  {id:52,name:'พงพโคน สกลนคร',province:'สกลนคร',tel:'-',v1:'Evolt',v2:'Innopower',pkg:'DC 120 kW',note:'',phone:'',fee:0,status:'ส่งมอบงานแล้ว',src:'TS',serviceStart:'2025-05-28',contractEnd:'2028-05-28'},
+  {id:53,name:'Coffee Farm',province:'ระยอง',tel:'-',v1:'',v2:'',pkg:'DC 30 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:54,name:'Ratch Group',province:'นนทบุรี',tel:'-',v1:'',v2:'',pkg:'DC 60 kW + 22 kW x2',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:55,name:'Column Tower',province:'กทม.',tel:'-',v1:'',v2:'',pkg:'DC 120/60/30 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  {id:56,name:'Absolute Twin Sands Resort & Spa',province:'ภูเก็ต',tel:'-',v1:'',v2:'',pkg:'DC 60 kW',note:'',phone:'',fee:0,status:'กำลังดำเนินการ',src:'TS',serviceStart:'',contractEnd:''},
+  // ── BangEN (สัญญา Isuzu บางแสน — DC 180kW, 1 SIM) ──
+  {id:57,name:'โชว์รูมอีซูซุ บางแสน (BangEN)',province:'ชลบุรี',tel:'-',v1:'Evolt',v2:'',pkg:'DC 180 kW x1',note:'สัญญา 3000005352-ZLVA | SIM ไม่อยู่ในประกันเครื่อง ใช้กฎ 2 ปีแรก',phone:'',fee:0,status:'อยู่ระหว่างติดตั้ง',src:'BangEN',serviceStart:'',contractEnd:'2027-08-15'},
+  // ── RPD SIM 6 สถานี (กฎต่าง: ใช้ rpdSimEnd = วันเติมเงิน) ──
+  {id:58,name:'EGAT จะนะ',province:'สงขลา',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',phone:'098-5194770',fee:150,status:'ส่งมอบงานแล้ว',src:'RPD',serviceStart:'2024-04-08',contractEnd:'2029-05-29',rpdSimEnd:'2025-08-20',pm:['2025-05-29','2025-11-29','2026-05-29','2026-11-29']},
+  {id:59,name:'EGAT บางประกง',province:'ฉะเชิงเทรา',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',phone:'098-1635350',fee:200,status:'ส่งมอบงานแล้ว',src:'RPD',serviceStart:'2024-05-24',contractEnd:'2029-05-29',rpdSimEnd:'2025-08-20',pm:['2025-05-29','2025-11-29','2026-05-29']},
+  {id:60,name:'ทำเนียบรัฐบาล',province:'กทม.',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',phone:'062-5271840',fee:150,status:'ส่งมอบงานแล้ว',src:'RPD',serviceStart:'2024-06-18',contractEnd:'2029-05-07',rpdSimEnd:'2025-08-20',pm:['2025-06-26','2025-12-26','2026-06-26']},
+  {id:61,name:'ศูนย์การเรียนรู้ EGAT',province:'กทม.',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',phone:'098-4150667',fee:150,status:'ส่งมอบงานแล้ว',src:'RPD',serviceStart:'2024-05-10',contractEnd:'2029-10-27',rpdSimEnd:'2025-09-15',pm:['2025-04-24','2025-10-24','2026-04-24','2026-10-24']},
+  {id:62,name:'Z Pell รังสิต',province:'ปทุมธานี',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',phone:'062-4277104',fee:200,status:'ส่งมอบงานแล้ว',src:'RPD',serviceStart:'2025-03-18',contractEnd:'2030-03-25',rpdSimEnd:'2025-08-26',pm:['2025-09-22']},
+  {id:63,name:'สถานีพังโคลน สกลนคร',province:'สกลนคร',tel:'-',v1:'RPD',v2:'',pkg:'RPD-SIM',note:'',phone:'082-1525361',fee:200,status:'ส่งมอบงานแล้ว',src:'RPD',serviceStart:'2025-03-29',contractEnd:'2027-05-15',rpdSimEnd:'2025-09-15',pm:[]}
+];
+
+/* ═══════════════════════════════════════
+   SORT
+═══════════════════════════════════════ */
+let SRT = {col:'id',dir:1};
+function srt(panel,col){
+  if(SRT.col===col) SRT.dir*=-1; else{SRT.col=col;SRT.dir=1;}
+  if(panel==='sim') renderSIM();
 }
 
-/* ════════ SORT STATE ════════ */
-let SRT = { col:'id', dir:1 };
-function sort(panel, col) {
-  if (SRT.col === col) SRT.dir *= -1; else { SRT.col = col; SRT.dir = 1; }
-  if (panel==='sim') renderSIM();
-}
-
-/* ════════ KPI ════════ */
-function renderKPI() {
-  const dy = DATA.map(d => daysLeft(d));
-  const expired = dy.filter(d => d !== null && d < 0).length;
-  const urgent  = dy.filter(d => d !== null && d >= 0 && d <= 30).length;
-  const warn    = dy.filter(d => d !== null && d > 30 && d <= 90).length;
-  const ok      = dy.filter(d => d !== null && d > 90).length;
-  const noSIM   = DATA.filter(d => !d.phone).length;
-  const fee     = DATA.reduce((a,d) => a + (d.fee||0), 0);
-
-  document.getElementById('kpi-strip').innerHTML = [
-    {label:'รายการทั้งหมด',val:DATA.length,sub:'TS + RPD SIM',color:'#1565e8',icon:'📋'},
-    {label:'หมดอายุแล้ว',val:expired,sub:'ดำเนินการด่วน',color:'#ef4444',icon:'🔴'},
-    {label:'เร่งด่วน (≤30 วัน)',val:urgent,sub:'ต้องต่ออายุ SIM',color:'#ef4444',icon:'⚡'},
-    {label:'ใกล้หมด (30-90 วัน)',val:warn,sub:'วางแผนต่ออายุ',color:'#f59e0b',icon:'⏳'},
-    {label:'ปกติ',val:ok,sub:'ยังไม่ต้องดำเนินการ',color:'#22c55e',icon:'✅'},
-    {label:'ยังไม่มีเบอร์ SIM',val:noSIM,sub:'รอการอัปเดต',color:'#06b6d4',icon:'📵'},
-    {label:'ค่า SIM/เดือน',val:fee.toLocaleString()+' ฿',sub:'รวมทุกสัญญา',color:'#f5c518',icon:'💰'},
-  ].map((k,i) => `
-    <div class="kpi-card" style="animation-delay:${i*60}ms">
-      <div class="kpi-accent" style="background:${k.color}"></div>
-      <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-lbl">${k.label}</div>
-      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
-      <div class="kpi-sub">${k.sub}</div>
+/* ═══════════════════════════════════════
+   KPI
+═══════════════════════════════════════ */
+function renderKPI(){
+  const inW  = DATA.filter(r=>simSt(r)==='in').length;
+  const soon = DATA.filter(r=>simSt(r)==='soon').length;
+  const exp  = DATA.filter(r=>simSt(r)==='exp').length;
+  const out  = DATA.filter(r=>{
+    if(r.src==='RPD') return false;
+    const wdy=daysFrom(simWarrEnd(r)); const cdy=daysFrom(r.contractEnd);
+    return wdy!==null && wdy<0 && cdy!==null && cdy>=0;
+  }).length;
+  const nd   = DATA.filter(r=>simSt(r)==='nd').length;
+  const fee  = DATA.reduce((a,r)=>a+(r.fee||0),0);
+  document.getElementById('kpi-strip').innerHTML=[
+    {l:'รายการทั้งหมด',v:DATA.length,s:'TS + RPD + BangEN',c:'#1565e8',i:'📋'},
+    {l:'อยู่ในประกัน SIM',v:inW,s:'2 ปีแรก ยังไม่หมด',c:'#22c55e',i:'✅'},
+    {l:'SIM ใกล้หมดประกัน',v:soon,s:'≤ 90 วัน (ต้องวางแผน)',c:'#f59e0b',i:'⏳'},
+    {l:'SIM หมดประกัน/อายุ',v:exp,s:'ดำเนินการด่วน!',c:'#ef4444',i:'🔴'},
+    {l:'พ้นประกัน SIM แล้ว',v:out,s:'สัญญาเครื่องยังอยู่',c:'#f97316',i:'⚠️'},
+    {l:'ยังไม่มีวันเปิดบริการ',v:nd,s:'รอ Commissioning',c:'#06b6d4',i:'📵'},
+    {l:'ค่า SIM/เดือน',v:fee.toLocaleString()+' ฿',s:'รวมทุกสัญญา (RPD)',c:'#f5c518',i:'💰'},
+  ].map((k,i)=>`
+    <div class="kpi-card" style="animation:fadeIn .4s ${i*60}ms both">
+      <div class="kpi-accent" style="background:${k.c}"></div>
+      <div class="kpi-icon">${k.i}</div>
+      <div class="kpi-lbl">${k.l}</div>
+      <div class="kpi-val" style="color:${k.c}">${k.v}</div>
+      <div class="kpi-sub">${k.s}</div>
     </div>`).join('');
 }
 
-/* ════════ SIM TABLE ════════ */
-function renderSIM() {
+/* ═══════════════════════════════════════
+   SIM TABLE
+═══════════════════════════════════════ */
+function renderSIM(){
   const q  = document.getElementById('sim-q').value.toLowerCase();
   const vf = document.getElementById('sim-v').value;
   const sf = document.getElementById('sim-s').value;
 
-  let rows = DATA.filter(d => {
-    const search = `${d.name}${d.province}${d.phone}`.toLowerCase();
-    if (q && !search.includes(q)) return false;
-    if (vf && d.v1 !== vf && d.v2 !== vf) return false;
-    const dy = daysLeft(d);
-    if (sf === 'nosim')   return !d.phone;
-    if (sf === 'expired') return dy !== null && dy < 0;
-    if (sf === 'red')     return dy !== null && dy >= 0 && dy <= 30;
-    if (sf === 'amber')   return dy !== null && dy > 30 && dy <= 90;
-    if (sf === 'green')   return dy !== null && dy > 90;
+  let rows = DATA.filter(r=>{
+    const search=`${r.name}${r.province}${r.phone||''}`.toLowerCase();
+    if(q && !search.includes(q)) return false;
+    if(vf && r.v1!==vf && r.v2!==vf) return false;
+    const st=simSt(r);
+    if(sf==='in')   return st==='in';
+    if(sf==='out')  { const wdy=daysFrom(simWarrEnd(r)); const cdy=daysFrom(r.contractEnd); return r.src!=='RPD' && wdy!==null && wdy<0 && cdy!==null && cdy>=0; }
+    if(sf==='exp')  return st==='exp'||st==='soon';
+    if(sf==='nd')   return st==='nd';
     return true;
   });
 
-  // sort
-  rows = [...rows].sort((a,b) => {
-    let av = a[SRT.col], bv = b[SRT.col];
-    if (SRT.col === 'dL')    { av = daysLeft(a) ?? 99999; bv = daysLeft(b) ?? 99999; }
-    if (typeof av === 'string') return av.localeCompare(bv,'th') * SRT.dir;
-    return ((av??0) - (bv??0)) * SRT.dir;
+  rows=[...rows].sort((a,b)=>{
+    let av=a[SRT.col],bv=b[SRT.col];
+    if(SRT.col==='simDL'){av=simDL(a)??99999;bv=simDL(b)??99999;}
+    if(SRT.col==='simWarrEnd'){av=simWarrEnd(a)||'';bv=simWarrEnd(b)||'';}
+    if(typeof av==='string') return av.localeCompare(bv,'th')*SRT.dir;
+    return((av??0)-(bv??0))*SRT.dir;
   });
 
-  document.getElementById('sim-count').textContent = `${rows.length} / ${DATA.length} รายการ`;
+  document.getElementById('sim-count').textContent=`${rows.length} / ${DATA.length} รายการ`;
 
-  const body = document.getElementById('tbl-sim-body');
-  if (!rows.length) { body.innerHTML = `<tr><td colspan="11" class="tbl-empty">🔍 ไม่พบข้อมูลที่ตรงกัน</td></tr>`; return; }
+  const body=document.getElementById('tbl-sim-body');
+  if(!rows.length){body.innerHTML=`<tr><td colspan="12" class="tbl-empty">🔍 ไม่พบข้อมูล</td></tr>`;return;}
 
-  body.innerHTML = rows.map(r => {
-    const dy = daysLeft(r);
-    const st = stOf(dy);
-    const totalD = r.accept && r.simEnd ? Math.max(1, Math.round((new Date(r.simEnd)-new Date(r.accept))/86400000)) : 365*3;
-    const usedD  = r.accept ? Math.max(0, Math.round((TODAY-new Date(r.accept))/86400000)) : 0;
-    const pct    = Math.min(100, Math.round(usedD/totalD*100));
-    const bc     = barColor(dy ?? 999);
-    const stCls  = {'red':'p-red','amber':'p-amber','green':'p-green','expired':'p-red','nosim':'p-gray'}[st] || 'p-gray';
-    const rpdsim = r.src==='RPD' ? '<br><span class="pill p-blue" style="font-size:9px">RPD-SIM</span>' : '';
-    const daysTxt = dy===null ? '-' : dy < 0 ? 'หมดแล้ว' : String(dy);
-    const txtColor = st==='red'||st==='expired' ? '#fca5a5' : st==='amber' ? '#fcd34d' : 'var(--text3)';
-    return `<tr>
+  body.innerHTML=rows.map(r=>{
+    const wEnd=simWarrEnd(r);
+    const wDy=simDL(r);
+    const cDy=daysFrom(r.contractEnd);
+    const st=simSt(r);
+
+    // row color class
+    let rcls='sim-no-data';
+    if(st==='in') rcls='sim-in-warranty';
+    else if(st==='exp'||st==='soon') rcls='sim-expired';
+    else if(st!=='nd') {
+      if(cDy!==null&&cDy>=0) rcls='sim-out-warranty';
+      else rcls='sim-expired';
+    }
+
+    // SIM warranty days bar
+    const wTotalD=730;
+    const wUsedD=r.serviceStart?Math.max(0,Math.round((TODAY-new Date(r.serviceStart))/86400000)):0;
+    const wPct=Math.min(100,Math.round(wUsedD/wTotalD*100));
+    const wBc=st==='in'?'#22c55e':st==='nd'?'#3d6491':'#ef4444';
+
+    const srcTag=r.src==='RPD'?'<br><span class="pill p-blue" style="font-size:9px">RPD-SIM</span>':
+                 r.src==='BangEN'?'<br><span class="pill p-coral" style="font-size:9px">BangEN</span>':'';
+
+    const rpdNote=r.src==='RPD'?'<br><span style="font-size:9px;color:var(--text3)">(วันเติมเงิน)</span>':'';
+
+    return`<tr class="${rcls}">
       <td style="color:var(--text3);font-size:11px;font-family:monospace">${r.id}</td>
-      <td style="font-size:12px;font-weight:500;max-width:160px">${r.name}${rpdsim}</td>
+      <td style="font-size:12px;font-weight:500;max-width:155px">${r.name}${srcTag}</td>
       <td style="font-size:11px;color:var(--text2)">${r.province||'-'}</td>
       <td>${r.v1?vendorPill(r.v1):'<span class="pill p-gray">-</span>'}${r.v2&&r.v2!==r.v1?' '+vendorPill(r.v2):''}</td>
       <td>${pkgBadge(r.pkg)}</td>
-      <td>${r.phone?`<span class="phone-mono">${r.phone}</span>`:'<span class="no-phone">ยังไม่มีเบอร์</span>'}</td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap">${fmtTH(r.accept)}</td>
-      <td style="font-size:11px;font-weight:500;white-space:nowrap;color:${st==='red'||st==='expired'?'var(--red)':st==='amber'?'var(--amber)':'var(--text1)'}">${fmtTH(r.simEnd)}</td>
+      <td>${r.phone?`<span class="phone-mono">${r.phone}</span>`:'<span class="no-phone">-</span>'}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap">${fmtTH(r.serviceStart)}</td>
+      <td style="font-size:11px;font-weight:500;white-space:nowrap;color:${wDy!==null&&wDy<0?'var(--red)':wDy!==null&&wDy<=90?'var(--amber)':'var(--text1)'}">${fmtTH(wEnd)}${rpdNote}</td>
       <td>
         <div class="prog-wrap">
-          <div class="prog"><div class="prog-fill" style="width:${pct}%;background:${bc}"></div></div>
-          <span class="prog-txt" style="color:${txtColor}">${daysTxt}</span>
+          <div class="prog"><div class="prog-fill" style="width:${wPct}%;background:${wBc}"></div></div>
+          <span class="prog-txt" style="color:${wDy!==null&&wDy<0?'var(--red)':wDy!==null&&wDy<=90?'var(--amber)':'var(--text3)'}">${wDy===null?'-':wDy<0?'หมด':wDy}</span>
         </div>
       </td>
-      <td><span class="pill ${stCls}">${stLabel(dy)}</span></td>
+      <td>${wBadge(r)}</td>
+      <td style="font-size:11px;color:${cDy!==null&&cDy<0?'var(--red)':cDy!==null&&cDy<=90?'var(--amber)':'var(--text2)'};white-space:nowrap">${fmtTH(r.contractEnd)}</td>
       <td style="white-space:nowrap">
-        <button class="icon-btn" title="แก้ไข" onclick="openEdit(${DATA.indexOf(r)})">✏️</button>
-        <button class="icon-btn" title="ลบ" onclick="delEntry(${DATA.indexOf(r)})">🗑️</button>
+        <button class="icon-btn" onclick="openEdit(${DATA.indexOf(r)})">✏️</button>
+        <button class="icon-btn" onclick="delEntry(${DATA.indexOf(r)})">🗑️</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-/* ════════ ALERT ════════ */
-function renderAlert() {
-  const urgent = DATA.filter(d => { const dy = daysLeft(d); return dy !== null && dy <= 90; })
-                     .sort((a,b) => (daysLeft(a)??9999) - (daysLeft(b)??9999));
-
-  const el = document.getElementById('alert-list');
-  el.innerHTML = !urgent.length
-    ? '<p style="color:var(--text3);font-size:13px;padding:16px">🎉 ไม่มีรายการที่ต้องดำเนินการในขณะนี้</p>'
-    : urgent.map(r => {
-        const dy = daysLeft(r); const st = stOf(dy);
-        const cls = dy < 0 || dy <= 30 ? 'al-red' : 'al-amber';
-        return `<div class="alert-card ${cls}">
+/* ═══════════════════════════════════════
+   ALERT
+═══════════════════════════════════════ */
+function renderAlert(){
+  // SIM urgent ≤90 วัน
+  const urgent=DATA.filter(r=>{const dy=simDL(r);return dy!==null&&dy<=90;})
+                   .sort((a,b)=>(simDL(a)??9999)-(simDL(b)??9999));
+  const el=document.getElementById('alert-list');
+  el.innerHTML=!urgent.length
+    ?'<p style="color:var(--text3);font-size:13px;padding:16px">🎉 ไม่มีรายการเร่งด่วน</p>'
+    :urgent.map(r=>{
+        const dy=simDL(r);
+        const cls=dy<0||dy<=30?'al-red':'al-amber';
+        return`<div class="alert-card ${cls}">
           <div class="alert-emoji">${dy<0?'🚨':dy<=30?'🔴':'🟡'}</div>
           <div class="alert-info">
             <div class="alert-name">${r.name}</div>
-            <div class="alert-meta">${r.province} · ${r.v1||'ไม่ระบุผู้รับเหมา'} · ${r.phone||'ไม่มีเบอร์ SIM'} · สิ้นสุด: ${fmtTH(r.simEnd)}</div>
+            <div class="alert-meta">${r.province} · ${r.v1||'-'} · ${r.phone||'ไม่มีเบอร์ SIM'} · SIM หมด: ${fmtTH(simWarrEnd(r))}</div>
           </div>
           <div class="alert-days ${cls}">${dy<0?'หมดแล้ว':dy+' วัน'}</div>
         </div>`;
       }).join('');
 
-  // PM
-  const pmItems = DATA.filter(d => d.pm && d.pm.length).map(d => {
-    const nxt = d.pm.map(s => new Date(s)).filter(dt => !isNaN(dt) && dt >= TODAY).sort((a,b)=>a-b)[0];
-    if (!nxt) return null;
-    const dy = Math.round((nxt-TODAY)/86400000);
-    return { name:d.name, phone:d.phone, nxt, dy };
-  }).filter(Boolean).sort((a,b) => a.dy-b.dy);
+  // พ้นประกัน SIM แต่สัญญาเครื่องยังอยู่
+  const outW=DATA.filter(r=>{
+    if(r.src==='RPD') return false;
+    const wdy=daysFrom(simWarrEnd(r));
+    const cdy=daysFrom(r.contractEnd);
+    return wdy!==null&&wdy<0&&cdy!==null&&cdy>=0;
+  }).sort((a,b)=>daysFrom(a.contractEnd)-daysFrom(b.contractEnd));
+  const owEl=document.getElementById('out-warranty-list');
+  owEl.innerHTML=!outW.length
+    ?'<p style="color:var(--text3);font-size:13px;padding:16px">ไม่มีรายการ</p>'
+    :outW.map(r=>`<div class="alert-card al-amber">
+        <div class="alert-emoji">⚠️</div>
+        <div class="alert-info">
+          <div class="alert-name">${r.name}</div>
+          <div class="alert-meta">SIM พ้นประกัน 2 ปีแล้ว · สัญญาเครื่องหมด: ${fmtTH(r.contractEnd)} (${daysFrom(r.contractEnd)} วัน) · ${r.province} · ${r.v1||'-'}</div>
+        </div>
+        <div class="alert-days al-amber">${Math.abs(simDL(r)??0)} วันที่แล้ว</div>
+      </div>`).join('');
 
-  const pmEl = document.getElementById('pm-list');
-  pmEl.innerHTML = !pmItems.length
-    ? '<p style="color:var(--text3);font-size:13px;padding:16px">ไม่มีข้อมูล PM</p>'
-    : pmItems.map(r => `<div class="alert-card al-teal">
+  // PM RPD
+  const pmItems=DATA.filter(r=>r.pm&&r.pm.length).map(r=>{
+    const nxt=r.pm.map(s=>new Date(s)).filter(dt=>!isNaN(dt)&&dt>=TODAY).sort((a,b)=>a-b)[0];
+    if(!nxt) return null;
+    return{name:r.name,phone:r.phone,nxt,dy:Math.round((nxt-TODAY)/86400000)};
+  }).filter(Boolean).sort((a,b)=>a.dy-b.dy);
+  const pmEl=document.getElementById('pm-list');
+  pmEl.innerHTML=!pmItems.length
+    ?'<p style="color:var(--text3);font-size:13px;padding:16px">ไม่มีข้อมูล PM</p>'
+    :pmItems.map(r=>`<div class="alert-card al-teal">
         <div class="alert-emoji">🔧</div>
         <div class="alert-info">
           <div class="alert-name">${r.name}</div>
-          <div class="alert-meta">PM วันที่ ${r.nxt.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'})} · ${r.phone}</div>
+          <div class="alert-meta">PM: ${r.nxt.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'})} · ${r.phone}</div>
         </div>
         <div class="alert-days al-teal">${r.dy} วัน</div>
       </div>`).join('');
 }
 
-/* ════════ CONTRACT ════════ */
-function renderContract() {
-  const q  = document.getElementById('con-q').value.toLowerCase();
-  const vf = document.getElementById('con-v').value;
-  const pf = document.getElementById('con-p').value;
-  const sf = document.getElementById('con-st').value;
-
-  let rows = DATA.filter(d => {
-    if (q && !d.name.toLowerCase().includes(q)) return false;
-    if (vf && d.v1 !== vf && d.v2 !== vf) return false;
-    if (pf && d.province !== pf) return false;
-    if (sf && d.status !== sf) return false;
+/* ═══════════════════════════════════════
+   CONTRACT
+═══════════════════════════════════════ */
+function renderContract(){
+  const q=document.getElementById('con-q').value.toLowerCase();
+  const vf=document.getElementById('con-v').value;
+  const pf=document.getElementById('con-p').value;
+  const sf=document.getElementById('con-st').value;
+  let rows=DATA.filter(r=>{
+    if(q&&!r.name.toLowerCase().includes(q))return false;
+    if(vf&&r.v1!==vf&&r.v2!==vf)return false;
+    if(pf&&r.province!==pf)return false;
+    if(sf&&r.status!==sf)return false;
     return true;
   });
-
-  document.getElementById('con-count').textContent = `${rows.length} / ${DATA.length} รายการ`;
-  const body = document.getElementById('tbl-con-body');
-  body.innerHTML = rows.map(r => `<tr>
-    <td style="color:var(--text3);font-size:11px;font-family:monospace">${r.id}</td>
-    <td style="font-size:12px;font-weight:500;max-width:160px">${r.name}</td>
-    <td style="font-size:11px;color:var(--text2)">${r.province||'-'}</td>
-    <td>${r.v1?vendorPill(r.v1):'<span style="color:var(--text3);font-size:11px">-</span>'}</td>
-    <td>${r.v2?vendorPill(r.v2):'<span style="color:var(--text3);font-size:11px">-</span>'}</td>
-    <td style="font-size:11px;color:var(--text2);max-width:100px">${r.pkg||'-'}</td>
-    <td style="font-size:11px;color:var(--text3);max-width:120px">${r.note||'-'}</td>
-    <td style="font-size:11px;color:var(--text2);white-space:nowrap">${fmtTH(r.accept)}</td>
-    <td style="font-size:11px;white-space:nowrap">${fmtTH(r.accept)}</td>
-    <td>${stBadge(r.status)}</td>
-  </tr>`).join('');
+  document.getElementById('con-count').textContent=`${rows.length} / ${DATA.length} รายการ`;
+  const body=document.getElementById('tbl-con-body');
+  body.innerHTML=rows.map(r=>{
+    const wEnd=simWarrEnd(r);
+    const wDy=daysFrom(wEnd);
+    const cDy=daysFrom(r.contractEnd);
+    const simRule=r.src==='RPD'?'<span class="pill p-blue" style="font-size:9px">วันเติมเงิน</span>':
+                  r.src==='BangEN'?'<span class="pill p-coral" style="font-size:9px">BangEN 2ปี</span>':
+                  '<span class="pill p-gray" style="font-size:9px">2 ปีแรก</span>';
+    return`<tr>
+      <td style="color:var(--text3);font-size:11px;font-family:monospace">${r.id}</td>
+      <td style="font-size:12px;font-weight:500;max-width:155px">${r.name}</td>
+      <td style="font-size:11px;color:var(--text2)">${r.province||'-'}</td>
+      <td>${r.v1?vendorPill(r.v1):'<span style="color:var(--text3);font-size:11px">-</span>'}</td>
+      <td>${r.v2?vendorPill(r.v2):'<span style="color:var(--text3);font-size:11px">-</span>'}</td>
+      <td style="font-size:11px;color:var(--text2);max-width:100px">${r.pkg||'-'}</td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px">${r.note||'-'}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap">${fmtTH(r.serviceStart)}</td>
+      <td style="font-size:11px;font-weight:500;white-space:nowrap;color:${wDy!==null&&wDy<0?'var(--red)':wDy!==null&&wDy<=90?'var(--amber)':'var(--text1)'}">${fmtTH(wEnd)}<br>${simRule}</td>
+      <td style="font-size:11px;white-space:nowrap;color:${cDy!==null&&cDy<0?'var(--red)':cDy!==null&&cDy<=90?'var(--amber)':'var(--text2)'}">${fmtTH(r.contractEnd)}</td>
+      <td>${stBadge(r.status)}</td>
+    </tr>`;
+  }).join('');
 }
 
-/* ════════ SUMMARY ════════ */
-function renderSummary() {
-  function barChart(el, items, colorFn) {
-    const max = Math.max(...items.map(i => i.v), 1);
-    document.getElementById(el).innerHTML = items.map(i => `
+/* ═══════════════════════════════════════
+   SUMMARY
+═══════════════════════════════════════ */
+function renderSummary(){
+  function bc(el,items,colorFn){
+    const max=Math.max(...items.map(i=>i.v),1);
+    document.getElementById(el).innerHTML=items.map(i=>`
       <div class="bar-row">
         <span class="bar-lbl">${i.k}</span>
         <div class="bar-track"><div class="bar-fill" style="width:${Math.round(i.v/max*100)}%;background:${colorFn(i.k)}"></div></div>
         <span class="bar-val">${i.v}</span>
       </div>`).join('');
   }
+  const byV={};DATA.forEach(r=>{if(r.v1)byV[r.v1]=(byV[r.v1]||0)+1;});
+  const vC={RPD:'#89c4ff',Evolt:'#c4b5fd',EDS:'#fdba74','6+1':'#67e8f9',Innopower:'#86efac',ChadeMo:'#fde68a'};
+  bc('ch-vendor',Object.entries(byV).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({k,v})),k=>vC[k]||'#7fa8d4');
 
-  // Vendor
-  const byV = {}; DATA.forEach(d => { if(d.v1) byV[d.v1]=(byV[d.v1]||0)+1; });
-  const vCol = {RPD:'#89c4ff',Evolt:'#c4b5fd',EDS:'#fdba74','6+1':'#67e8f9',Innopower:'#86efac',ChadeMo:'#fde68a'};
-  barChart('ch-vendor', Object.entries(byV).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({k,v})), k => vCol[k]||'#7fa8d4');
-
-  // Package
-  const byP = {}; DATA.forEach(d => {
-    const p = /120|150/.test(d.pkg)?'L — 120 kW+': /30|50|60/.test(d.pkg)?'M — 30-60 kW': /22|7\.4/.test(d.pkg)?'S — AC ≤22 kW':'อื่นๆ';
+  const byP={};DATA.forEach(r=>{
+    const p=/180|120|150/.test(r.pkg)?'L — 120-180 kW':/30|50|60/.test(r.pkg)?'M — 30-60 kW':/22|7\.4/.test(r.pkg)?'S — AC ≤22 kW':'อื่นๆ';
     byP[p]=(byP[p]||0)+1;
   });
-  const pCol = {'L — 120 kW+':'#fb923c','M — 30-60 kW':'#a78bfa','S — AC ≤22 kW':'#22d3ee','อื่นๆ':'#7fa8d4'};
-  barChart('ch-pkg', Object.entries(byP).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({k,v})), k => pCol[k]||'#7fa8d4');
+  const pC={'L — 120-180 kW':'#fb923c','M — 30-60 kW':'#a78bfa','S — AC ≤22 kW':'#22d3ee','อื่นๆ':'#7fa8d4'};
+  bc('ch-pkg',Object.entries(byP).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({k,v})),k=>pC[k]||'#7fa8d4');
 
-  // SIM Status
-  const stMap = {expired:'หมดอายุแล้ว',red:'เร่งด่วน',amber:'ใกล้หมด',green:'ปกติ',nosim:'ไม่มีเบอร์ SIM'};
-  const stCol2= {expired:'#fca5a5',red:'#ef4444',amber:'#fcd34d',green:'#86efac',nosim:'#67e8f9'};
-  const byS = {}; DATA.forEach(d => { const st=stOf(daysLeft(d)); byS[st]=(byS[st]||0)+1; });
-  document.getElementById('ch-status').innerHTML = Object.entries(byS).map(([k,v]) => {
-    const max2 = Math.max(...Object.values(byS),1);
-    return `<div class="bar-row"><span class="bar-lbl">${stMap[k]||k}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max2*100)}%;background:${stCol2[k]||'#7fa8d4'}"></div></div><span class="bar-val">${v}</span></div>`;
+  // SIM status
+  const stMap={in:'ในประกัน 2 ปี',soon:'ใกล้หมดประกัน',exp:'หมดประกัน/อายุ',nd:'ยังไม่มีวันเปิดบริการ'};
+  const stC2={in:'#86efac',soon:'#fcd34d',exp:'#fca5a5',nd:'#67e8f9'};
+  const byS={};DATA.forEach(r=>{const st=simSt(r);byS[st]=(byS[st]||0)+1;});
+  document.getElementById('ch-status').innerHTML=Object.entries(byS).map(([k,v])=>{
+    const max2=Math.max(...Object.values(byS),1);
+    return`<div class="bar-row"><span class="bar-lbl">${stMap[k]||k}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max2*100)}%;background:${stC2[k]||'#7fa8d4'}"></div></div><span class="bar-val">${v}</span></div>`;
   }).join('');
 
-  // Province Top10
-  const byPr = {}; DATA.forEach(d => { if(d.province) byPr[d.province]=(byPr[d.province]||0)+1; });
-  barChart('ch-prov', Object.entries(byPr).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>({k,v})), ()=>'#4da6ff');
+  const byPr={};DATA.forEach(r=>{if(r.province)byPr[r.province]=(byPr[r.province]||0)+1;});
+  bc('ch-prov',Object.entries(byPr).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>({k,v})),()=>'#4da6ff');
 
-  // Expire 180d
-  const exp = DATA.filter(d => { const dy=daysLeft(d); return dy!==null&&dy>=0&&dy<=180; }).sort((a,b)=>daysLeft(a)-daysLeft(b));
-  const ew = document.getElementById('expire-wrap');
-  ew.innerHTML = !exp.length
-    ? '<p style="color:var(--text3);font-size:12px">ไม่มีสัญญาหมดใน 180 วัน 🎉</p>'
-    : exp.map(r => {
-        const dy=daysLeft(r); const st=stOf(dy);
-        const cl = st==='red'?'var(--red)':st==='amber'?'var(--amber)':'var(--teal)';
-        return `<div class="expire-card" style="border-left-color:${cl}">
+  // expire SIM 180d
+  const exp=DATA.filter(r=>{const dy=simDL(r);return dy!==null&&dy>=0&&dy<=180;})
+                .sort((a,b)=>simDL(a)-simDL(b));
+  const ew=document.getElementById('expire-wrap');
+  ew.innerHTML=!exp.length
+    ?'<p style="color:var(--text3);font-size:12px">ไม่มีรายการหมดใน 180 วัน 🎉</p>'
+    :exp.map(r=>{
+        const dy=simDL(r);
+        const cl=dy<=30?'var(--red)':dy<=90?'var(--amber)':'var(--teal)';
+        return`<div class="expire-card" style="border-left-color:${cl}">
           <div class="expire-name">${r.name}</div>
-          <div class="expire-meta">${r.province} · ${fmtTH(r.simEnd)}</div>
-          <span class="pill ${st==='red'?'p-red':st==='amber'?'p-amber':'p-teal'}">${dy} วัน</span>
+          <div class="expire-meta">${r.province} · SIM หมด: ${fmtTH(simWarrEnd(r))}</div>
+          <span class="pill ${dy<=30?'p-red':dy<=90?'p-amber':'p-teal'}">${dy} วัน</span>
         </div>`;
       }).join('');
 }
 
-/* ════════ TAB ════════ */
-let _activeTab = 'sim';
-function switchTab(id, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab,.mob-tab').forEach(b => b.classList.remove('active'));
+/* ═══════════════════════════════════════
+   TAB / MODAL
+═══════════════════════════════════════ */
+let _activeTab='sim';
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab,.mob-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
-  document.querySelectorAll(`[data-tab="${id}"]`).forEach(b => b.classList.add('active'));
-  _activeTab = id;
-  if (id==='alert')   renderAlert();
-  if (id==='summary') renderSummary();
-  if (id==='contract')renderContract();
+  document.querySelectorAll(`[data-tab="${id}"]`).forEach(b=>b.classList.add('active'));
+  _activeTab=id;
+  if(id==='alert')    renderAlert();
+  if(id==='summary')  renderSummary();
+  if(id==='contract') renderContract();
 }
 
-/* ════════ MODAL ════════ */
-let _editIdx = null;
-function openAdd() {
-  _editIdx = null;
-  document.getElementById('modal-ttl').textContent = '＋ เพิ่มข้อมูลใหม่';
-  ['f-name','f-prov','f-tel','f-pkg','f-phone','f-accept','f-end','f-note'].forEach(id => document.getElementById(id).value='');
+let _ei=null;
+function openAdd(){
+  _ei=null;
+  document.getElementById('modal-ttl').textContent='＋ เพิ่มข้อมูลใหม่';
+  ['f-name','f-prov','f-tel','f-pkg','f-phone','f-service','f-contract','f-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-v1').value='';
   document.getElementById('f-v2').value='';
   document.getElementById('f-fee').value='0';
   document.getElementById('f-stat').value='กำลังดำเนินการ';
   document.getElementById('modal').classList.add('open');
 }
-function openEdit(idx) {
-  _editIdx = idx; const d = DATA[idx];
-  document.getElementById('modal-ttl').textContent = '✏️ แก้ไขข้อมูล';
-  document.getElementById('f-name').value  = d.name||'';
-  document.getElementById('f-prov').value  = d.province||'';
-  document.getElementById('f-tel').value   = d.tel||'';
-  document.getElementById('f-v1').value    = d.v1||'';
-  document.getElementById('f-v2').value    = d.v2||'';
-  document.getElementById('f-pkg').value   = d.pkg||'';
-  document.getElementById('f-phone').value = d.phone||'';
-  document.getElementById('f-fee').value   = d.fee||0;
-  document.getElementById('f-accept').value= d.accept||'';
-  document.getElementById('f-end').value   = d.simEnd||'';
-  document.getElementById('f-stat').value  = d.status||'กำลังดำเนินการ';
-  document.getElementById('f-note').value  = d.note||'';
+function openEdit(idx){
+  _ei=idx;const r=DATA[idx];
+  document.getElementById('modal-ttl').textContent='✏️ แก้ไขข้อมูล';
+  document.getElementById('f-name').value=r.name||'';
+  document.getElementById('f-prov').value=r.province||'';
+  document.getElementById('f-tel').value=r.tel||'';
+  document.getElementById('f-v1').value=r.v1||'';
+  document.getElementById('f-v2').value=r.v2||'';
+  document.getElementById('f-pkg').value=r.pkg||'';
+  document.getElementById('f-phone').value=r.phone||'';
+  document.getElementById('f-fee').value=r.fee||0;
+  document.getElementById('f-service').value=r.serviceStart||'';
+  document.getElementById('f-contract').value=r.contractEnd||'';
+  document.getElementById('f-stat').value=r.status||'กำลังดำเนินการ';
+  document.getElementById('f-note').value=r.note||'';
   document.getElementById('modal').classList.add('open');
 }
-function saveEntry() {
-  const entry = {
-    id: _editIdx===null ? Math.max(...DATA.map(d=>d.id))+1 : DATA[_editIdx].id,
-    name:     document.getElementById('f-name').value.trim() || '(ไม่ระบุ)',
-    province: document.getElementById('f-prov').value.trim(),
-    tel:      document.getElementById('f-tel').value.trim(),
-    v1:       document.getElementById('f-v1').value,
-    v2:       document.getElementById('f-v2').value,
-    pkg:      document.getElementById('f-pkg').value.trim(),
-    phone:    document.getElementById('f-phone').value.trim(),
-    fee:      parseInt(document.getElementById('f-fee').value)||0,
-    accept:   document.getElementById('f-accept').value,
-    simEnd:   document.getElementById('f-end').value,
-    status:   document.getElementById('f-stat').value,
-    note:     document.getElementById('f-note').value.trim(),
-    src: _editIdx!==null ? DATA[_editIdx].src : 'manual',
-    pm:  _editIdx!==null ? (DATA[_editIdx].pm||[]) : [],
+function saveEntry(){
+  const e={
+    id:_ei===null?Math.max(...DATA.map(r=>r.id))+1:DATA[_ei].id,
+    name:document.getElementById('f-name').value.trim()||'(ไม่ระบุ)',
+    province:document.getElementById('f-prov').value.trim(),
+    tel:document.getElementById('f-tel').value.trim(),
+    v1:document.getElementById('f-v1').value,
+    v2:document.getElementById('f-v2').value,
+    pkg:document.getElementById('f-pkg').value.trim(),
+    phone:document.getElementById('f-phone').value.trim(),
+    fee:parseInt(document.getElementById('f-fee').value)||0,
+    serviceStart:document.getElementById('f-service').value,
+    contractEnd:document.getElementById('f-contract').value,
+    status:document.getElementById('f-stat').value,
+    note:document.getElementById('f-note').value.trim(),
+    src:_ei!==null?DATA[_ei].src:'manual',
+    pm:_ei!==null?(DATA[_ei].pm||[]):[],
   };
-  if (_editIdx===null) DATA.push(entry); else DATA[_editIdx]=entry;
+  if(_ei===null)DATA.push(e);else DATA[_ei]=e;
   document.getElementById('modal').classList.remove('open');
   refresh();
 }
-function delEntry(idx) {
-  if (!confirm(`ลบ "${DATA[idx].name}" ออกจากระบบ?`)) return;
-  DATA.splice(idx,1);
-  refresh();
+function delEntry(idx){
+  if(!confirm(`ลบ "${DATA[idx].name}" ?`))return;
+  DATA.splice(idx,1);refresh();
 }
-function closeModal(e) { if(e.target.id==='modal') document.getElementById('modal').classList.remove('open'); }
+function closeModal(e){if(e.target.id==='modal')document.getElementById('modal').classList.remove('open');}
 
-/* ════════ FILTER POPULATE ════════ */
-function populateFilters() {
-  const provs  = [...new Set(DATA.map(d=>d.province).filter(Boolean))].sort();
-  const statuses = [...new Set(DATA.map(d=>d.status).filter(Boolean))].sort();
-  const conP = document.getElementById('con-p');
-  conP.innerHTML = '<option value="">ทั้งหมด</option>' + provs.map(p=>`<option>${p}</option>`).join('');
-  const conSt = document.getElementById('con-st');
-  conSt.innerHTML = '<option value="">ทั้งหมด</option>' + statuses.map(s=>`<option>${s}</option>`).join('');
+/* ═══════════════════════════════════════
+   FILTER POPULATE
+═══════════════════════════════════════ */
+function populateFilters(){
+  const provs=[...new Set(DATA.map(r=>r.province).filter(Boolean))].sort();
+  const stats=[...new Set(DATA.map(r=>r.status).filter(Boolean))].sort();
+  const cp=document.getElementById('con-p');
+  cp.innerHTML='<option value="">ทั้งหมด</option>'+provs.map(p=>`<option>${p}</option>`).join('');
+  const cs=document.getElementById('con-st');
+  cs.innerHTML='<option value="">ทั้งหมด</option>'+stats.map(s=>`<option>${s}</option>`).join('');
 }
 
-/* ════════ CLOCK ════════ */
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent =
-    now.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) + ' ' +
-    now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+/* ═══════════════════════════════════════
+   CLOCK
+═══════════════════════════════════════ */
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').textContent=
+    n.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})+' '+
+    n.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
-setInterval(updateClock, 1000); updateClock();
+setInterval(tick,1000);tick();
 
-/* ════════ INIT ════════ */
-function refresh() {
-  renderKPI(); renderSIM();
-  if (_activeTab==='alert')    renderAlert();
-  if (_activeTab==='summary')  renderSummary();
-  if (_activeTab==='contract') renderContract();
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function refresh(){
+  renderKPI();renderSIM();
+  if(_activeTab==='alert')    renderAlert();
+  if(_activeTab==='summary')  renderSummary();
+  if(_activeTab==='contract') renderContract();
 }
 populateFilters();
 refresh();
