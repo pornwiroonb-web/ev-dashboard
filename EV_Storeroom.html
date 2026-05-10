@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EV Storeroom · EGAT</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--surface3:#1f2b40;
+  --border:#2a3a55;--border2:#3a4d6a;
+  --accent:#00c8ff;--accent2:#0077ff;--green:#00e676;--yellow:#ffd600;--red:#ff4545;--orange:#ff9100;
+  --text:#e8edf8;--text2:#8a9bbf;--text3:#5a6a8a;
+  --font:'Sarabun',sans-serif;--mono:'IBM Plex Mono',monospace;
+  --r:10px;--r2:6px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* SETUP SCREEN */
+#setup-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.setup-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:32px;width:100%;max-width:520px}
+.setup-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.logo-mark{width:44px;height:44px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;letter-spacing:.5px}
+.setup-title{font-size:20px;font-weight:600}
+.setup-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.setup-steps{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.step{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--accent2);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-label{font-size:13px;font-weight:600}
+.step-optional{font-size:11px;color:var(--text3);margin-left:auto;background:var(--surface3);padding:2px 7px;border-radius:20px}
+.inp{width:100%;background:var(--surface3);border:1px solid var(--border);border-radius:var(--r2);padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:.2s}
+.inp:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(0,119,255,.15)}
+.inp::placeholder{color:var(--text3)}
+.inp-row{display:flex;gap:8px}
+.hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5}
+.hint a{color:var(--accent);text-decoration:none}
+.btn-primary{width:100%;padding:11px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;border-radius:var(--r2);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:.2s;letter-spacing:.3px}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-skip{width:100%;padding:8px;background:transparent;border:1px solid var(--border);border-radius:var(--r2);color:var(--text2);font-family:var(--font);font-size:13px;cursor:pointer;margin-top:8px;transition:.2s}
+.btn-skip:hover{border-color:var(--border2);color:var(--text)}
+
+/* MAIN APP */
+#app{display:none;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:12px;height:52px}
+.topbar-logo{display:flex;align-items:center;gap:9px}
+.topbar-name{font-size:14px;font-weight:600}
+.topbar-sub{font-size:11px;color:var(--text3);margin-left:2px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.topbar-clock{font-family:var(--mono);font-size:12px;color:var(--text2);margin-left:auto}
+.topbar-user{font-size:12px;color:var(--text2);background:var(--surface2);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
+.btn-settings{background:transparent;border:1px solid var(--border);border-radius:var(--r2);padding:5px 10px;color:var(--text2);font-family:var(--font);font-size:12px;cursor:pointer;transition:.2s}
+.btn-settings:hover{border-color:var(--border2);color:var(--text)}
+
+.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:4px;overflow-x:auto}
+.nav-tab{padding:10px 14px;font-size:13px;font-weight:500;color:var(--text2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s;font-family:var(--font)}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-badge{background:var(--red);color:#fff;font-size:10px;padding:1px 5px;border-radius:10px;margin-left:4px}
+
+.main{padding:16px 20px;max-width:1200px;margin:0 auto}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.stat-val{font-size:28px;font-weight:600;font-family:var(--mono);line-height:1}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-val.green{color:var(--green)}
+.stat-val.yellow{color:var(--yellow)}
+.stat-val.red{color:var(--red)}
+.stat-val.blue{color:var(--accent)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:600;color:var(--text)}
+.card-body{padding:14px 16px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 10px;text-align:left;color:var(--text3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid rgba(42,58,85,.5);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr:last-child td{border-bottom:none}
+
+/* PILLS */
+.pill{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;white-space:nowrap;letter-spacing:.3px}
+.pill-green{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.pill-yellow{background:rgba(255,214,0,.12);color:var(--yellow);border:1px solid rgba(255,214,0,.25)}
+.pill-red{background:rgba(255,69,69,.12);color:var(--red);border:1px solid rgba(255,69,69,.25)}
+.pill-blue{background:rgba(0,200,255,.12);color:var(--accent);border:1px solid rgba(0,200,255,.25)}
+.pill-gray{background:rgba(90,106,138,.15);color:var(--text2);border:1px solid var(--border)}
+.pill-orange{background:rgba(255,145,0,.12);color:var(--orange);border:1px solid rgba(255,145,0,.25)}
+
+/* SEARCH / FILTER */
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-row .inp{flex:1;min-width:140px}
+
+/* BUTTONS */
+.btn{font-size:11px;padding:4px 10px;border-radius:var(--r2);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:.2s;white-space:nowrap}
+.btn:hover{border-color:var(--border2);color:var(--text)}
+.btn-green{background:rgba(0,230,118,.1);color:var(--green);border-color:rgba(0,230,118,.3)}
+.btn-green:hover{background:rgba(0,230,118,.2)}
+.btn-red{background:rgba(255,69,69,.1);color:var(--red);border-color:rgba(255,69,69,.3)}
+.btn-red:hover{background:rgba(255,69,69,.2)}
+.btn-blue{background:rgba(0,119,255,.15);color:var(--accent);border-color:rgba(0,200,255,.3)}
+.btn-blue:hover{background:rgba(0,119,255,.25)}
+.btn-orange{background:rgba(255,145,0,.1);color:var(--orange);border-color:rgba(255,145,0,.3)}
+.btn-add{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;padding:7px 14px;font-size:13px;font-weight:600}
+.btn-add:hover{opacity:.9}
+.btn-export{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.3);padding:7px 14px;font-size:12px;font-weight:600}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;color:var(--text2);font-weight:500}
+.form-group select,.form-group input,.form-group textarea{background:var(--surface3);border:1px solid var(--border);border-radius:var(--r2);padding:8px 11px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:.2s}
+.form-group select:focus,.form-group input:focus,.form-group textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(0,119,255,.15)}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-section{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);padding:10px 0 4px;border-top:1px solid var(--border);margin-top:8px}
+.notify-checks{display:flex;gap:16px;flex-wrap:wrap}
+.notify-checks label{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.notify-checks input[type=checkbox]{accent-color:var(--accent2);width:14px;height:14px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface)}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-body{padding:18px 20px}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* ACTIVITY */
+.activity-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,58,85,.4)}
+.activity-item:last-child{border-bottom:none}
+.act-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px}
+.act-text{font-size:13px;line-height:1.5}
+.act-time{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* APPROVE CARD */
+.approve-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.approve-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.approve-tool{font-size:14px;font-weight:600}
+.approve-meta{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.6}
+.approve-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* ALERT ITEMS */
+.alert-item{display:flex;gap:12px;align-items:flex-start;padding:10px;background:var(--surface2);border-radius:var(--r2);border-left:3px solid;margin-bottom:8px}
+.alert-item.warn{border-color:var(--yellow)}
+.alert-item.danger{border-color:var(--red)}
+.alert-item.info{border-color:var(--accent)}
+.alert-item.success{border-color:var(--green)}
+
+/* PROGRESS */
+.prog-row{margin-bottom:10px}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.prog-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s ease}
+
+/* SETTINGS */
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.settings-title{font-size:13px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,58,85,.4);font-size:13px}
+.settings-row:last-child{border-bottom:none}
+.toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--surface3);border-radius:11px;transition:.3s;border:1px solid var(--border)}
+.toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:2px;bottom:2px;background:var(--text3);border-radius:50%;transition:.3s}
+.toggle input:checked+.toggle-slider{background:rgba(0,119,255,.3);border-color:var(--accent2)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(18px);background:var(--accent)}
+.users-grid{display:grid;gap:8px}
+.user-row{display:flex;align-items:center;gap:10px;background:var(--surface2);padding:10px 12px;border-radius:var(--r2);border:1px solid var(--border)}
+.user-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+
+/* SHARE BANNER */
+.share-banner{background:linear-gradient(135deg,rgba(0,119,255,.15),rgba(0,200,255,.08));border:1px solid rgba(0,200,255,.25);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.share-url{font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--surface2);padding:6px 12px;border-radius:var(--r2);border:1px solid var(--border);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-copy{background:var(--accent2);border:none;color:#fff;padding:7px 14px;border-radius:var(--r2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--font)}
+.btn-copy:hover{opacity:.9}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 18px;border-radius:var(--r);font-size:13px;z-index:999;transition:.3s;pointer-events:none;white-space:nowrap;max-width:90vw}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* PAGE HIDDEN */
+.page{display:none}
+.page.active{display:block}
+
+/* SYNC STATUS */
+.sync-bar{font-size:11px;color:var(--text3);padding:4px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .stats{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .form-full{grid-column:1}
+  .main{padding:12px}
+  .topbar{padding:0 12px}
+  .nav{padding:0 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+<div class="setup-card">
+  <div class="setup-logo">
+    <div class="logo-mark">EV</div>
+    <div>
+      <div class="setup-title">EV Storeroom · EGAT</div>
+      <div class="setup-sub">ตั้งค่าระบบก่อนเริ่มใช้งาน</div>
+    </div>
+  </div>
+  <div class="setup-steps">
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num">1</div>
+        <div class="step-label">Google Sheets (Backend)</div>
+      </div>
+      <div class="hint" style="margin-bottom:8px">วิธีตั้งค่า: <a href="https://developers.google.com/apps-script" target="_blank">Google Apps Script</a> → สร้าง Web App → วาง script ด้านล่าง → Deploy → คัดลอก URL มาใส่</div>
+      <input class="inp" id="gs-url" type="url" placeholder="https://script.google.com/macros/s/...../exec">
+      <div class="hint">
+        💡 <a href="#" onclick="showGSGuide();return false">ดูวิธีสร้าง Google Apps Script ทีละขั้น</a>
+      </div>
+    </div>
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-label">Line Notify Token</div>
+      </div>
+      <div class="hint" style="margin-bottom:8px">ไปที่ <a href="https://notify.line.me" target="_blank">notify.line.me</a> → My page → Generate token → ตั้งชื่อ "EV Storeroom EGAT" → คัดลอก Token</div>
+      <input class="inp" id="line-token-setup" type="password" placeholder="วาง Line Notify Token ที่นี่">
+    </div>
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-head">
+        <div class="step-num">3</div>
+        <div class="step-label">Email ผู้อนุมัติ</div>
+        <span class="step-optional">optional</span>
+      </div>
+      <div class="inp-row">
+        <input class="inp" id="email-approver" type="email" placeholder="591250@egat.co.th (ไข่)" style="flex:1">
+        <input class="inp" id="email-approver2" type="email" placeholder="597082@egat.co.th (กิติภัฏ)" style="flex:1">
+      </div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="startApp()">เริ่มใช้งาน EV Storeroom</button>
+  <button class="btn-skip" onclick="startApp(true)">ข้าม (ใช้งานแบบ local ก่อน)</button>
+  <div id="gs-guide" style="display:none;margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-size:12px;line-height:1.8;color:var(--text2)">
+    <b style="color:var(--text)">วิธีสร้าง Google Apps Script:</b><br>
+    1. เปิด <a href="https://docs.google.com/spreadsheets/u/0/create" target="_blank" style="color:var(--accent)">Google Sheets ใหม่</a> → ตั้งชื่อ "EV Storeroom EGAT 2569"<br>
+    2. Extensions → Apps Script → ลบโค้ดเดิมออก<br>
+    3. วางโค้ดนี้ลงไป:<br>
+    <pre style="background:var(--bg);padding:10px;border-radius:6px;margin:6px 0;overflow-x:auto;font-size:11px;color:var(--accent)">function doPost(e){
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const data = JSON.parse(e.postData.contents);
+  const sheet = ss.getSheetByName(data.sheet) || ss.insertSheet(data.sheet);
+  if(data.action==='append') sheet.appendRow(data.row);
+  if(data.action==='clear'){sheet.clearContents();sheet.appendRow(data.headers);}
+  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+}
+function doGet(e){
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(e.parameter.sheet);
+  if(!sheet) return ContentService.createTextOutput(JSON.stringify({rows:[]})).setMimeType(ContentService.MimeType.JSON);
+  const rows = sheet.getDataRange().getValues();
+  return ContentService.createTextOutput(JSON.stringify({rows})).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+    4. Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone → Deploy<br>
+    5. คัดลอก URL มาใส่ในช่องด้านบน
+  </div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark" style="width:32px;height:32px;font-size:11px">EV</div>
+    <div>
+      <span class="topbar-name">EV Storeroom</span>
+      <span class="topbar-sub">EGAT · กธตบ-ธ.</span>
+    </div>
+  </div>
+  <div class="live-dot"></div>
+  <span class="topbar-clock" id="clock">--:--:--</span>
+  <span class="topbar-user" id="current-user-badge">นายพรวิรุฬ บุญยวรรณ</span>
+  <button class="btn-settings" onclick="switchTab('settings')">⚙ ตั้งค่า</button>
+</div>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-status">ระบบพร้อมใช้งาน</span>
+  <span style="margin-left:auto" id="last-sync"></span>
+</div>
+
+<div class="nav">
+  <button class="nav-tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+  <button class="nav-tab" onclick="switchTab('inventory',this)">สต็อกเครื่องมือ</button>
+  <button class="nav-tab" onclick="switchTab('borrow',this)">ยืม-คืน</button>
+  <button class="nav-tab" id="approve-tab" onclick="switchTab('approve',this)">อนุมัติ <span class="nav-badge" id="approve-cnt">0</span></button>
+  <button class="nav-tab" onclick="switchTab('alerts',this)">แจ้งเตือน</button>
+  <button class="nav-tab" onclick="switchTab('settings',this)">ตั้งค่า / Share</button>
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="stats">
+    <div class="stat"><div class="stat-label">ทั้งหมด</div><div class="stat-val blue" id="m-total">0</div><div class="stat-sub">รายการ</div></div>
+    <div class="stat"><div class="stat-label">พร้อมใช้ (วาง)</div><div class="stat-val green" id="m-avail">0</div><div class="stat-sub">รายการ</div></div>
+    <div class="stat"><div class="stat-label">ถูกยืม</div><div class="stat-val yellow" id="m-borrow">0</div><div class="stat-sub">รายการ</div></div>
+    <div class="stat"><div class="stat-label">รอซ่อม</div><div class="stat-val red" id="m-repair">0</div><div class="stat-sub">รายการ</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="card">
+      <div class="card-head"><span class="card-title">สัดส่วนสถานะ</span></div>
+      <div class="card-body" id="prog-section"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">ประเภทเครื่องมือ</span></div>
+      <div class="card-body" id="cat-section"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="card-head">
+      <span class="card-title">กิจกรรมล่าสุด</span>
+      <button class="btn btn-export" onclick="exportLogbook()">📥 Export Logbook Excel</button>
+    </div>
+    <div class="card-body" id="activity-feed" style="max-height:280px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- INVENTORY -->
+<div id="page-inventory" class="page">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">เครื่องมือทั้งหมด (<span id="inv-cnt">0</span> รายการ)</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-export" onclick="exportLogbook()">📥 Export Excel</button>
+        <button class="btn btn-add" onclick="openBorrowModal()">+ ยืมเครื่องมือ</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="filter-row">
+        <input class="inp" id="inv-search" placeholder="ค้นหา ชื่อ / รหัส..." oninput="renderInventory()" style="max-width:220px">
+        <select class="inp" id="inv-cat" onchange="renderInventory()" style="max-width:150px">
+          <option value="">ทุกประเภท</option>
+          <option>HANDTOOL</option><option>TOOLS</option><option>CHARGING</option><option>GENERAL</option>
+        </select>
+        <select class="inp" id="inv-status" onchange="renderInventory()" style="max-width:160px">
+          <option value="">ทุกสถานะ</option>
+          <option value="วาง">วาง (พร้อมใช้)</option>
+          <option value="ยืม">ถูกยืม</option>
+          <option value="รอซ่อม">รอซ่อม</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr>
+          <th>รหัส</th><th>ชื่อเครื่องมือ</th><th>ยี่ห้อ</th><th>ประเภท</th><th>สถานะ</th><th>ผู้ยืม</th><th>กำหนดคืน</th><th></th>
+        </tr></thead><tbody id="inv-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BORROW -->
+<div id="page-borrow" class="page">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="card">
+      <div class="card-head"><span class="card-title">กำลังยืมอยู่</span><span class="pill pill-yellow" id="borrow-cnt">0 รายการ</span></div>
+      <div class="card-body" id="borrow-active" style="max-height:400px;overflow-y:auto"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">ประวัติการยืม-คืน</span></div>
+      <div class="card-body" id="borrow-history" style="max-height:400px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVE -->
+<div id="page-approve" class="page">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">รออนุมัติ</span>
+      <span class="pill pill-red" id="pending-cnt2">0 รายการ</span>
+    </div>
+    <div class="card-body" id="approve-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">ประวัติการอนุมัติ</span></div>
+    <div class="tbl-wrap card-body">
+      <table><thead><tr><th>เครื่องมือ</th><th>ผู้ขอ</th><th>วันที่</th><th>ผู้อนุมัติ</th><th>ผล</th></tr></thead>
+      <tbody id="approve-history"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div id="page-alerts" class="page">
+  <div class="card">
+    <div class="card-head"><span class="card-title">การแจ้งเตือน</span></div>
+    <div class="card-body" id="alerts-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">ทดสอบส่งการแจ้งเตือน</span></div>
+    <div class="card-body">
+      <div class="form-grid" style="gap:10px">
+        <div class="form-group">
+          <label class="form-label">ช่องทาง</label>
+          <select id="test-ch"><option>Line Notify</option><option>Email</option><option>Line + Email</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ประเภท</label>
+          <select id="test-type">
+            <option>คำขอยืมใหม่</option><option>อนุมัติการยืม</option>
+            <option>ปฏิเสธการยืม</option><option>ครบกำหนดคืน</option><option>เครื่องมือใกล้หมด</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-blue" style="margin-top:10px;padding:8px 16px" onclick="testNotify()">ส่งทดสอบ</button>
+      <div id="test-result" style="font-size:12px;margin-top:8px;color:var(--green)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS / SHARE -->
+<div id="page-settings" class="page">
+  <!-- SHARE LINK -->
+  <div class="settings-section">
+    <div class="settings-title">🔗 Share Link — ส่งให้ทีมกดใช้ได้เลย</div>
+    <div class="share-banner">
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px">ลิงก์นี้ใช้งานได้บนมือถือและคอมพิวเตอร์ทุกเครื่อง</div>
+        <div class="share-url" id="share-url-display">กำลังสร้างลิงก์...</div>
+      </div>
+      <button class="btn-copy" onclick="copyShareLink()">📋 คัดลอก</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-green" onclick="shareToLine()">📤 ส่งผ่าน Line</button>
+      <button class="btn btn-blue" onclick="shareByEmail()">📧 ส่ง Email</button>
+      <button class="btn" onclick="downloadHTML()">💾 ดาวน์โหลด HTML</button>
+    </div>
+    <div class="hint" style="margin-top:8px">💡 หากต้องการ URL ถาวร ให้อัปโหลดไฟล์ HTML นี้ไปที่ Google Drive → Share → Anyone with link → Open in browser</div>
+  </div>
+
+  <!-- LINE NOTIFY -->
+  <div class="settings-section">
+    <div class="settings-title">📲 Line Notify</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label">Token</label>
+      <input class="inp" id="s-line-token" type="password" placeholder="วาง Token จาก notify.line.me">
+    </div>
+    <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">แจ้งเตือนเมื่อ:</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px"><input type="checkbox" id="n-new" checked style="accent-color:var(--accent2)"> มีคำขอยืมใหม่ (แจ้งผู้อนุมัติทันที)</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px"><input type="checkbox" id="n-approved" checked style="accent-color:var(--accent2)"> อนุมัติ / ปฏิเสธ (แจ้งผู้ยืม)</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px"><input type="checkbox" id="n-due" checked style="accent-color:var(--accent2)"> ครบกำหนดคืน (แจ้ง 1 วันล่วงหน้า)</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px"><input type="checkbox" id="n-repair" style="accent-color:var(--accent2)"> รอซ่อมนานเกิน 30 วัน</label>
+    </div>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="settings-section">
+    <div class="settings-title">📧 Email การแจ้งเตือน</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Email ผู้อนุมัติหลัก (ไข่)</label>
+        <input class="inp" id="s-email1" type="email" placeholder="591250@egat.co.th">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email ผู้อนุมัติ 2 (กิติภัฏ)</label>
+        <input class="inp" id="s-email2" type="email" placeholder="597082@egat.co.th">
+      </div>
+    </div>
+    <div class="hint" style="margin-top:8px">💡 ระบบจะส่ง Email ผ่าน <a href="https://formsubmit.co" target="_blank">FormSubmit.co</a> (ฟรี ไม่ต้อง backend) หรือใช้ Google Apps Script ที่ตั้งค่าไว้</div>
+  </div>
+
+  <!-- GOOGLE SHEETS -->
+  <div class="settings-section">
+    <div class="settings-title">📊 Google Sheets Backend</div>
+    <div class="form-group">
+      <label class="form-label">Apps Script Web App URL</label>
+      <input class="inp" id="s-gs-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+      <button class="btn btn-green" onclick="testGSheets()">ทดสอบการเชื่อมต่อ</button>
+      <button class="btn btn-blue" onclick="syncToSheets()">🔄 Sync ข้อมูลไปยัง Sheets</button>
+      <span id="gs-test-result" style="font-size:12px;color:var(--green)"></span>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="settings-section">
+    <div class="settings-title">👥 ทีมงานกธตบ-ธ.</div>
+    <div class="users-grid" id="users-grid"></div>
+  </div>
+
+  <button class="btn-add" style="width:100%;padding:11px;font-size:14px" onclick="saveSettings()">💾 บันทึกการตั้งค่าทั้งหมด</button>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL: ยืม -->
+<div class="modal-overlay" id="borrow-modal">
+<div class="modal">
+  <div class="modal-head">
+    <span class="modal-title">ยืมเครื่องมือ</span>
+    <button class="modal-close" onclick="closeModal('borrow-modal')">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">ผู้ยืม</label>
+        <select id="f-borrower"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">เครื่องมือที่ต้องการ</label>
+        <select id="f-tool"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">วันที่ยืม</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">กำหนดคืน</label>
+        <input type="date" id="f-return">
+      </div>
+      <div class="form-group form-full">
+        <label class="form-label">วัตถุประสงค์ / สถานที่ใช้งาน</label>
+        <textarea id="f-purpose" placeholder="เช่น ทดสอบ EV Charger สถานี Elex by EGAT สุวรรณภูมิ"></textarea>
+      </div>
+    </div>
+    <div class="form-section">การแจ้งเตือน</div>
+    <div class="notify-checks" style="margin-top:8px">
+      <label><input type="checkbox" id="f-line" checked> Line Notify (ผู้อนุมัติ)</label>
+      <label><input type="checkbox" id="f-email" checked> Email</label>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" onclick="closeModal('borrow-modal')">ยกเลิก</button>
+    <button class="btn-add" style="padding:8px 20px" onclick="submitBorrow()">ส่งคำขอยืม</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: คืน -->
+<div class="modal-overlay" id="return-modal">
+<div class="modal">
+  <div class="modal-head">
+    <span class="modal-title">คืนเครื่องมือ</span>
+    <button class="modal-close" onclick="closeModal('return-modal')">×</button>
+  </div>
+  <div class="modal-body" id="return-modal-body"></div>
+  <div class="modal-foot">
+    <button class="btn" onclick="closeModal('return-modal')">ยกเลิก</button>
+    <button class="btn-green" style="padding:8px 20px;font-weight:600" onclick="confirmReturn()">ยืนยันคืน</button>
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===== DATA =====
+const TEAM=[
+  {id:'591250',name:'นายพรวิรุฬ บุญยวรรณ',nick:'ไข่',role:'Admin+Approver',pos:'ช.6',phone:'061-3964242',email:'591250@egat.co.th',color:'#0077ff'},
+  {id:'569879',name:'นายภาสวร วรรณกาญจน์',nick:'',role:'User',pos:'กธตบ-ธ.',phone:'080-9775222',email:'padsaworn.w@egat.co.th',color:'#8a9bbf'},
+  {id:'597082',name:'นายกิติภัฏ ร่มเพชร',nick:'',role:'Admin+Approver',pos:'วศ.6',phone:'082-2974781',email:'597082@egat.co.th',color:'#0077ff'},
+  {id:'590374',name:'นายพีรพัฒน์ ลิ่มบุญพา',nick:'',role:'User',pos:'วศ.8',phone:'086-5258358',email:'590374@egat.co.th',color:'#8a9bbf'},
+  {id:'597058',name:'นายวสุท ช่างเรือ',nick:'',role:'User',pos:'วศ.6',phone:'085-8448972',email:'597058@egat.co.th',color:'#8a9bbf'},
+  {id:'596558',name:'นายณัฐจักร์ ตุ่นแก้ว',nick:'',role:'User',pos:'ช.5',phone:'064-1499398',email:'596558@egat.co.th',color:'#8a9bbf'},
+  {id:'591969',name:'นายวีระวุฒิ คำสาสินธุ์',nick:'',role:'User',pos:'วศ.8',phone:'089-1219352',email:'591969@egat.co.th',color:'#8a9bbf'},
+  {id:'599055',name:'นายอนุตร คล้ายประยูร',nick:'',role:'User',pos:'วศ.4',phone:'061-4654882',email:'599055@egat.co.th',color:'#8a9bbf'},
+  {id:'599015',name:'นายกิตติกานต์ ป่าไพร',nick:'',role:'User',pos:'ช.4',phone:'063-2673269',email:'599015@egat.co.th',color:'#8a9bbf'},
+];
+
+const TOOLS_DATA=[
+  {id:'EV_TOOLS_001',name:'HT EV TEST 100 (1)',brand:'HT ITALIA',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'20100933'},
+  {id:'EV_TOOLS_002',name:'HT EV TEST 100 (2)',brand:'HT ITALIA',type:'TOOLS',status:'ยืม',borrower:'นายอนุตร คล้ายประยูร',borrowDate:'2026-04-29',returnDate:'2026-05-07',serial:'20100934'},
+  {id:'EV_TOOLS_003',name:'HT MACRO EV TEST (1)',brand:'HT ITALIA',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'20120511'},
+  {id:'EV_TOOLS_004',name:'HT MACRO EV TEST (2)',brand:'HT ITALIA',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'20120509'},
+  {id:'EV_TOOLS_005',name:'ชุดสว่านโรตารี่ไร้สาย',brand:'MILWAUKEE',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'AC01R2001'},
+  {id:'EV_TOOLS_006',name:'Multimeter IMSK COMBO (1)',brand:'Fluke 87V',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_007',name:'Multimeter IMSK COMBO (2)',brand:'Fluke 87V',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_008',name:'Multimeter IMSK COMBO (3)',brand:'Fluke 87V',type:'CHARGING',status:'ยืม',borrower:'นายวีระวุฒิ คำสาสินธุ์',borrowDate:'2026-05-03',returnDate:'2026-05-08',serial:'Pending'},
+  {id:'EV_TOOLS_009',name:'Multimeter IMSK COMBO (4)',brand:'Fluke 87V',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_010',name:'Multimeter IMSK COMBO (5)',brand:'Fluke 87V',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_011',name:'Insulation Tester + EVCS',brand:'Metral',type:'TOOLS',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_012',name:'Accuracy Portable Tester',brand:'TUNKIA',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_013',name:'Load DC 60 kW.',brand:'TK',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_014',name:'Load DC 45 kW.',brand:'TK',type:'CHARGING',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'Pending'},
+  {id:'EV_TOOLS_015',name:'comemso Mini-Charger-Tester',brand:'comemso',type:'CHARGING',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'1001982'},
+  {id:'EV_TOOLS_016',name:'ชุดดูดฝุ่นแห้ง/เปียกไร้สาย',brand:'MILWAUKEE',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'AF01C2005'},
+  {id:'EV_TOOLS_017',name:'ไขควงกระแทกไร้สาย (1)',brand:'MILWAUKEE',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'AF01F2017-1'},
+  {id:'EV_TOOLS_018',name:'ไขควงกระแทกไร้สาย (2)',brand:'MILWAUKEE',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'AF01F2017-2'},
+  {id:'EV_TOOLS_019',name:'ไขควงกระแทกไร้สาย (3)',brand:'MILWAUKEE',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'AF01F2017-3'},
+  {id:'EV_TOOLS_020',name:'กระเป๋าเครื่องมือกันกระแทก (1)',brand:'MILWAUKEE',type:'GENERAL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_021',name:'กระเป๋าเครื่องมือกันกระแทก (2)',brand:'MILWAUKEE',type:'GENERAL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_022',name:'กระเป๋าเครื่องมือกันกระแทก (3)',brand:'MILWAUKEE',type:'GENERAL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_023',name:'เครื่องวัด Phase Diagram (1)',brand:'UNI-T',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_024',name:'เครื่องวัด Phase Diagram (2)',brand:'UNI-T',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_025',name:'เครื่องวัด Phase Diagram (3)',brand:'UNI-T',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_026',name:'เครื่องวัด Phase Diagram (4)',brand:'UNI-T',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_027',name:'เครื่องวัด Phase Diagram (5)',brand:'UNI-T',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_028',name:'ชุดเครื่องมือช่าง 8 ชิ้น (1)',brand:'INGCO',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_029',name:'ชุดเครื่องมือช่าง 8 ชิ้น (2)',brand:'INGCO',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_030',name:'ชุดเครื่องมือช่าง 8 ชิ้น (3)',brand:'INGCO',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_031',name:'ชุดเครื่องมือช่าง 8 ชิ้น (4)',brand:'INGCO',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_032',name:'ชุดเครื่องมือช่าง 8 ชิ้น (5)',brand:'INGCO',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_033',name:'ชุดเครื่องมือหุ้มฉนวน (1)',brand:'TOTAL',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_034',name:'ชุดเครื่องมือหุ้มฉนวน (2)',brand:'TOTAL',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_035',name:'ชุดเครื่องมือหุ้มฉนวน (3)',brand:'TOTAL',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_036',name:'ชุดประแจปากตายหุ้มฉนวน (1)',brand:'TOTAL',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_037',name:'ชุดประแจปากตายหุ้มฉนวน (2)',brand:'TOTAL',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_038',name:'ชุดประแจปากตายหุ้มฉนวน (3)',brand:'TOTAL',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_039',name:'ประแจปอนด์ 1/2 นิ้ว (1)',brand:'FORCE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_040',name:'ประแจปอนด์ 1/2 นิ้ว (2)',brand:'FORCE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_041',name:'ประแจปอนด์ 1/2 นิ้ว (3)',brand:'FORCE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_042',name:'ชุดดอกไขควงไฟฟ้า (1)',brand:'MILWAUKEE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_043',name:'ชุดดอกไขควงไฟฟ้า (2)',brand:'MILWAUKEE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_044',name:'ชุดดอกไขควงไฟฟ้า (3)',brand:'MILWAUKEE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_045',name:'ชุดสว่านไร้สาย 20V.',brand:'DEWALT',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'DCD7781D2A'},
+  {id:'EV_TOOLS_046',name:'สว่านไร้สาย 12V.',brand:'STANLEY',type:'TOOLS',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'SCD121S2K'},
+  {id:'EV_TOOLS_047',name:'ชุดไขควง L-SHAPE (1)',brand:'WERA',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_048',name:'ชุดไขควง L-SHAPE (2)',brand:'WERA',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_049',name:'ชุดไขควง L-SHAPE (3)',brand:'WERA',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_050',name:'ชุดดอกโฮลซอเจาะเหล็ก',brand:'MILWAUKEE',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_051',name:'คีมปอก-ย้ำสายไฟออโต้ (1)',brand:'STANLEY',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_052',name:'คีมปอก-ย้ำสายไฟออโต้ (2)',brand:'STANLEY',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_053',name:'ล้อเก็บสายไฟ 30m (1)',brand:'MASTER',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_054',name:'ล้อเก็บสายไฟ 30m (2)',brand:'MASTER',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_055',name:'ล้อเก็บสายไฟ 30m (3)',brand:'MASTER',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_056',name:'รถเข็นพื้นเหล็กชั้นเดียว (1)',brand:'JUMBO',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_057',name:'รถเข็นพื้นเหล็กชั้นเดียว (2)',brand:'JUMBO',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_058',name:'บันไดเอนกประสงค์ 2x5 3.2m',brand:'BARCO',type:'HANDTOOL',status:'รอซ่อม',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_059',name:'ถุงมือกันไฟ Class 00',brand:'Best Safety',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_060',name:'ถุงมือกันไฟ Class 0',brand:'Best Safety',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_061',name:'ถุงมือหนังขนาด 12 นิ้ว',brand:'NOVAX',type:'HANDTOOL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_062',name:'ป้ายกั้นพื้นที่ 3 แบบ',brand:'-',type:'GENERAL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_063',name:'กรวยจราจรสีส้ม 70 CM.',brand:'-',type:'GENERAL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_TOOLS_064',name:'ฐานรองกรวยสีดำ 38.5x38.5',brand:'-',type:'GENERAL',status:'ยืม',borrower:'นายกิตติกานต์ ป่าไพร',borrowDate:'2026-05-01',returnDate:'2026-05-06',serial:'-'},
+  {id:'EV_BAG01',name:'ชุดกระเป๋า EV01 PM/CM',brand:'-',type:'GENERAL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_BAG02',name:'ชุดกระเป๋า EV02 Elex',brand:'-',type:'GENERAL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+  {id:'EV_BAG03',name:'ชุดกระเป๋า EV03 Total Solution',brand:'-',type:'GENERAL',status:'วาง',borrower:'',borrowDate:'',returnDate:'',serial:'-'},
+];
+
+let tools=[...TOOLS_DATA];
+let pendingReqs=[
+  {id:'REQ-001',tool:'Multimeter IMSK COMBO (3)',toolId:'EV_TOOLS_008',requester:'นายวีระวุฒิ คำสาสินธุ์',date:'2026-05-03',returnDate:'2026-05-08',purpose:'ทดสอบ EV Charger สถานี EGAT นนทบุรี',notifyLine:true,notifyEmail:true},
+  {id:'REQ-002',tool:'ฐานรองกรวยสีดำ 38.5x38.5',toolId:'EV_TOOLS_064',requester:'นายกิตติกานต์ ป่าไพร',date:'2026-05-01',returnDate:'2026-05-06',purpose:'ติดตั้งป้ายจราจร สถานี PTT',notifyLine:true,notifyEmail:false},
+];
+let approveHistory=[
+  {tool:'ไขควงกระแทกไร้สาย (2)',requester:'นายณัฐจักร์ ตุ่นแก้ว',date:'2026-04-28',approver:'นายพรวิรุฬ บุญยวรรณ',result:'อนุมัติ'},
+  {tool:'HT EV TEST 100 (1)',requester:'นายอนุตร คล้ายประยูร',date:'2026-04-25',approver:'นายพรวิรุฬ บุญยวรรณ',result:'อนุมัติ'},
+  {tool:'Load DC 60 kW.',requester:'นายวสุท ช่างเรือ',date:'2026-04-20',approver:'นายกิติภัฏ ร่มเพชร',result:'ปฏิเสธ'},
+];
+let activity=[
+  {type:'return',msg:'นายณัฐจักร์ คืน ไขควงกระแทกไร้สาย (2) เรียบร้อย',time:'วันนี้ 08:40'},
+  {type:'borrow',msg:'คำขอยืม REQ-001 — Multimeter IMSK (3) จากนายวีระวุฒิ · รออนุมัติ',time:'เมื่อวาน 15:20'},
+  {type:'warn',msg:'ถุงมือกันไฟ Class 00 เหลือ 1 คู่',time:'เมื่อวาน 14:00'},
+];
+let cfg={gsUrl:'',lineToken:'',email1:'',email2:''};
+let returnTargetId=null;
+
+// ===== SETUP =====
+function showGSGuide(){document.getElementById('gs-guide').style.display=document.getElementById('gs-guide').style.display==='none'?'block':'none'}
+
+function startApp(skip){
+  if(!skip){
+    cfg.gsUrl=document.getElementById('gs-url').value.trim();
+    cfg.lineToken=document.getElementById('line-token-setup').value.trim();
+    cfg.email1=document.getElementById('email-approver').value.trim();
+    cfg.email2=document.getElementById('email-approver2').value.trim();
+  }
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  initApp();
+}
+
+function initApp(){
+  updateClock();setInterval(updateClock,1000);
+  buildSelects();buildUsers();updateMetrics();renderInventory();
+  renderBorrow();renderApprove();renderAlerts();renderActivity();
+  setShareURL();syncStatus('พร้อม');
+  if(cfg.gsUrl) setTimeout(syncToSheets,2000);
+  loadSettings();
+}
+
+// ===== CLOCK =====
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+// ===== TAB =====
+function switchTab(name,el){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  (el||document.querySelector(`[onclick*="'${name}'"]`))?.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='inventory') renderInventory();
+  if(name==='borrow') renderBorrow();
+  if(name==='approve') renderApprove();
+  if(name==='alerts') renderAlerts();
+  if(name==='settings') loadSettings();
+}
+
+// ===== METRICS =====
+function updateMetrics(){
+  const av=tools.filter(t=>t.status==='วาง').length;
+  const bo=tools.filter(t=>t.status==='ยืม').length;
+  const re=tools.filter(t=>t.status==='รอซ่อม').length;
+  document.getElementById('m-total').textContent=tools.length;
+  document.getElementById('m-avail').textContent=av;
+  document.getElementById('m-borrow').textContent=bo;
+  document.getElementById('m-repair').textContent=re;
+  document.getElementById('inv-cnt').textContent=tools.length;
+  document.getElementById('borrow-cnt').textContent=bo+' รายการ';
+  const pc=pendingReqs.length;
+  document.getElementById('approve-cnt').textContent=pc;
+  document.getElementById('pending-cnt2').textContent=pc+' รายการ';
+
+  // Progress bars
+  const tot=tools.length;
+  document.getElementById('prog-section').innerHTML=`
+    <div class="prog-row"><div class="prog-label"><span>วาง (พร้อมใช้)</span><span style="color:var(--green)">${Math.round(av/tot*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${av/tot*100}%;background:var(--green)"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>รอซ่อม</span><span style="color:var(--red)">${Math.round(re/tot*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${re/tot*100}%;background:var(--red)"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>ถูกยืม</span><span style="color:var(--yellow)">${Math.round(bo/tot*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${bo/tot*100}%;background:var(--yellow)"></div></div></div>`;
+
+  const cats=['HANDTOOL','TOOLS','CHARGING','GENERAL'];
+  document.getElementById('cat-section').innerHTML=cats.map(c=>{
+    const n=tools.filter(t=>t.type===c).length;
+    return `<div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(42,58,85,.3)"><span>${c}</span><span style="font-weight:600;font-family:var(--mono)">${n}</span></div>`;
+  }).join('');
+}
+
+// ===== PILL HELPER =====
+function pill(s){
+  if(s==='วาง') return `<span class="pill pill-green">วาง</span>`;
+  if(s==='ยืม') return `<span class="pill pill-yellow">ถูกยืม</span>`;
+  if(s==='รอซ่อม') return `<span class="pill pill-red">รอซ่อม</span>`;
+  return `<span class="pill pill-gray">${s}</span>`;
+}
+
+// ===== INVENTORY =====
+function renderInventory(){
+  const q=(document.getElementById('inv-search')?.value||'').toLowerCase();
+  const cat=document.getElementById('inv-cat')?.value||'';
+  const st=document.getElementById('inv-status')?.value||'';
+  let list=tools.filter(t=>{
+    return (!q||t.name.toLowerCase().includes(q)||t.id.toLowerCase().includes(q))
+      &&(!cat||t.type===cat)&&(!st||t.status===st);
+  });
+  document.getElementById('inv-cnt').textContent=list.length;
+  document.getElementById('inv-tbody').innerHTML=list.map(t=>`<tr>
+    <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${t.id}</td>
+    <td style="font-weight:500">${t.name}</td>
+    <td style="color:var(--text2)">${t.brand}</td>
+    <td><span class="pill pill-gray">${t.type}</span></td>
+    <td>${pill(t.status)}</td>
+    <td style="font-size:12px;color:var(--text2)">${t.borrower||'—'}</td>
+    <td style="font-size:12px;color:${t.returnDate&&new Date(t.returnDate)<new Date()?'var(--red)':'var(--text3)'}">${t.returnDate||'—'}</td>
+    <td><div style="display:flex;gap:4px">
+      ${t.status==='วาง'?`<button class="btn btn-blue" onclick="quickBorrow('${t.id}')">ยืม</button>`:''}
+      ${t.status==='ยืม'?`<button class="btn btn-green" onclick="openReturn('${t.id}')">คืน</button>`:''}
+      ${t.status==='รอซ่อม'?`<button class="btn btn-orange" onclick="markFixed('${t.id}')">ซ่อมแล้ว</button>`:''}
+    </div></td>
+  </tr>`).join('');
+}
+
+// ===== BORROW PAGE =====
+function renderBorrow(){
+  const active=tools.filter(t=>t.status==='ยืม');
+  document.getElementById('borrow-active').innerHTML=active.length?active.map(t=>`
+    <div style="padding:10px 0;border-bottom:1px solid rgba(42,58,85,.4)">
+      <div style="font-weight:600;font-size:13px">${t.name}</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px">ผู้ยืม: ${t.borrower}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <span style="font-size:11px;color:${new Date(t.returnDate)<new Date()?'var(--red)':'var(--text3)'}">คืน: ${t.returnDate}</span>
+        <button class="btn btn-green" onclick="openReturn('${t.id}')">คืนเครื่องมือ</button>
+      </div>
+    </div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:10px 0">ไม่มีเครื่องมือที่ถูกยืมอยู่</div>`;
+
+  document.getElementById('borrow-history').innerHTML=approveHistory.map(h=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(42,58,85,.3);font-size:12px">
+      <div><div style="font-weight:500">${h.tool}</div><div style="color:var(--text3)">${h.requester} · ${h.date}</div></div>
+      <span class="pill ${h.result==='อนุมัติ'?'pill-green':'pill-red'}">${h.result}</span>
+    </div>`).join('');
+}
+
+// ===== APPROVE =====
+function renderApprove(){
+  document.getElementById('approve-list').innerHTML=pendingReqs.length?pendingReqs.map((r,i)=>`
+    <div class="approve-item">
+      <div class="approve-head">
+        <div>
+          <div class="approve-tool">${r.tool} <span class="pill pill-blue">${r.id}</span></div>
+          <div class="approve-meta">ผู้ขอ: ${r.requester}<br>วันที่: ${r.date} · คืน: ${r.returnDate}<br>วัตถุประสงค์: ${r.purpose}<br>แจ้งเตือน: ${r.notifyLine?'Line ✓':''} ${r.notifyEmail?'Email ✓':''}</div>
+        </div>
+        <div class="approve-actions">
+          <button class="btn btn-green" onclick="doApprove(${i})">อนุมัติ</button>
+          <button class="btn btn-red" onclick="doReject(${i})">ปฏิเสธ</button>
+        </div>
+      </div>
+    </div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:10px 0">ไม่มีรายการรออนุมัติ</div>`;
+
+  document.getElementById('approve-history').innerHTML=approveHistory.map(h=>`<tr>
+    <td>${h.tool}</td><td>${h.requester}</td><td>${h.date}</td><td>${h.approver}</td>
+    <td><span class="pill ${h.result==='อนุมัติ'?'pill-green':'pill-red'}">${h.result}</span></td>
+  </tr>`).join('');
+}
+
+// ===== ALERTS =====
+function renderAlerts(){
+  const items=[
+    {type:'warn',msg:'EV_TOOLS_064 ครบกำหนดคืน 2026-05-06 · ผู้ยืม: นายกิตติกานต์',time:'วันนี้ 08:00'},
+    {type:'warn',msg:'EV_TOOLS_008 ครบกำหนดคืน 2026-05-08 · ผู้ยืม: นายวีระวุฒิ',time:'วันนี้ 08:00'},
+    {type:'danger',msg:'เครื่องมือหุ้มฉนวน 6 รายการ รอซ่อมนานเกิน 30 วัน',time:'2026-04-15'},
+    {type:'info',msg:'REQ-001 ส่งคำขอยืมแล้ว · แจ้ง Line ผู้อนุมัติแล้ว',time:'2026-05-03 15:20'},
+    {type:'success',msg:'คืน ไขควงกระแทกไร้สาย (2) เรียบร้อย',time:'วันนี้ 08:40'},
+  ];
+  const ic={warn:'⚠',danger:'✕',info:'ℹ',success:'✓'};
+  document.getElementById('alerts-list').innerHTML=items.map(a=>`
+    <div class="alert-item ${a.type}">
+      <span style="font-size:14px;margin-top:1px">${ic[a.type]}</span>
+      <div><div style="font-size:13px">${a.msg}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${a.time}</div></div>
+    </div>`).join('');
+}
+
+// ===== ACTIVITY FEED =====
+function renderActivity(){
+  const ic={borrow:'↗',return:'✓',warn:'⚠',approve:'✓'};
+  const cl={borrow:'var(--accent)',return:'var(--green)',warn:'var(--yellow)',approve:'var(--green)'};
+  document.getElementById('activity-feed').innerHTML=activity.map(a=>`
+    <div class="activity-item">
+      <div class="act-icon" style="background:rgba(255,255,255,.05);color:${cl[a.type]||'var(--text2)'}">${ic[a.type]||'·'}</div>
+      <div><div class="act-text">${a.msg}</div><div class="act-time">${a.time}</div></div>
+    </div>`).join('');
+}
+
+// ===== BORROW MODAL =====
+function buildSelects(){
+  document.getElementById('f-borrower').innerHTML=TEAM.map(u=>`<option>${u.name}</option>`).join('');
+  document.getElementById('f-tool').innerHTML=tools.filter(t=>t.status==='วาง').map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+}
+
+function openBorrowModal(){
+  buildSelects();
+  const now=new Date().toISOString().split('T')[0];
+  const ret=new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  document.getElementById('f-date').value=now;
+  document.getElementById('f-return').value=ret;
+  document.getElementById('borrow-modal').classList.add('open');
+}
+
+function quickBorrow(id){
+  openBorrowModal();
+  setTimeout(()=>{document.getElementById('f-tool').value=id},50);
+}
+
+function submitBorrow(){
+  const borrower=document.getElementById('f-borrower').value;
+  const toolId=document.getElementById('f-tool').value;
+  const rd=document.getElementById('f-return').value;
+  const purpose=document.getElementById('f-purpose').value||'-';
+  const notifyLine=document.getElementById('f-line').checked;
+  const notifyEmail=document.getElementById('f-email').checked;
+  const t=tools.find(x=>x.id===toolId);
+  if(!t){toast('ไม่พบเครื่องมือ');return}
+  const id='REQ-'+(String(pendingReqs.length+3).padStart(3,'0'));
+  pendingReqs.push({id,tool:t.name,toolId,requester:borrower,date:new Date().toISOString().split('T')[0],returnDate:rd,purpose,notifyLine,notifyEmail});
+  closeModal('borrow-modal');
+  updateMetrics();renderApprove();
+  const ch=(notifyLine?'Line ':''+(notifyEmail?'Email':''));
+  activity.unshift({type:'borrow',msg:`${borrower} ส่งคำขอยืม ${t.name} · รออนุมัติ`,time:'เพิ่งส่ง'});
+  renderActivity();
+  if(notifyLine&&cfg.lineToken) sendLine(`📋 คำขอยืมใหม่ [${id}]\nเครื่องมือ: ${t.name}\nผู้ขอ: ${borrower}\nกำหนดคืน: ${rd}\nวัตถุประสงค์: ${purpose}`);
+  if(notifyEmail&&cfg.email1) sendEmail(cfg.email1,`EV Storeroom: คำขอยืม ${id}`,`ผู้ขอ: ${borrower}\nเครื่องมือ: ${t.name}\nกำหนดคืน: ${rd}`);
+  syncAction('append_req',{id,tool:t.name,borrower,date:new Date().toISOString().split('T')[0],returnDate:rd,purpose,status:'รออนุมัติ'});
+  toast('ส่งคำขอยืม '+t.name+' แล้ว · แจ้ง'+ch);
+}
+
+// ===== RETURN MODAL =====
+function openReturn(id){
+  const t=tools.find(x=>x.id===id);
+  if(!t) return;
+  returnTargetId=id;
+  document.getElementById('return-modal-body').innerHTML=`
+    <div style="font-weight:600;font-size:14px;margin-bottom:8px">${t.name}</div>
+    <div style="font-size:13px;color:var(--text2)">ผู้ยืม: ${t.borrower}</div>
+    <div style="font-size:13px;color:var(--text2)">ยืม: ${t.borrowDate} · กำหนดคืน: ${t.returnDate}</div>
+    <div class="form-group" style="margin-top:14px">
+      <label class="form-label">สภาพหลังคืน</label>
+      <select id="ret-cond">
+        <option value="1">ปกติ — พร้อมใช้งาน</option>
+        <option value="0">ชำรุด / ต้องซ่อม</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:10px">
+      <label class="form-label">หมายเหตุ (ถ้ามี)</label>
+      <input type="text" id="ret-note" placeholder="เช่น สายชำรุดเล็กน้อย">
+    </div>`;
+  document.getElementById('return-modal').classList.add('open');
+}
+
+function confirmReturn(){
+  const t=tools.find(x=>x.id===returnTargetId);
+  if(!t) return;
+  const cond=document.getElementById('ret-cond').value;
+  const note=document.getElementById('ret-note')?.value||'';
+  const prev=t.borrower;
+  t.status=cond==='1'?'วาง':'รอซ่อม';
+  t.borrower='';t.borrowDate='';t.returnDate='';
+  approveHistory.unshift({tool:t.name,requester:prev,date:new Date().toISOString().split('T')[0],approver:'ระบบ (คืนเอง)',result:'อนุมัติ'});
+  activity.unshift({type:'return',msg:`${prev} คืน ${t.name} · สถานะ: ${t.status}${note?' ('+note+')':''}`,time:'เพิ่งคืน'});
+  closeModal('return-modal');
+  updateMetrics();renderBorrow();renderActivity();
+  if(cfg.lineToken) sendLine(`✅ คืนเครื่องมือแล้ว\nเครื่องมือ: ${t.name}\nผู้คืน: ${prev}\nสภาพ: ${cond==='1'?'ปกติ':'ชำรุด'}${note?'\nหมายเหตุ: '+note:''}`);
+  syncAction('update_tool',{id:t.id,status:t.status});
+  toast('คืน '+t.name+' เรียบร้อย');
+}
+
+function markFixed(id){
+  const t=tools.find(x=>x.id===id);
+  if(!t) return;
+  t.status='วาง';
+  activity.unshift({type:'return',msg:`${t.name} — อัปเดตสถานะเป็น "พร้อมใช้งาน"`,time:'เพิ่งอัปเดต'});
+  updateMetrics();renderInventory();renderActivity();
+  syncAction('update_tool',{id:t.id,status:'วาง'});
+  toast(t.name+' พร้อมใช้งานแล้ว');
+}
+
+// ===== APPROVE ACTIONS =====
+function doApprove(i){
+  const r=pendingReqs[i];
+  const t=tools.find(x=>x.id===r.toolId);
+  if(t){t.status='ยืม';t.borrower=r.requester;t.borrowDate=r.date;t.returnDate=r.returnDate}
+  approveHistory.unshift({tool:r.tool,requester:r.requester,date:r.date,approver:'นายพรวิรุฬ บุญยวรรณ',result:'อนุมัติ'});
+  activity.unshift({type:'approve',msg:`อนุมัติ ${r.tool} ให้ ${r.requester} แล้ว`,time:'เพิ่งอนุมัติ'});
+  pendingReqs.splice(i,1);
+  if(r.notifyLine&&cfg.lineToken) sendLine(`✅ อนุมัติการยืม\nเครื่องมือ: ${r.tool}\nผู้ยืม: ${r.requester}\nกำหนดคืน: ${r.returnDate}\nอนุมัติโดย: นายพรวิรุฬ บุญยวรรณ`);
+  if(r.notifyEmail&&cfg.email1) sendEmail(cfg.email1,`EV Storeroom: อนุมัติ ${r.id}`,`อนุมัติการยืม ${r.tool} ให้ ${r.requester}`);
+  updateMetrics();renderApprove();renderBorrow();renderActivity();
+  syncAction('approve_req',{id:r.id,result:'อนุมัติ',approver:'591250'});
+  toast('อนุมัติ '+r.tool+' แล้ว · แจ้ง Line/Email แล้ว');
+}
+
+function doReject(i){
+  const r=pendingReqs[i];
+  approveHistory.unshift({tool:r.tool,requester:r.requester,date:r.date,approver:'นายพรวิรุฬ บุญยวรรณ',result:'ปฏิเสธ'});
+  activity.unshift({type:'warn',msg:`ปฏิเสธคำขอ ${r.tool} จาก ${r.requester}`,time:'เพิ่งปฏิเสธ'});
+  pendingReqs.splice(i,1);
+  if(r.notifyLine&&cfg.lineToken) sendLine(`❌ ปฏิเสธการยืม\nเครื่องมือ: ${r.tool}\nผู้ขอ: ${r.requester}`);
+  updateMetrics();renderApprove();renderActivity();
+  toast('ปฏิเสธคำขอ '+r.tool);
+}
+
+// ===== LINE NOTIFY =====
+function sendLine(msg){
+  if(!cfg.lineToken) return;
+  fetch('https://notify-api.line.me/api/notify',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+cfg.lineToken,'Content-Type':'application/x-www-form-urlencoded'},
+    body:'message='+encodeURIComponent('\n[EV Storeroom EGAT]\n'+msg)
+  }).catch(()=>{});
+}
+
+// ===== EMAIL (via FormSubmit) =====
+function sendEmail(to,subject,body){
+  if(!to) return;
+  fetch('https://formsubmit.co/ajax/'+to,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({_subject:subject,message:body,_captcha:'false'})
+  }).catch(()=>{});
+}
+
+// ===== TEST NOTIFY =====
+function testNotify(){
+  const ch=document.getElementById('test-ch').value;
+  const type=document.getElementById('test-type').value;
+  const res=document.getElementById('test-result');
+  res.textContent='กำลังส่ง...';
+  res.style.color='var(--yellow)';
+  const msg=`[ทดสอบ] ${type} — จาก EV Storeroom EGAT`;
+  const promises=[];
+  if((ch.includes('Line'))&&cfg.lineToken) promises.push(sendLine(msg));
+  if((ch.includes('Email'))&&cfg.email1) promises.push(sendEmail(cfg.email1,'[TEST] '+type,msg));
+  setTimeout(()=>{
+    const ok=(!ch.includes('Line')||cfg.lineToken)&&(!ch.includes('Email')||cfg.email1);
+    res.textContent=ok?'✓ ส่งสำเร็จ — '+ch:'⚠ กรุณาตั้งค่า Token/Email ก่อน';
+    res.style.color=ok?'var(--green)':'var(--yellow)';
+  },1200);
+}
+
+// ===== GOOGLE SHEETS SYNC =====
+function syncToSheets(){
+  if(!cfg.gsUrl){setSyncStatus('ไม่มี Google Sheets URL');return}
+  setSyncStatus('กำลัง Sync...',true);
+  const rows=[['รหัส','ชื่อเครื่องมือ','ยี่ห้อ','ประเภท','สถานะ','ผู้ยืม','วันยืม','กำหนดคืน','Serial'],...tools.map(t=>[t.id,t.name,t.brand,t.type,t.status,t.borrower,t.borrowDate,t.returnDate,t.serial])];
+  fetch(cfg.gsUrl,{method:'POST',body:JSON.stringify({sheet:'Inventory',action:'clear',headers:rows[0]})})
+    .then(()=>Promise.all(rows.slice(1).map(r=>fetch(cfg.gsUrl,{method:'POST',body:JSON.stringify({sheet:'Inventory',action:'append',row:r})}))))
+    .then(()=>{setSyncStatus('Sync แล้ว');toast('Sync ข้อมูลไป Google Sheets สำเร็จ')})
+    .catch(()=>{setSyncStatus('Sync ล้มเหลว');toast('Sync ล้มเหลว — ตรวจสอบ URL')});
+}
+
+function syncAction(action,data){if(cfg.gsUrl){fetch(cfg.gsUrl,{method:'POST',body:JSON.stringify({sheet:'Log',action:'append',row:[new Date().toISOString(),action,JSON.stringify(data)]})}).catch(()=>{})}}
+
+function testGSheets(){
+  if(!cfg.gsUrl){document.getElementById('gs-test-result').textContent='กรุณาใส่ URL';return}
+  document.getElementById('gs-test-result').textContent='กำลังทดสอบ...';
+  fetch(cfg.gsUrl+'?sheet=Inventory').then(r=>r.json()).then(()=>{
+    document.getElementById('gs-test-result').textContent='✓ เชื่อมต่อสำเร็จ';
+  }).catch(()=>{document.getElementById('gs-test-result').textContent='✕ เชื่อมต่อล้มเหลว'});
+}
+
+function setSyncStatus(msg,syncing=false){
+  document.getElementById('sync-status').textContent=msg;
+  document.getElementById('sync-dot').className='sync-dot'+(syncing?' syncing':'');
+  if(!syncing) document.getElementById('last-sync').textContent='อัปเดต '+new Date().toLocaleTimeString('th-TH');
+}
+function syncStatus(msg){setSyncStatus(msg)}
+
+// ===== EXPORT EXCEL =====
+function exportLogbook(){
+  const wb=XLSX.utils.book_new();
+  // Sheet 1: Inventory
+  const inv=[['รหัส','ชื่อเครื่องมือ','ยี่ห้อ','ประเภท','Serial','สถานะ','ผู้ยืม','วันที่ยืม','กำหนดคืน'],...tools.map(t=>[t.id,t.name,t.brand,t.type,t.serial,t.status,t.borrower,t.borrowDate,t.returnDate])];
+  const ws1=XLSX.utils.aoa_to_sheet(inv);
+  ws1['!cols']=[{wch:15},{wch:35},{wch:15},{wch:12},{wch:15},{wch:10},{wch:25},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws1,'สต็อกเครื่องมือ');
+  // Sheet 2: Borrow Log
+  const bor=[['ลำดับ','เครื่องมือ','ผู้ขอ','วันที่','กำหนดคืน','ผู้อนุมัติ','ผล'],...approveHistory.map((h,i)=>[i+1,h.tool,h.requester,h.date,'-',h.approver,h.result])];
+  const ws2=XLSX.utils.aoa_to_sheet(bor);
+  ws2['!cols']=[{wch:6},{wch:35},{wch:25},{wch:12},{wch:12},{wch:25},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Logbook ยืม-คืน');
+  // Sheet 3: Summary
+  const av=tools.filter(t=>t.status==='วาง').length;
+  const bo=tools.filter(t=>t.status==='ยืม').length;
+  const re=tools.filter(t=>t.status==='รอซ่อม').length;
+  const now=new Date().toLocaleDateString('th-TH');
+  const sum=[['EV Storeroom — สรุปรายงาน EGAT'],['วันที่จัดทำ',now],[''],['สถานะ','จำนวน'],['ทั้งหมด',tools.length],['วาง (พร้อมใช้)',av],['ถูกยืม',bo],['รอซ่อม',re]];
+  const ws3=XLSX.utils.aoa_to_sheet(sum);
+  XLSX.utils.book_append_sheet(wb,ws3,'สรุป');
+  const m=new Date();
+  XLSX.writeFile(wb,`EV_Storeroom_Logbook_${m.getFullYear()}${String(m.getMonth()+1).padStart(2,'0')}.xlsx`);
+  toast('Export Excel สำเร็จ');
+}
+
+// ===== SETTINGS =====
+function loadSettings(){
+  document.getElementById('s-line-token').value=cfg.lineToken;
+  document.getElementById('s-gs-url').value=cfg.gsUrl;
+  document.getElementById('s-email1').value=cfg.email1;
+  document.getElementById('s-email2').value=cfg.email2;
+
+  const roleColor={'Admin+Approver':'var(--accent2)','Approver':'var(--accent)','User':'var(--text3)'};
+  document.getElementById('users-grid').innerHTML=TEAM.map(u=>`
+    <div class="user-row">
+      <div class="user-avatar" style="background:rgba(0,119,255,.15);color:${u.color}">${u.name.split(' ')[1]?.charAt(0)||'U'}</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:13px">${u.name}${u.nick?' ('+u.nick+')':''}</div>
+        <div style="font-size:11px;color:var(--text3)">${u.pos} · ${u.phone}</div>
+      </div>
+      <span class="pill" style="background:rgba(0,119,255,.1);color:${roleColor[u.role]||'var(--text2)'};border-color:rgba(0,119,255,.2)">${u.role}</span>
+    </div>`).join('');
+
+  setShareURL();
+}
+
+function saveSettings(){
+  cfg.lineToken=document.getElementById('s-line-token').value.trim();
+  cfg.gsUrl=document.getElementById('s-gs-url').value.trim();
+  cfg.email1=document.getElementById('s-email1').value.trim();
+  cfg.email2=document.getElementById('s-email2').value.trim();
+  localStorage.setItem('ev_cfg',JSON.stringify(cfg));
+  toast('บันทึกการตั้งค่าแล้ว');
+  setShareURL();
+}
+
+// ===== SHARE LINK =====
+function setShareURL(){
+  const url=window.location.href.split('?')[0];
+  document.getElementById('share-url-display').textContent=url;
+}
+
+function copyShareLink(){
+  const url=window.location.href.split('?')[0];
+  navigator.clipboard.writeText(url).then(()=>toast('คัดลอกลิงก์แล้ว')).catch(()=>{
+    const el=document.createElement('textarea');el.value=url;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);toast('คัดลอกลิงก์แล้ว');
+  });
+}
+
+function shareToLine(){
+  const url=window.location.href.split('?')[0];
+  window.open('https://line.me/R/msg/text/?'+encodeURIComponent('📱 EV Storeroom Dashboard\nกดลิงก์เพื่อเข้าใช้ระบบติดตามเครื่องมือ EV EGAT\n'+url));
+}
+
+function shareByEmail(){
+  const url=window.location.href.split('?')[0];
+  window.location.href='mailto:?subject=EV Storeroom Dashboard EGAT&body='+encodeURIComponent('สวัสดีครับ\n\nระบบติดตามเครื่องมือ EV Storeroom EGAT พร้อมใช้งานแล้ว\nกดลิงก์ด้านล่างเพื่อเข้าใช้งาน:\n\n'+url+'\n\nขอบคุณครับ\nทีม กธตบ-ธ. EGAT');
+}
+
+function downloadHTML(){
+  const html=document.documentElement.outerHTML;
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='EV_Storeroom_EGAT.html';a.click();
+  toast('ดาวน์โหลดไฟล์ HTML แล้ว — แชร์ไปยัง Google Drive หรือส่งทาง Line ได้เลย');
+}
+
+// ===== MODAL =====
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m) m.classList.remove('open')}));
+
+// ===== TOAST =====
+let toastT;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ===== USERS GRID =====
+function buildUsers(){
+  // Called after loadSettings in initApp
+}
+
+// ===== LOAD SAVED CONFIG =====
+try{const s=localStorage.getItem('ev_cfg');if(s){const c=JSON.parse(s);Object.assign(cfg,c)}}catch(e){}
+
+// ===== GS GUIDE TOGGLE =====
+function showGSGuide(){const g=document.getElementById('gs-guide');g.style.display=g.style.display==='none'?'block':'none'}
+</script>
+</body>
+</html>
