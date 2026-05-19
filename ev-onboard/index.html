@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EGAT EV · Total Solution Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#050d1a;--bg1:#091628;--bg2:#0d1e38;--bg3:#122544;--bg4:#1a3058;
+  --b:rgba(77,166,255,.11);--b2:rgba(77,166,255,.22);
+  --t1:#e8f0ff;--t2:#7fa8d4;--t3:#3d6491;
+  --blue:#1565e8;--bl:#4da6ff;--bll:#89c4ff;
+  --gold:#f5c518;--red:#ef4444;--rl:#fca5a5;
+  --amb:#f59e0b;--al:#fcd34d;--grn:#22c55e;--gl:#86efac;
+  --tel:#06b6d4;--pur:#8b5cf6;--cor:#f97316;
+  --r:10px;--rs:6px;--tr:all .18s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg0);color:var(--t1);min-height:100vh;line-height:1.5;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(21,101,232,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(21,101,232,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(5,13,26,.98),rgba(5,13,26,.92));border-bottom:1px solid var(--b2);backdrop-filter:blur(20px)}
+.topbar-inner{max-width:1680px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:0 24px;height:60px}
+.logo-block{display:flex;align-items:center;gap:12px}
+.logo-icon{width:38px;height:38px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,var(--blue),#0a3fa8);display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;animation:logoPulse 4s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 20px rgba(21,101,232,.6)}50%{box-shadow:0 0 34px rgba(77,166,255,.8)}}
+.logo-name{font-size:14.5px;font-weight:600;color:var(--t1)}
+.logo-sub{font-size:10.5px;color:var(--t3)}
+.nav-tabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:4px}
+.nav-tab{background:none;border:none;color:var(--t3);padding:6px 14px;border-radius:7px;font-size:12.5px;font-family:inherit;font-weight:500;cursor:pointer;transition:var(--tr);white-space:nowrap}
+.nav-tab:hover{color:var(--t2);background:var(--bg3)}
+.nav-tab.active{color:var(--bl);background:var(--bg3);box-shadow:0 0 0 1px var(--b2)}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.clock-pill{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--t2);background:var(--bg2);border:1px solid var(--b);padding:5px 11px;border-radius:20px}
+.add-btn{background:var(--blue);color:#fff;border:none;padding:7px 14px;border-radius:var(--rs);font-size:12.5px;font-family:inherit;font-weight:500;cursor:pointer;transition:var(--tr)}
+.add-btn:hover{background:var(--bl);box-shadow:0 0 20px rgba(77,166,255,.4)}
+/* MAIN */
+.main{max-width:1680px;margin:0 auto;padding:24px;position:relative;z-index:1}
+.panel{display:none}.panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* KPI */
+.kpi-strip{display:grid;gap:12px;margin-bottom:20px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.kpi{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:var(--tr);cursor:default}
+.kpi:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.kpi-acc{position:absolute;top:0;left:0;right:0;height:2.5px;border-radius:var(--r) var(--r) 0 0}
+.kpi-lbl{font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.kpi-val{font-size:26px;font-weight:600;line-height:1;letter-spacing:-1px;margin-bottom:4px}
+.kpi-sub{font-size:10.5px;color:var(--t3)}
+.kpi-ico{position:absolute;right:14px;top:12px;font-size:20px;opacity:.15}
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--bl);display:inline-block}
+.sec-ct{font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace}
+/* FILTER */
+.fbar{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.fbar label{font-size:11px;color:var(--t3);white-space:nowrap}
+.fi{background:var(--bg3);color:var(--t1);border:1px solid var(--b);border-radius:var(--rs);padding:6px 10px;font-size:12px;font-family:inherit;outline:none;transition:var(--tr)}
+.fi:focus{border-color:var(--bl)}
+.si{min-width:180px}
+/* TABLE */
+.tw{border-radius:var(--r);border:1px solid var(--b);overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead tr{background:var(--bg3)}
+th{padding:9px 12px;text-align:left;color:var(--t3);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--b);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--t2)}
+th.asc::after{content:' ▲';font-size:8px}th.desc::after{content:' ▼';font-size:8px}
+td{padding:8px 12px;border-bottom:1px solid var(--b);color:var(--t1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .12s}
+tbody tr:hover td{background:rgba(77,166,255,.04)}
+.tbl-empty{text-align:center;padding:48px;color:var(--t3)}
+/* PILLS */
+.pill{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;line-height:1.6}
+.p-r{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.p-a{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+.p-g{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.p-b{background:rgba(77,166,255,.15);color:#89c4ff;border:1px solid rgba(77,166,255,.3)}
+.p-t{background:rgba(6,182,212,.15);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.p-pu{background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)}
+.p-co{background:rgba(249,115,22,.15);color:#fdba74;border:1px solid rgba(249,115,22,.3)}
+.p-go{background:rgba(245,197,24,.15);color:#fde68a;border:1px solid rgba(245,197,24,.3)}
+.p-gr{background:rgba(77,100,145,.15);color:var(--t2);border:1px solid var(--b)}
+/* CHARTS */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.cc{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:20px}
+.ct{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px}
+.bc{display:flex;flex-direction:column;gap:8px}
+.br{display:flex;align-items:center;gap:10px}
+.bl2{font-size:11.5px;color:var(--t2);min-width:110px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{flex:1;height:13px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bf{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.bv{font-size:11px;color:var(--t2);min-width:56px;font-family:'IBM Plex Mono',monospace}
+/* MONEY BAR */
+.money-bar{height:28px;border-radius:6px;overflow:hidden;display:flex;margin-bottom:6px;gap:1px}
+.money-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;transition:width .8s ease;min-width:0}
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.contract-card{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;transition:var(--tr);border-left:3px solid}
+.contract-card:hover{background:var(--bg3);border-color:var(--b2)}
+.cc-name{font-size:13px;font-weight:500;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-meta{font-size:11px;color:var(--t3);margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cc-price{font-size:18px;font-weight:600;color:var(--gold);font-family:'IBM Plex Mono',monospace}
+.cc-detail{font-size:11px;color:var(--t2);margin-top:6px;line-height:1.5}
+/* STATUS TRACKER */
+.status-flow{display:flex;align-items:center;gap:0;margin-bottom:16px;flex-wrap:wrap;gap:4px}
+.sf-step{display:flex;align-items:center;gap:4px}
+.sf-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sf-lbl{font-size:11px;font-weight:500}
+.sf-count{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--t3)}
+.sf-sep{color:var(--t3);font-size:12px;margin:0 2px}
+/* PROG */
+.prog-w{display:flex;align-items:center;gap:5px}
+.prog{height:4px;border-radius:2px;background:var(--bg4);min-width:50px;overflow:hidden}
+.prog-f{height:100%;border-radius:2px}
+/* DIVIDER */
+.divider{height:1px;background:var(--b);margin:20px 0}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-radius:14px;padding:26px;width:min(560px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.8);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:none}}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--t3);margin-bottom:18px}
+.fg{margin-bottom:11px}
+.fg label{font-size:10.5px;color:var(--t3);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{width:100%;font-size:12.5px;padding:8px 10px;background:var(--bg3);color:var(--t1);border:1px solid var(--b);border-radius:var(--rs);font-family:inherit;outline:none;transition:var(--tr)}
+.fg input:focus,.fg select:focus{border-color:var(--bl)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg-hint{font-size:10px;color:var(--t3);margin-top:2px}
+.btn-row2{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.bc2{background:var(--bg3);color:var(--t2);border:1px solid var(--b);padding:8px 18px;border-radius:var(--rs);font-size:12.5px;font-family:inherit;cursor:pointer;transition:var(--tr)}
+.bs{background:var(--blue);color:#fff;border:none;padding:8px 22px;border-radius:var(--rs);font-size:12.5px;font-family:inherit;font-weight:500;cursor:pointer;transition:var(--tr)}
+.bs:hover{background:var(--bl)}
+.ibtn{background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;padding:3px 6px;border-radius:5px;transition:var(--tr)}
+.ibtn:hover{color:var(--t1);background:var(--bg3)}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+/* RESPONSIVE */
+@media(max-width:900px){.cg{grid-template-columns:1fr}.topbar-center{display:none}.mobile-nav{display:flex!important}.main{padding-bottom:70px}}
+@media(max-width:600px){.main{padding:12px}.kpi-strip{grid-template-columns:repeat(2,1fr)}.logo-sub,.clock-pill{display:none}}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--b2);padding:8px 0;z-index:90;justify-content:space-around}
+.mob-tab{background:none;border:none;color:var(--t3);font-size:10px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;cursor:pointer;transition:color .15s}
+.mob-tab.active{color:var(--bl)}
+.mob-tab .ic{font-size:18px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo-block">
+      <div class="logo-icon">EV</div>
+      <div>
+        <div class="logo-name">EGAT EV · Total Solution</div>
+        <div class="logo-sub">กองธุรกิจติดตั้งและบำรุงรักษาสถานีอัดประจุไฟฟ้า (กธตบ-ธ.)</div>
+      </div>
+    </div>
+    <nav style="flex:1;display:flex;justify-content:center" class="topbar-center">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview',this)">📊 ภาพรวม</button>
+        <button class="nav-tab" data-tab="contracts" onclick="switchTab('contracts',this)">📋 สัญญาทั้งหมด</button>
+        <button class="nav-tab" data-tab="status" onclick="switchTab('status',this)">🔄 ติดตามสถานะ</button>
+        <button class="nav-tab" data-tab="sim" onclick="switchTab('sim',this)">📡 SIM Card</button>
+      </div>
+    </nav>
+    <div class="topbar-right">
+      <div class="clock-pill" id="clock"></div>
+      <button class="add-btn" onclick="openAdd()">＋ เพิ่มสัญญา</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ── OVERVIEW ── -->
+<section id="panel-overview" class="panel active">
+  <div class="kpi-strip" id="kpi-overview"></div>
+
+  <div class="cg" style="margin-bottom:20px">
+    <div class="cc">
+      <div class="ct">💰 ยอดขายรายปี (บาท)</div>
+      <div class="bc" id="ch-year"></div>
+    </div>
+    <div class="cc">
+      <div class="ct">📦 สัดส่วน Package S / M / L</div>
+      <div id="pkg-bar-wrap" style="margin-bottom:10px"></div>
+      <div class="bc" id="ch-pkg"></div>
+    </div>
+    <div class="cc">
+      <div class="ct">🔄 สถานะงานทั้งหมด</div>
+      <div class="bc" id="ch-status"></div>
+    </div>
+    <div class="cc">
+      <div class="ct">🏢 ประเภทธุรกิจ (มูลค่า)</div>
+      <div class="bc" id="ch-biz"></div>
+    </div>
+  </div>
+
+  <div class="cc" style="margin-bottom:20px">
+    <div class="ct">⏰ สัญญาใกล้หมดอายุ (180 วันข้างหน้า)</div>
+    <div id="expiring-list" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<!-- ── CONTRACTS ── -->
+<section id="panel-contracts" class="panel">
+  <div class="sec-hdr">
+    <span class="sec-title">สัญญา Total Solution ทั้งหมด</span>
+    <span class="sec-ct" id="con-ct"></span>
+  </div>
+  <div class="fbar">
+    <label>ค้นหา:</label>
+    <input type="text" class="fi si" id="con-q" placeholder="ชื่อบริษัท, เลขใบเสนอ..." oninput="renderContracts()">
+    <label>Package:</label>
+    <select class="fi" id="con-pkg" onchange="renderContracts()">
+      <option value="">ทั้งหมด</option><option>S</option><option>M</option><option>L</option>
+    </select>
+    <label>สถานะ:</label>
+    <select class="fi" id="con-stat" onchange="renderContracts()"><option value="">ทั้งหมด</option></select>
+    <label>ประเภท:</label>
+    <select class="fi" id="con-biz" onchange="renderContracts()"><option value="">ทั้งหมด</option></select>
+    <div style="flex:1"></div>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th onclick="srt('id',this)">#</th>
+        <th onclick="srt('name',this)">บริษัท / ลูกค้า</th>
+        <th onclick="srt('pkg',this)">Pkg</th>
+        <th style="max-width:160px">อุปกรณ์</th>
+        <th onclick="srt('price',this)">ราคา (บาท)</th>
+        <th onclick="srt('poDate',this)">วันลงนาม PO</th>
+        <th onclick="srt('startDate',this)">เริ่มสัญญา</th>
+        <th onclick="srt('endDate',this)">สิ้นสุดสัญญา</th>
+        <th>เหลือ</th>
+        <th onclick="srt('bizType',this)">ประเภทธุรกิจ</th>
+        <th onclick="srt('jobStatus',this)">สถานะงาน</th>
+        <th>SIM / ไฟ / Charger</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="tbl-contracts"></tbody>
+    </table>
+  </div>
+  <p style="font-size:10.5px;color:var(--t3);margin-top:8px">* ยอดรวมทั้งหมด <span id="total-sum" style="color:var(--gold);font-family:monospace"></span> บาท (ไม่รวม VAT)</p>
+</section>
+
+<!-- ── STATUS ── -->
+<section id="panel-status" class="panel">
+  <div class="sec-hdr"><span class="sec-title">ติดตามสถานะงาน</span></div>
+  <!-- status swimlane -->
+  <div id="swimlane" style="display:grid;gap:14px"></div>
+</section>
+
+<!-- ── SIM ── -->
+<section id="panel-sim" class="panel">
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:10px 14px;background:var(--bg2);border:1px solid var(--b);border-radius:8px">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--grn)"></div>อยู่ในประกัน SIM (2 ปีแรก)</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--amb)"></div>พ้นประกัน SIM</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--red)"></div>SIM หมดอายุ/เร่งด่วน</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--t3)"></div>ยังไม่มีวันเปิดบริการ</div>
+  </div>
+  <div class="kpi-strip" id="kpi-sim"></div>
+  <div class="fbar">
+    <label>ค้นหา:</label>
+    <input type="text" class="fi si" id="sim-q" placeholder="ชื่อ, เบอร์ SIM..." oninput="renderSIM()">
+    <label>SIM โดย:</label>
+    <select class="fi" id="sim-v" onchange="renderSIM()">
+      <option value="">ทั้งหมด</option>
+      <option>Inno</option><option>6+1</option><option>wifi พท.</option><option>กธซย-ธ.</option>
+    </select>
+    <label>สถานะ SIM:</label>
+    <select class="fi" id="sim-st" onchange="renderSIM()">
+      <option value="">ทั้งหมด</option>
+      <option value="in">อยู่ในประกัน</option>
+      <option value="out">พ้นประกัน</option>
+      <option value="exp">หมดอายุ/เร่งด่วน</option>
+      <option value="nd">ยังไม่ทราบ</option>
+    </select>
+    <div style="flex:1"></div>
+    <span class="sec-ct" id="sim-ct"></span>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>#</th>
+        <th>บริษัท / ลูกค้า</th>
+        <th>Pkg</th>
+        <th>SIM โดย</th>
+        <th>ระบบไฟฟ้า</th>
+        <th>Charger</th>
+        <th>เริ่มสัญญา</th>
+        <th>SIM ประกัน 2 ปี (ถึง)</th>
+        <th>เหลือ (วัน)</th>
+        <th>สถานะ SIM</th>
+        <th>สิ้นสุดสัญญา</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="tbl-sim"></tbody>
+    </table>
+  </div>
+  <p style="font-size:10.5px;color:var(--t3);margin-top:8px">* SIM ประกัน 2 ปีแรก นับจากวันเริ่มสัญญา | BangEN: SIM ไม่อยู่ในประกันเครื่อง ใช้กฎ 2 ปีแรก</p>
+</section>
+
+</main>
+
+<nav class="mobile-nav">
+  <button class="mob-tab active" data-tab="overview" onclick="switchTab('overview',this)"><span class="ic">📊</span>ภาพรวม</button>
+  <button class="mob-tab" data-tab="contracts" onclick="switchTab('contracts',this)"><span class="ic">📋</span>สัญญา</button>
+  <button class="mob-tab" data-tab="status" onclick="switchTab('status',this)"><span class="ic">🔄</span>สถานะ</button>
+  <button class="mob-tab" data-tab="sim" onclick="switchTab('sim',this)"><span class="ic">📡</span>SIM</button>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title" id="modal-ttl">＋ เพิ่มสัญญาใหม่</div>
+    <div class="modal-sub">ข้อมูลจะบันทึกในเซสชันนี้ · เพิ่มถาวรใน Google Sheets</div>
+    <div class="fg-row">
+      <div class="fg" style="grid-column:1/-1"><label>ชื่อบริษัท / ลูกค้า *</label><input id="f-name" type="text"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Package</label><select id="f-pkg"><option>S</option><option>M</option><option>L</option></select></div>
+      <div class="fg"><label>ราคา (บาท)</label><input id="f-price" type="number" value="0"></div>
+    </div>
+    <div class="fg"><label>รายละเอียดอุปกรณ์</label><input id="f-detail" type="text"></div>
+    <div class="fg-row">
+      <div class="fg"><label>วันลงนาม PO</label><input id="f-po" type="date"></div>
+      <div class="fg"><label>ประเภทธุรกิจ</label><input id="f-biz" type="text" placeholder="Hotel, Office..."></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>วันเริ่มสัญญา</label><input id="f-start" type="date"></div>
+      <div class="fg"><label>วันสิ้นสุดสัญญา</label><input id="f-end" type="date"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>SIM โดย</label><input id="f-sim" type="text" placeholder="Inno, 6+1, wifi พท..."></div>
+      <div class="fg"><label>ระบบไฟฟ้า</label><input id="f-elec" type="text" placeholder="ลูกค้า, Evolt..."></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Charger</label><input id="f-charger" type="text" placeholder="Inno, Entech..."></div>
+      <div class="fg"><label>สถานะงาน</label>
+        <select id="f-stat">
+          <option>แล้วเสร็จ</option><option>รอไฟมา</option><option>รอเครื่อง</option>
+          <option>รอสำรวจหน้างาน</option><option>อยู่ระหว่างติดตั้ง</option><option>กำลังดำเนินการ</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row2">
+      <button class="bc2" onclick="document.getElementById('modal').classList.remove('open')">ยกเลิก</button>
+      <button class="bs" onclick="saveEntry()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════ DATA ═══════════════════ */
+const TODAY = (() => { const d=new Date(); d.setHours(0,0,0,0); return d; })();
+
+let DATA = [
+  {id:1,year:'2565',quote:'Q-BN2022-0009',name:'บริษัท ทวินโลตัส จำกัด',pkg:'S',detail:'Wallbox Commander2 22kw 2EA',price:189789.86,poDate:'2023-09-01',startDate:'2023-09-01',endDate:'2026-08-31',bizType:'Hotel',jobStatus:'แล้วเสร็จ',sim:'wifi พท.',electrical:'',charger:'',contractStatus:''},
+  {id:2,year:'2565',quote:'Q-BN2022-0018',name:'บริษัท พลังงานนครพิงค์ จำกัด (เทศบาล)',pkg:'S',detail:'Wallbox pulsar plus 22kw 1EA',price:49778.05,poDate:'2021-09-01',startDate:'2021-09-01',endDate:'2025-08-31',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:3,year:'2565',quote:'Q-BN2022-0033',name:'ห้างหุ้นส่วนไตรรัตน์ เซอร์วิส',pkg:'S',detail:'Wallbox Commander2 22kw 2EA',price:308350.32,poDate:'2022-10-01',startDate:'2022-10-01',endDate:'2026-06-30',bizType:'Café & Restaurant',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:4,year:'2565',quote:'Q-BN2022-0013',name:'นิติบุคคลอาคารชุด เซเรนนิตี้ จอมเทียน',pkg:'S',detail:'Wallbox pulsar plus 7.4kw & 22kW 4EA',price:279900.64,poDate:'2023-07-01',startDate:'2023-07-01',endDate:'2027-06-30',bizType:'Condo/Apartment',jobStatus:'แล้วเสร็จ',sim:'wifi พท.',electrical:'',charger:'',contractStatus:''},
+  {id:5,year:'2566',quote:'Q-BN2023-0048',name:'บริษัท บางซื่อโรงสีไฟเจียเม้ง จำกัด',pkg:'S',detail:'Wallbox pulsar Max 7.4kw 1EA',price:67000,poDate:'2023-04-11',startDate:'2023-04-11',endDate:'2025-04-10',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:6,year:'2566',quote:'Q-BN2023-0100',name:'บริษัท ผลิตไฟฟ้า จำกัด (EGCO)',pkg:'S',detail:'Wallbox Commander2 22kw 4EA + Flexx DC60kW',price:2358850,poDate:'2023-08-04',startDate:'2023-11-01',endDate:'2026-11-30',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:7,year:'2566',quote:'Q-BN2023-0093',name:'บริษัท ซัมมิท ไพน์เฮิร์สท กอล์ฟ คลับ จำกัด',pkg:'S',detail:'Wallbox Commander2 22kw',price:370445,poDate:'2023-09-02',startDate:'2023-11-01',endDate:'2026-10-31',bizType:'Sport Complex',jobStatus:'แล้วเสร็จ',sim:'wifi พท.',electrical:'',charger:'',contractStatus:''},
+  {id:8,year:'2566',quote:'Q-BN2023-0067',name:'บริษัท โรงพยาบาลเชียงใหม่ราม จำกัด (DC)',pkg:'M',detail:'DC Delta City 50kW',price:1619231,poDate:'2023-07-08',startDate:'2023-12-01',endDate:'2026-02-28',bizType:'Hospital',jobStatus:'แล้วเสร็จ',sim:'6+1',electrical:'',charger:'',contractStatus:''},
+  {id:9,year:'2566',quote:'Q-BN2023-0068',name:'บริษัท โรงพยาบาลเชียงใหม่ราม จำกัด (AC)',pkg:'S',detail:'Delta 22kW',price:274519,poDate:'2023-07-08',startDate:'2023-12-01',endDate:'2026-02-28',bizType:'Hospital',jobStatus:'แล้วเสร็จ',sim:'6+1',electrical:'',charger:'',contractStatus:''},
+  {id:10,year:'2566',quote:'Q-BN2023-0149',name:'บริษัท ใหม่ เรสซิเดนซ์ จำกัด',pkg:'S',detail:'Wallbox Pulsar Pro 22kw',price:194000,poDate:'2023-11-29',startDate:'2023-12-16',endDate:'2025-12-15',bizType:'Hotel',jobStatus:'แล้วเสร็จ',sim:'wifi พท.',electrical:'',charger:'',contractStatus:''},
+  {id:11,year:'2567',quote:'Q-BN2024-0034',name:'ห้างหุ้นส่วนจำกัด ดีไทย เจนซี่ กรุ๊ป',pkg:'S',detail:'ABB 22kW 2EA',price:180000,poDate:'2024-02-13',startDate:'2024-04-01',endDate:'2026-03-31',bizType:'Condo',jobStatus:'แล้วเสร็จ',sim:'wifi พท.',electrical:'',charger:'',contractStatus:'ต่อ BN'},
+  {id:12,year:'2567',quote:'Q-BN2022-0140',name:'บริษัท แทมมารินด์ ระยอง จำกัด',pkg:'S',detail:'ABB 22kW 2EA',price:173000,poDate:'2024-02-21',startDate:'2024-04-01',endDate:'2026-03-31',bizType:'Hotel',jobStatus:'แล้วเสร็จ',sim:'wifi พท.',electrical:'',charger:'',contractStatus:'ต่อ BN'},
+  {id:13,year:'2567',quote:'Q-BN2024-0024',name:'บริษัท พีอาร์ซี คอมปาวเดอร์ จำกัด',pkg:'M',detail:'Flexx 30kW 1EA',price:439000,poDate:'2024-01-22',startDate:'2024-05-01',endDate:'2026-04-30',bizType:'Café & Restaurant',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:14,year:'2567',quote:'Q-BN2023-0169',name:'ห้างหุ้นส่วนจำกัด พี แอนด์ เอ็ม แอลพีจี เซอร์วิส',pkg:'L',detail:'Flexx Classic 120kW 2EA',price:2378000,poDate:'2024-04-01',startDate:'2024-04-01',endDate:'2026-03-31',bizType:'EV Station',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:'ต่อ BN'},
+  {id:15,year:'2567',quote:'Q-BN2023-0143',name:'คุณสัญญา ศรีคุณ',pkg:'M',detail:'Flexx 30kW 1EA',price:419000,poDate:'2024-05-01',startDate:'2024-05-01',endDate:'2026-06-30',bizType:'Condo/Apartment',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:16,year:'2567',quote:'Q-BN2023-0157',name:'บริษัท อุบลรักษ์ จำกัด',pkg:'S',detail:'ABB 22kW 2EA',price:209000,poDate:'2024-06-16',startDate:'2024-06-16',endDate:'2026-06-15',bizType:'Hospital',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:17,year:'2567',quote:'Q-BN2024-0028',name:'คุณจิรา ประกฤตติภูมิ',pkg:'L',detail:'Exicom 120kW 1EA',price:1084000,poDate:'2024-06-16',startDate:'2024-06-16',endDate:'2027-06-15',bizType:'Café & Restaurant',jobStatus:'แล้วเสร็จ',sim:'Inno',electrical:'ลูกค้า',charger:'Inno',contractStatus:''},
+  {id:18,year:'2567',quote:'Q-BN2024-0029',name:'บมจ.ภัทรลิสซิ่ง',pkg:'M',detail:'AC delta 22kW + DC Exicom 30kW',price:723500,poDate:'2024-09-16',startDate:'2024-09-16',endDate:'2026-09-15',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'6+1',electrical:'6+1',charger:'6+1',contractStatus:''},
+  {id:19,year:'2567',quote:'Q-BN2023-0148',name:'บริษัท จีทู กรุ๊ป จำกัด',pkg:'L',detail:'Flexx Classic 120kW 1EA',price:1229430,poDate:'2024-09-01',startDate:'2024-09-01',endDate:'2026-08-31',bizType:'Community mall',jobStatus:'แล้วเสร็จ',sim:'',electrical:'',charger:'',contractStatus:''},
+  {id:20,year:'2567',quote:'Q-BN2024-0039B',name:'บ. สวารอฟสกี้ (จุดที่ 1)',pkg:'S',detail:'Delta 22kW 3EA',price:360000,poDate:'2024-07-15',startDate:'2024-10-01',endDate:'2026-09-30',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'6+1',electrical:'ลูกค้า',charger:'เครื่อง EleX',contractStatus:''},
+  {id:21,year:'2567',quote:'QN-2024-0091B',name:'บริษัท เร้นท์ คอปเปอร์เรชั่น',pkg:'L',detail:'Exicom 120kW 1EA',price:1250000,poDate:'2024-11-16',startDate:'2024-11-16',endDate:'2026-11-15',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'Inno',electrical:'AT.29',charger:'Inno',contractStatus:''},
+  {id:22,year:'2567',quote:'Q-BN2023-0067B',name:'บริษัท เพทรา พาวเวอร์ จำกัด',pkg:'L',detail:'Exicom 120kW 1EA',price:1662540.42,poDate:'2025-06-16',startDate:'2025-06-16',endDate:'2027-06-15',bizType:'สถาบันการศึกษา',jobStatus:'แล้วเสร็จ',sim:'Inno',electrical:'AT.30',charger:'Inno',contractStatus:''},
+  {id:23,year:'2568',quote:'Q-BN2024-0053D',name:'บ.สตาร์ไรส์',pkg:'L',detail:'Exicom 120kW 1EA',price:1715000,poDate:'2024-12-16',startDate:'2024-12-16',endDate:'2027-02-15',bizType:'Café & Restaurant',jobStatus:'แล้วเสร็จ',sim:'Inno',electrical:'Evolt',charger:'Inno',contractStatus:''},
+  {id:24,year:'2568',quote:'Q-BN2024-0173',name:'คุณกรวรรณ สกลนคร',pkg:'L',detail:'Exicom 120kW 1EA',price:1450000,poDate:'2025-01-02',startDate:'2025-04-01',endDate:'2027-05-31',bizType:'Café & Restaurant',jobStatus:'แล้วเสร็จ',sim:'Inno',electrical:'Evolt',charger:'Inno',contractStatus:''},
+  {id:25,year:'2568',quote:'Q-BN2025-0059',name:'สวารอฟสกี้ จุดที่ 2',pkg:'S',detail:'AC เปล่า 2 เครื่อง',price:230000,poDate:'2025-06-26',startDate:'2025-08-16',endDate:'2027-08-15',bizType:'Office',jobStatus:'แล้วเสร็จ',sim:'6+1',electrical:'ลูกค้า',charger:'เครื่อง EleX',contractStatus:''},
+  {id:26,year:'2569',quote:'',name:'บ. เอ.ที. 59 จำกัด [Isuzu บางแสน]',pkg:'L',detail:'Starcharge Tritran V5 180kW 1EA',price:1640000,poDate:'',startDate:'',endDate:'',bizType:'',jobStatus:'รอไฟมา',sim:'กธซย-ธ.',electrical:'Evolt',charger:'Entech',contractStatus:''},
+  {id:27,year:'2569',quote:'',name:'บ. คิว.อี. แคปปิตอล [เมืองทอง]',pkg:'L',detail:'Starcharge Tritran V5 180kW 4EA',price:1780000,poDate:'',startDate:'',endDate:'',bizType:'',jobStatus:'รอเครื่อง',sim:'กธซย-ธ.',electrical:'ลูกค้า',charger:'Entech',contractStatus:''},
+  {id:28,year:'2569',quote:'',name:'บ. ชาร์จพลัส โซลูชั่นกรุ๊ป [สายไหม 56]',pkg:'L',detail:'Starcharge Tritran V5 180kW 4EA',price:1780000,poDate:'',startDate:'',endDate:'',bizType:'',jobStatus:'รอเครื่อง',sim:'กธซย-ธ.',electrical:'ลูกค้า',charger:'Entech',contractStatus:''},
+  {id:29,year:'2569',quote:'',name:'บ. อีวี เทลวี จำกัด',pkg:'L',detail:'Starcharge Tritran V5 180kW 3EA',price:5800000,poDate:'',startDate:'',endDate:'',bizType:'',jobStatus:'รอสำรวจหน้างาน',sim:'กธซย-ธ.',electrical:'Evolt',charger:'Entech',contractStatus:''},
+];
+
+/* ═══════════════════ HELPERS ═══════════════════ */
+function dF(s){if(!s)return null;const d=new Date(s);if(isNaN(d))return null;d.setHours(0,0,0,0);return Math.round((d-TODAY)/86400000);}
+function fTH(s){if(!s)return'-';const d=new Date(s);if(isNaN(d))return s;return d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});}
+function fMoney(n){return n?n.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0}):'-';}
+function pkgCls(p){return p==='S'?'p-t':p==='M'?'p-pu':p==='L'?'p-co':'p-gr';}
+function simWarrEnd(r){const d=addYears(r.startDate,2);return d;}
+function addYears(s,y){if(!s)return null;const d=new Date(s);if(isNaN(d))return null;d.setFullYear(d.getFullYear()+y);return d.toISOString().slice(0,10);}
+function simDL(r){return dF(simWarrEnd(r));}
+function simSt(r){const dy=simDL(r);if(dy===null)return'nd';if(dy<0)return'exp';if(dy<=90)return'soon';return'in';}
+function statusColor(s){
+  if(!s)return'#3d6491';
+  if(s.includes('แล้วเสร็จ'))return'#22c55e';
+  if(s.includes('รอไฟ'))return'#f59e0b';
+  if(s.includes('รอเครื่อง'))return'#f97316';
+  if(s.includes('รอสำรวจ'))return'#8b5cf6';
+  if(s.includes('ติดตั้ง'))return'#06b6d4';
+  return'#1565e8';
+}
+function contractDays(r){
+  const dy=dF(r.endDate);
+  if(dy===null)return '';
+  if(dy<0)return`<span style="color:var(--red);font-size:11px">หมดแล้ว</span>`;
+  if(dy<=90)return`<span style="color:var(--amb);font-size:11px">${dy} วัน</span>`;
+  return`<span style="color:var(--t3);font-size:11px">${dy} วัน</span>`;
+}
+
+/* ═══════════════════ SORT ═══════════════════ */
+let SRT={col:'id',dir:1};
+function srt(col,el){
+  document.querySelectorAll('th.asc,th.desc').forEach(t=>{t.classList.remove('asc','desc');});
+  if(SRT.col===col)SRT.dir*=-1;else{SRT.col=col;SRT.dir=1;}
+  el.classList.add(SRT.dir===1?'asc':'desc');
+  renderContracts();
+}
+
+/* ═══════════════════ KPI OVERVIEW ═══════════════════ */
+function renderKPIOverview(){
+  const total=DATA.reduce((s,r)=>s+r.price,0);
+  const done=DATA.filter(r=>r.jobStatus==='แล้วเสร็จ');
+  const doneVal=done.reduce((s,r)=>s+r.price,0);
+  const inProg=DATA.filter(r=>r.jobStatus!=='แล้วเสร็จ');
+  const inProgVal=inProg.reduce((s,r)=>s+r.price,0);
+  const expiring=DATA.filter(r=>{const dy=dF(r.endDate);return dy!==null&&dy>=0&&dy<=90;}).length;
+  document.getElementById('kpi-overview').innerHTML=[
+    {l:'สัญญาทั้งหมด',v:DATA.length+' ราย',s:'Total Solution',c:'#1565e8',i:'📋'},
+    {l:'มูลค่ารวม (ไม่รวม VAT)',v:fMoney(total),s:'บาท',c:'#f5c518',i:'💰'},
+    {l:'แล้วเสร็จ',v:done.length+' ราย',s:fMoney(doneVal)+' บาท',c:'#22c55e',i:'✅'},
+    {l:'อยู่ระหว่างดำเนินการ',v:inProg.length+' ราย',s:fMoney(inProgVal)+' บาท',c:'#f59e0b',i:'⚙️'},
+    {l:'สัญญาหมดใน 90 วัน',v:expiring,s:'ต้องดำเนินการ',c:'#ef4444',i:'⏳'},
+    {l:'Package L (DC Fast)',v:DATA.filter(r=>r.pkg==='L').length,s:'สัญญา',c:'#f97316',i:'⚡'},
+  ].map((k,i)=>`<div class="kpi" style="animation:fadeIn .4s ${i*60}ms both">
+    <div class="kpi-acc" style="background:${k.c}"></div>
+    <div class="kpi-ico">${k.i}</div>
+    <div class="kpi-lbl">${k.l}</div>
+    <div class="kpi-val" style="color:${k.c};font-size:${k.v.length>8?'18px':'26px'}">${k.v}</div>
+    <div class="kpi-sub">${k.s}</div>
+  </div>`).join('');
+}
+
+/* ═══════════════════ CHARTS ═══════════════════ */
+function barChart(el,items,colorFn,useMoney=false){
+  const max=Math.max(...items.map(i=>i.v),1);
+  document.getElementById(el).innerHTML=items.map(i=>`
+    <div class="br">
+      <span class="bl2">${i.k}</span>
+      <div class="bt"><div class="bf" style="width:${Math.round(i.v/max*100)}%;background:${colorFn(i.k)}"></div></div>
+      <span class="bv">${useMoney?fMoney(i.v):i.v}</span>
+    </div>`).join('');
+}
+
+function renderCharts(){
+  // year
+  const byY={};DATA.forEach(r=>{byY[r.year]=(byY[r.year]||0)+r.price;});
+  barChart('ch-year',Object.entries(byY).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>({k,v})),()=>'#4da6ff',true);
+
+  // pkg bar
+  const byP={S:0,M:0,L:0};DATA.forEach(r=>{byP[r.pkg]=(byP[r.pkg]||0)+r.price;});
+  const tot=Object.values(byP).reduce((a,b)=>a+b,0);
+  const pClr={S:'#22d3ee',M:'#a78bfa',L:'#fb923c'};
+  document.getElementById('pkg-bar-wrap').innerHTML=`
+    <div class="money-bar">
+      ${Object.entries(byP).map(([p,v])=>`<div class="money-seg" style="width:${(v/tot*100).toFixed(1)}%;background:${pClr[p]};min-width:${v>0?'40px':'0'}">
+        <span style="padding:0 6px">${p} ${(v/tot*100).toFixed(0)}%</span>
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:12px;font-size:11px;color:var(--t2)">
+      ${Object.entries(byP).map(([p,v])=>`<span><span style="color:${pClr[p]};font-weight:500">Pkg ${p}</span> ${DATA.filter(r=>r.pkg===p).length} ราย · ${fMoney(v)} บาท</span>`).join('')}
+    </div>`;
+  barChart('ch-pkg',Object.entries(byP).map(([k,v])=>({k:`Package ${k}`,v})),k=>pClr[k.slice(-1)]||'#888',true);
+
+  // status
+  const bySt={};DATA.forEach(r=>{bySt[r.jobStatus]=(bySt[r.jobStatus]||0)+1;});
+  barChart('ch-status',Object.entries(bySt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({k,v})),k=>statusColor(k));
+
+  // biz by value
+  const byB={};DATA.forEach(r=>{if(r.bizType)byB[r.bizType]=(byB[r.bizType]||0)+r.price;});
+  barChart('ch-biz',Object.entries(byB).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>({k,v})),()=>'#1565e8',true);
+
+  // expiring contracts
+  const exp=DATA.filter(r=>{const dy=dF(r.endDate);return dy!==null&&dy>=0&&dy<=180;}).sort((a,b)=>dF(a.endDate)-dF(b.endDate));
+  const expEl=document.getElementById('expiring-list');
+  if(!exp.length){expEl.innerHTML='<p style="color:var(--t3);font-size:12px">ไม่มีสัญญาหมดใน 180 วัน 🎉</p>';return;}
+  expEl.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px">${exp.map(r=>{
+    const dy=dF(r.endDate);
+    const cl=dy<=30?'var(--red)':dy<=90?'var(--amb)':'var(--tel)';
+    return`<div style="background:var(--bg3);border:1px solid var(--b);border-left:3px solid ${cl};border-radius:8px;padding:10px 14px;min-width:200px">
+      <div style="font-size:12px;font-weight:500;margin-bottom:4px">${r.name.substring(0,28)}</div>
+      <div style="font-size:11px;color:var(--t3)">${fTH(r.endDate)}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
+        <span class="pill ${pkgCls(r.pkg)}">${r.pkg}</span>
+        <span class="pill" style="background:rgba(0,0,0,.2);color:${cl};border:1px solid ${cl};font-size:10px">${dy} วัน</span>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ═══════════════════ CONTRACTS TABLE ═══════════════════ */
+function renderContracts(){
+  const q=document.getElementById('con-q').value.toLowerCase();
+  const pf=document.getElementById('con-pkg').value;
+  const sf=document.getElementById('con-stat').value;
+  const bf=document.getElementById('con-biz').value;
+  let rows=DATA.filter(r=>{
+    if(q&&!`${r.name}${r.quote}`.toLowerCase().includes(q))return false;
+    if(pf&&r.pkg!==pf)return false;
+    if(sf&&r.jobStatus!==sf)return false;
+    if(bf&&r.bizType!==bf)return false;
+    return true;
+  });
+  rows=[...rows].sort((a,b)=>{
+    let av=a[SRT.col]??0,bv=b[SRT.col]??0;
+    if(typeof av==='string')return av.localeCompare(bv,'th')*SRT.dir;
+    return(av-bv)*SRT.dir;
+  });
+  document.getElementById('con-ct').textContent=`${rows.length} / ${DATA.length} รายการ`;
+  const filtTotal=rows.reduce((s,r)=>s+r.price,0);
+  document.getElementById('total-sum').textContent=fMoney(filtTotal);
+  const tbody=document.getElementById('tbl-contracts');
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="13" class="tbl-empty">🔍 ไม่พบข้อมูล</td></tr>`;return;}
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td style="color:var(--t3);font-size:11px;font-family:monospace">${r.id}</td>
+    <td style="font-size:12px;font-weight:500;max-width:170px">${r.name}</td>
+    <td><span class="pill ${pkgCls(r.pkg)}">${r.pkg}</span></td>
+    <td style="font-size:11px;color:var(--t2);max-width:130px">${r.detail||'-'}</td>
+    <td style="text-align:right;font-family:monospace;font-size:12px;color:var(--gold);white-space:nowrap">${fMoney(r.price)}</td>
+    <td style="font-size:11px;color:var(--t2);white-space:nowrap">${fTH(r.poDate)}</td>
+    <td style="font-size:11px;white-space:nowrap">${fTH(r.startDate)}</td>
+    <td style="font-size:11px;font-weight:500;white-space:nowrap;color:${dF(r.endDate)!==null&&dF(r.endDate)<90?'var(--amb)':'var(--t1)'}">${fTH(r.endDate)}</td>
+    <td>${contractDays(r)}</td>
+    <td style="font-size:11px;color:var(--t2)">${r.bizType||'-'}</td>
+    <td><span class="pill" style="background:rgba(0,0,0,.2);color:${statusColor(r.jobStatus)};border:1px solid ${statusColor(r.jobStatus)}40;font-size:10px">${r.jobStatus||'-'}</span></td>
+    <td style="font-size:10.5px;color:var(--t2);white-space:nowrap">${[r.sim,r.electrical,r.charger].filter(Boolean).join(' · ')||'-'}</td>
+    <td><button class="ibtn" onclick="openEdit(${DATA.indexOf(r)})">✏️</button><button class="ibtn" onclick="delEntry(${DATA.indexOf(r)})">🗑️</button></td>
+  </tr>`).join('');
+}
+
+/* ═══════════════════ STATUS SWIMLANE ═══════════════════ */
+function renderStatus(){
+  const statuses=['แล้วเสร็จ','อยู่ระหว่างติดตั้ง','รอไฟมา','รอเครื่อง','รอเครื่ื่อง','รอสำรวจหน้างาน','กำลังดำเนินการ'];
+  const byS={};
+  DATA.forEach(r=>{
+    const k=r.jobStatus||'ไม่ระบุ';
+    if(!byS[k])byS[k]=[];
+    byS[k].push(r);
+  });
+  // merge typo
+  if(byS['รอเครื่ื่อง']){
+    byS['รอเครื่อง']=[...(byS['รอเครื่อง']||[]),...byS['รอเครื่ื่อง']];
+    delete byS['รอเครื่ื่อง'];
+  }
+  const order=['แล้วเสร็จ','รอไฟมา','รอเครื่อง','รอสำรวจหน้างาน','อยู่ระหว่างติดตั้ง','กำลังดำเนินการ','ไม่ระบุ'];
+  const lanes=order.filter(k=>byS[k]&&byS[k].length);
+  document.getElementById('swimlane').innerHTML=lanes.map(status=>{
+    const items=byS[status];
+    const val=items.reduce((s,r)=>s+r.price,0);
+    const c=statusColor(status);
+    return`<div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:3px;height:18px;border-radius:2px;background:${c}"></div>
+        <span style="font-size:13px;font-weight:500;color:${c}">${status}</span>
+        <span style="font-size:11px;color:var(--t3)">${items.length} ราย · ${fMoney(val)} บาท</span>
+      </div>
+      <div class="card-grid">
+        ${items.map(r=>`<div class="contract-card" style="border-left-color:${c}">
+          <div class="cc-name">${r.name}</div>
+          <div class="cc-meta">
+            <span class="pill ${pkgCls(r.pkg)}">${r.pkg}</span>
+            ${r.bizType?`<span class="pill p-gr">${r.bizType}</span>`:''}
+            ${r.contractStatus?`<span class="pill p-b">${r.contractStatus}</span>`:''}
+          </div>
+          <div class="cc-price">${fMoney(r.price)} ฿</div>
+          <div class="cc-detail">
+            ${r.detail||'-'}
+            ${r.endDate?`<br>สัญญาสิ้นสุด: ${fTH(r.endDate)}`:''}
+            ${r.sim?`<br>SIM: ${r.sim}`:''}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════ SIM TABLE ═══════════════════ */
+function renderKPISIM(){
+  const wIn=DATA.filter(r=>simSt(r)==='in').length;
+  const wSoon=DATA.filter(r=>simSt(r)==='soon').length;
+  const wExp=DATA.filter(r=>simSt(r)==='exp').length;
+  const wNd=DATA.filter(r=>simSt(r)==='nd').length;
+  document.getElementById('kpi-sim').innerHTML=[
+    {l:'SIM ทั้งหมด',v:DATA.length,s:'สัญญา TS',c:'#1565e8',i:'📡'},
+    {l:'อยู่ในประกัน SIM',v:wIn,s:'2 ปีแรก',c:'#22c55e',i:'✅'},
+    {l:'ใกล้หมดประกัน',v:wSoon,s:'≤ 90 วัน',c:'#f59e0b',i:'⏳'},
+    {l:'หมดประกัน/อายุ',v:wExp,s:'ดำเนินการด่วน',c:'#ef4444',i:'🔴'},
+    {l:'ยังไม่ทราบวันเปิด',v:wNd,s:'รอข้อมูล',c:'#06b6d4',i:'📵'},
+  ].map((k,i)=>`<div class="kpi" style="animation:fadeIn .4s ${i*60}ms both">
+    <div class="kpi-acc" style="background:${k.c}"></div>
+    <div class="kpi-ico">${k.i}</div>
+    <div class="kpi-lbl">${k.l}</div>
+    <div class="kpi-val" style="color:${k.c}">${k.v}</div>
+    <div class="kpi-sub">${k.s}</div>
+  </div>`).join('');
+}
+
+function renderSIM(){
+  const q=document.getElementById('sim-q').value.toLowerCase();
+  const vf=document.getElementById('sim-v').value;
+  const sf=document.getElementById('sim-st').value;
+  let rows=DATA.filter(r=>{
+    if(q&&!`${r.name}${r.sim||''}`.toLowerCase().includes(q))return false;
+    if(vf&&r.sim!==vf)return false;
+    const st=simSt(r);
+    if(sf==='in')return st==='in';
+    if(sf==='out'){const wdy=simDL(r),cdy=dF(r.endDate);return wdy!==null&&wdy<0&&cdy!==null&&cdy>=0;}
+    if(sf==='exp')return st==='exp'||st==='soon';
+    if(sf==='nd')return st==='nd';
+    return true;
+  });
+  document.getElementById('sim-ct').textContent=`${rows.length} / ${DATA.length} รายการ`;
+  const tbody=document.getElementById('tbl-sim');
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="12" class="tbl-empty">🔍 ไม่พบข้อมูล</td></tr>`;return;}
+  tbody.innerHTML=rows.map(r=>{
+    const wEnd=simWarrEnd(r),wDy=simDL(r),cDy=dF(r.endDate),st=simSt(r);
+    const rowBdr=st==='in'?'var(--grn)':st==='exp'||st==='soon'?'var(--red)':st==='nd'?'var(--t3)':'var(--amb)';
+    const wBadge=wDy===null?'<span style="color:var(--t3);font-size:10px">ไม่มีข้อมูล</span>':wDy<0?`<span class="pill p-r">หมดแล้ว ${Math.abs(wDy)} วัน</span>`:wDy<=30?`<span class="pill p-r">เร่งด่วน ${wDy} วัน</span>`:wDy<=90?`<span class="pill p-a">ใกล้หมด ${wDy} วัน</span>`:`<span class="pill p-g">ในประกัน ${wDy} วัน</span>`;
+    const pct=r.startDate?Math.min(100,Math.round(Math.max(0,-dF(r.startDate)??0)/730*100)):0;
+    const pc=st==='in'?'#22c55e':st==='nd'?'#3d6491':'#ef4444';
+    return`<tr style="border-left:3px solid ${rowBdr}">
+      <td style="color:var(--t3);font-size:11px;font-family:monospace">${r.id}</td>
+      <td style="font-size:12px;font-weight:500;max-width:160px">${r.name}</td>
+      <td><span class="pill ${pkgCls(r.pkg)}">${r.pkg}</span></td>
+      <td style="font-size:11px">${r.sim||'<span style="color:var(--t3)">-</span>'}</td>
+      <td style="font-size:11px;color:var(--t2)">${r.electrical||'-'}</td>
+      <td style="font-size:11px;color:var(--t2)">${r.charger||'-'}</td>
+      <td style="font-size:11px;white-space:nowrap">${fTH(r.startDate)}</td>
+      <td style="font-size:11px;white-space:nowrap;font-weight:500;color:${wDy!==null&&wDy<0?'var(--red)':wDy!==null&&wDy<=90?'var(--amb)':'var(--t1)'}">${fTH(wEnd)}</td>
+      <td>
+        <div class="prog-w">
+          <div class="prog"><div class="prog-f" style="width:${pct}%;background:${pc}"></div></div>
+          <span style="font-size:11px;font-family:monospace;color:${pc}">${wDy===null?'-':wDy<0?'หมด':wDy}</span>
+        </div>
+      </td>
+      <td>${wBadge}</td>
+      <td style="font-size:11px;white-space:nowrap;color:${cDy!==null&&cDy<=90?'var(--amb)':'var(--t2)'}">${fTH(r.endDate)}</td>
+      <td><button class="ibtn" onclick="openEdit(${DATA.indexOf(r)})">✏️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════ FILTER POPULATE ═══════════════════ */
+function populateFilters(){
+  const stats=[...new Set(DATA.map(r=>r.jobStatus).filter(Boolean))].sort();
+  const bizs=[...new Set(DATA.map(r=>r.bizType).filter(Boolean))].sort();
+  const sEl=document.getElementById('con-stat');
+  sEl.innerHTML='<option value="">ทั้งหมด</option>'+stats.map(s=>`<option>${s}</option>`).join('');
+  const bEl=document.getElementById('con-biz');
+  bEl.innerHTML='<option value="">ทั้งหมด</option>'+bizs.map(s=>`<option>${s}</option>`).join('');
+}
+
+/* ═══════════════════ TAB ═══════════════════ */
+let _tab='overview';
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab,.mob-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll(`[data-tab="${id}"]`).forEach(b=>b.classList.add('active'));
+  _tab=id;
+  if(id==='contracts')renderContracts();
+  if(id==='status')renderStatus();
+  if(id==='sim'){renderKPISIM();renderSIM();}
+}
+
+/* ═══════════════════ MODAL ═══════════════════ */
+let _ei=null;
+function openAdd(){
+  _ei=null;
+  document.getElementById('modal-ttl').textContent='＋ เพิ่มสัญญาใหม่';
+  ['f-name','f-price','f-detail','f-po','f-biz','f-start','f-end','f-sim','f-elec','f-charger'].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.value='';
+  });
+  document.getElementById('f-price').value='0';
+  document.getElementById('f-pkg').value='S';
+  document.getElementById('f-stat').value='กำลังดำเนินการ';
+  document.getElementById('modal').classList.add('open');
+}
+function openEdit(idx){
+  _ei=idx;const r=DATA[idx];
+  document.getElementById('modal-ttl').textContent='✏️ แก้ไขสัญญา';
+  document.getElementById('f-name').value=r.name||'';
+  document.getElementById('f-pkg').value=r.pkg||'S';
+  document.getElementById('f-price').value=r.price||0;
+  document.getElementById('f-detail').value=r.detail||'';
+  document.getElementById('f-po').value=r.poDate||'';
+  document.getElementById('f-biz').value=r.bizType||'';
+  document.getElementById('f-start').value=r.startDate||'';
+  document.getElementById('f-end').value=r.endDate||'';
+  document.getElementById('f-sim').value=r.sim||'';
+  document.getElementById('f-elec').value=r.electrical||'';
+  document.getElementById('f-charger').value=r.charger||'';
+  document.getElementById('f-stat').value=r.jobStatus||'กำลังดำเนินการ';
+  document.getElementById('modal').classList.add('open');
+}
+function saveEntry(){
+  const e={
+    id:_ei===null?Math.max(...DATA.map(r=>r.id))+1:DATA[_ei].id,
+    year:new Date().getFullYear()+543-2000+'25'+Math.floor((new Date().getFullYear()-2000)/100),
+    name:document.getElementById('f-name').value.trim()||'(ไม่ระบุ)',
+    pkg:document.getElementById('f-pkg').value,
+    price:parseFloat(document.getElementById('f-price').value)||0,
+    detail:document.getElementById('f-detail').value.trim(),
+    poDate:document.getElementById('f-po').value,
+    bizType:document.getElementById('f-biz').value.trim(),
+    startDate:document.getElementById('f-start').value,
+    endDate:document.getElementById('f-end').value,
+    sim:document.getElementById('f-sim').value.trim(),
+    electrical:document.getElementById('f-elec').value.trim(),
+    charger:document.getElementById('f-charger').value.trim(),
+    jobStatus:document.getElementById('f-stat').value,
+    quote:'',contractStatus:'',
+  };
+  if(_ei===null)DATA.push(e);else DATA[_ei]=e;
+  document.getElementById('modal').classList.remove('open');
+  refresh();
+}
+function delEntry(idx){if(!confirm(`ลบ "${DATA[idx].name}" ?`))return;DATA.splice(idx,1);refresh();}
+function closeModal(e){if(e.target.id==='modal')document.getElementById('modal').classList.remove('open');}
+
+/* ═══════════════════ CLOCK ═══════════════════ */
+function tick(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})+' '+n.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+setInterval(tick,1000);tick();
+
+/* ═══════════════════ INIT ═══════════════════ */
+function refresh(){
+  renderKPIOverview();renderCharts();populateFilters();
+  if(_tab==='contracts')renderContracts();
+  if(_tab==='status')renderStatus();
+  if(_tab==='sim'){renderKPISIM();renderSIM();}
+}
+populateFilters();
+refresh();
+</script>
+</body>
+</html>
