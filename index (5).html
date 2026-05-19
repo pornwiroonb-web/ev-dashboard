@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIM Dashboard — EleXA by EGAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0e1a; --bg2:#0f1628; --bg3:#141d35; --card:#161e36;
+  --border:#1e2d50; --border2:#263660;
+  --accent:#00d4ff; --accent2:#0099cc;
+  --green:#00e676; --yellow:#ffeb3b; --orange:#ff9800; --red:#f44336; --purple:#9c27b0;
+  --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b;
+  --egat:#005baa; --egat2:#0076d6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#050d20,#0a1632 50%,#0d1e40);border-bottom:1px solid var(--border2);
+  padding:16px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.logo-badge{background:linear-gradient(135deg,var(--egat),var(--egat2));border-radius:10px;padding:7px 14px;
+  font-weight:700;font-size:13px;letter-spacing:1px;color:#fff;white-space:nowrap;}
+header h1{font-size:17px;font-weight:600;flex:1;}
+header h1 span{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:400;margin-left:8px;opacity:.7;}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);
+  border-radius:20px;padding:5px 12px;font-size:12px;color:var(--green);font-family:'JetBrains Mono',monospace;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}}
+#last-update{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+
+/* MAIN */
+.main-wrap{padding:20px 22px 48px;max-width:1700px;margin:0 auto;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:18px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 16px;
+  position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;}
+.kpi-card.blue::before{background:linear-gradient(90deg,var(--accent),var(--egat2));}
+.kpi-card.green::before{background:linear-gradient(90deg,var(--green),#00bcd4);}
+.kpi-card.orange::before{background:linear-gradient(90deg,var(--orange),#ff5722);}
+.kpi-card.yellow::before{background:linear-gradient(90deg,var(--yellow),var(--orange));}
+.kpi-card.red::before{background:linear-gradient(90deg,var(--red),#e91e63);}
+.kpi-card.purple::before{background:linear-gradient(90deg,var(--purple),#3f51b5);}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.kpi-val{font-size:26px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1;}
+.kpi-card.blue .kpi-val{color:var(--accent);}
+.kpi-card.green .kpi-val{color:var(--green);}
+.kpi-card.orange .kpi-val{color:var(--orange);}
+.kpi-card.yellow .kpi-val{color:var(--yellow);}
+.kpi-card.red .kpi-val{color:var(--red);}
+.kpi-card.purple .kpi-val{color:#ce93d8;}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* TOOLBAR */
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:14px;}
+.search-wrap{position:relative;}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none;}
+input.search-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 34px;
+  color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;width:240px;outline:none;transition:border-color .2s;}
+input.search-box:focus{border-color:var(--accent);}
+select.filter-sel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;
+  color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;cursor:pointer;outline:none;transition:border-color .2s;}
+select.filter-sel:focus{border-color:var(--accent);}
+.toolbar-spacer{flex:1;}
+#row-count{font-size:12px;color:var(--text3);white-space:nowrap;padding:8px 0;}
+.btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 13px;color:var(--text2);
+  font-size:13px;cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* TABLE */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1500px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--border2);}
+th{padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);font-size:11px;letter-spacing:.5px;
+  white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s;}
+th:hover{color:var(--accent);}
+.sort-ico{margin-left:4px;opacity:.4;font-size:10px;}
+th.sort-asc .sort-ico::after{content:'▲';opacity:1;color:var(--accent);}
+th.sort-desc .sort-ico::after{content:'▼';opacity:1;color:var(--accent);}
+th:not(.sort-asc):not(.sort-desc) .sort-ico::after{content:'⇅';}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(0,212,255,.04);}
+td{padding:9px 12px;color:var(--text);vertical-align:middle;white-space:nowrap;}
+td.wrap{white-space:normal;max-width:210px;line-height:1.4;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;}
+.bdone  {background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25);}
+.binprog{background:rgba(0,212,255,.12);color:var(--accent);border:1px solid rgba(0,212,255,.25);}
+.binstall{background:rgba(255,152,0,.12);color:var(--orange);border:1px solid rgba(255,152,0,.25);}
+.bts    {background:rgba(0,118,214,.15);color:#60b4ff;border:1px solid rgba(0,118,214,.3);}
+.brpd   {background:rgba(156,39,176,.15);color:#ce93d8;border:1px solid rgba(156,39,176,.3);}
+.bbangen{background:rgba(255,235,59,.12);color:var(--yellow);border:1px solid rgba(255,235,59,.25);}
+.pkg-s{background:rgba(0,212,255,.1);color:var(--accent);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;}
+.pkg-m{background:rgba(255,152,0,.1);color:var(--orange);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;}
+.pkg-l{background:rgba(244,67,54,.1);color:var(--red);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;}
+.sim-ok {color:var(--green);font-weight:600;}
+.sim-warn{color:var(--yellow);font-weight:600;}
+.sim-exp{color:var(--red);font-weight:600;}
+.sim-none{color:var(--text3);}
+.price-val{font-family:'JetBrains Mono',monospace;color:#a5d6ff;font-size:12px;}
+.date-cell{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);}
+.id-cell{font-family:'JetBrains Mono',monospace;color:var(--text3);font-size:11px;}
+.ts-done{color:var(--green);}
+.ts-inprog{color:var(--accent);}
+
+/* LOADING / ERROR */
+.loading-row td,.empty-row td{text-align:center;padding:60px;color:var(--text3);font-size:14px;}
+.spinner{display:inline-block;width:22px;height:22px;border:3px solid var(--border2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-banner{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:10px;
+  padding:13px 18px;margin-bottom:14px;color:#ef9a9a;font-size:13px;display:none;line-height:1.6;}
+.debug-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;
+  margin-bottom:14px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text3);display:none;
+  white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent2);}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  header{padding:12px 14px;flex-wrap:wrap;gap:8px;}
+  header h1{font-size:14px;}
+  .main-wrap{padding:14px 12px 40px;}
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  input.search-box{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-badge">⚡ EleXA</div>
+  <h1>SIM Dashboard <span>EleXA by EGAT</span></h1>
+  <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+  <div id="last-update">—</div>
+</header>
+
+<div class="main-wrap">
+  <div id="error-banner" class="error-banner"></div>
+  <div id="debug-box" class="debug-box"></div>
+
+  <!-- KPI -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">  <div class="kpi-label">ทั้งหมด</div>          <div class="kpi-val" id="kpi-total">—</div>   <div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card green"> <div class="kpi-label">ส่งมอบแล้ว</div>       <div class="kpi-val" id="kpi-done">—</div>    <div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">กำลังดำเนินการ</div>   <div class="kpi-val" id="kpi-inprog">—</div>  <div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card yellow"><div class="kpi-label">ระหว่างติดตั้ง</div>   <div class="kpi-val" id="kpi-install">—</div> <div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card red">   <div class="kpi-label">SIM หมดอายุ/ใกล้หมด</div><div class="kpi-val" id="kpi-simexp">—</div> <div class="kpi-sub">รายการ</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">มูลค่ารวม</div>         <div class="kpi-val" id="kpi-price">—</div>  <div class="kpi-sub">ล้านบาท</div></div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input type="text" class="search-box" id="search" placeholder="ค้นหาชื่อ, จังหวัด, SIM...">
+    </div>
+    <select class="filter-sel" id="f-status"><option value="">สถานะทั้งหมด</option></select>
+    <select class="filter-sel" id="f-province"><option value="">จังหวัดทั้งหมด</option></select>
+    <select class="filter-sel" id="f-biz"><option value="">ประเภทธุรกิจ</option></select>
+    <select class="filter-sel" id="f-src"><option value="">Source</option></select>
+    <select class="filter-sel" id="f-simwarn">
+      <option value="">SIM ทั้งหมด</option>
+      <option value="expired">หมดอายุแล้ว</option>
+      <option value="soon">ใกล้หมด &lt;30 วัน</option>
+      <option value="ok">ปกติ</option>
+      <option value="none">ไม่มีข้อมูล</option>
+    </select>
+    <div class="toolbar-spacer"></div>
+    <span id="row-count">— รายการ</span>
+    <button class="btn" id="btn-refresh">🔄 รีเฟรช</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="main-table">
+      <thead>
+        <tr>
+          <th data-col="id">#<span class="sort-ico"></span></th>
+          <th data-col="name">ชื่อสถานที่<span class="sort-ico"></span></th>
+          <th data-col="province">จังหวัด<span class="sort-ico"></span></th>
+          <th data-col="pkg_type">ประเภท Charger<span class="sort-ico"></span></th>
+          <th data-col="pkg">PKG<span class="sort-ico"></span></th>
+          <th data-col="bizType">ประเภทธุรกิจ<span class="sort-ico"></span></th>
+          <th data-col="jobStatus">สถานะงาน<span class="sort-ico"></span></th>
+          <th data-col="tsStatus">TS Status<span class="sort-ico"></span></th>
+          <th data-col="src">Source<span class="sort-ico"></span></th>
+          <th data-col="sim_v1">SIM v1<span class="sort-ico"></span></th>
+          <th data-col="sim_v2">SIM v2<span class="sort-ico"></span></th>
+          <th data-col="serviceStart">เริ่มบริการ<span class="sort-ico"></span></th>
+          <th data-col="contractEnd">สิ้นสุดสัญญา<span class="sort-ico"></span></th>
+          <th data-col="simExpire">SIM หมดอายุ<span class="sort-ico"></span></th>
+          <th data-col="simRenew">ต่ออายุ SIM<span class="sort-ico"></span></th>
+          <th data-col="price">ราคา (บาท)<span class="sort-ico"></span></th>
+          <th data-col="quote">ใบเสนอราคา<span class="sort-ico"></span></th>
+          <th data-col="note">หมายเหตุ<span class="sort-ico"></span></th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr class="loading-row"><td colspan="18"><span class="spinner"></span>กำลังโหลดข้อมูล…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// CONFIG — แก้ค่านี้ถ้าเปลี่ยน Sheet
+// ════════════════════════════════════════════════════════
+const SHEET_ID   = '1h0m20N8wnyaV2UA8VP2N-VO8LyiFS2SEtsz0hhF_Giw';
+const GID        = '0';
+const REFRESH_MS = 60000;
+
+// field → header label ใน Sheet (lowercase, trim)
+const FIELD_MAP = {
+  id:'id', name:'name', province:'province', pkg_type:'pkg_type',
+  sim_v1:'sim_v1', sim_v2:'sim_v2', phone:'phone', fee:'fee',
+  jobStatus:'jobstatus', src:'src', serviceStart:'servicestart',
+  contractEnd:'contractend', simExpire:'simexpire', simRenew:'simrenew',
+  note:'note', quote:'quote', year:'year', pkg:'pkg', detail:'detail',
+  price:'price', bizType:'biztype', tsStatus:'tsstatus',
+};
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let allData = [];
+let colIdx  = {};
+let sortCol = 'id';
+let sortDir = 1;
+
+// ════════════════════════════════════════════════════════
+// FETCH
+// ════════════════════════════════════════════════════════
+async function fetchData() {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&_=${Date.now()}`;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} — ดึงข้อมูลไม่ได้`);
+  const raw  = await res.text();
+
+  // strip JSONP
+  const jsonStr = raw
+    .replace(/^\s*\/\*[^*]*\*\/\s*/, '')
+    .replace(/^\s*google\.visualization\.Query\.setResponse\(/, '')
+    .replace(/\);\s*$/, '');
+
+  let json;
+  try { json = JSON.parse(jsonStr); }
+  catch(e) { throw new Error('Parse JSON ล้มเหลว: ' + e.message); }
+
+  const table = json.table;
+  if (!table || !table.cols) throw new Error('ไม่พบ table.cols ใน response');
+
+  // Auto-detect columns
+  colIdx = {};
+  table.cols.forEach((col, i) => {
+    const lbl = (col.label || col.id || '').toLowerCase().trim().replace(/\s+/g,'_');
+    for (const [field, match] of Object.entries(FIELD_MAP)) {
+      if (lbl === match) colIdx[field] = i;
+    }
+  });
+  dbg('Headers: ' + table.cols.map((c,i)=>`[${i}]${c.label||c.id}`).join(', '));
+  dbg('ColIdx: ' + JSON.stringify(colIdx));
+
+  // Parse rows — skip row[0] if it looks like a duplicate header
+  const rows = table.rows || [];
+  allData = rows.map((row, ri) => {
+    const get = field => {
+      const i = colIdx[field];
+      if (i === undefined || !row.c || row.c.length <= i || row.c[i] == null) return '';
+      const cell = row.c[i];
+      if (!cell) return '';
+      // Date object from gviz
+      if (cell.v !== null && cell.v !== undefined) {
+        if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) return cell.v;
+        return String(cell.v);
+      }
+      return cell.f ? String(cell.f) : '';
+    };
+    return {
+      _row: ri,
+      id:get('id'), name:get('name'), province:get('province'), pkg_type:get('pkg_type'),
+      sim_v1:get('sim_v1'), sim_v2:get('sim_v2'), phone:get('phone'), fee:get('fee'),
+      jobStatus:get('jobStatus'), src:get('src'), serviceStart:get('serviceStart'),
+      contractEnd:get('contractEnd'), simExpire:get('simExpire'), simRenew:get('simRenew'),
+      note:get('note'), quote:get('quote'), year:get('year'), pkg:get('pkg'),
+      detail:get('detail'), price:get('price'), bizType:get('bizType'), tsStatus:get('tsStatus'),
+    };
+  }).filter(r => r.name && r.name.trim() !== '' && r.name.toLowerCase() !== 'name');
+}
+
+// ════════════════════════════════════════════════════════
+// DATE
+// ════════════════════════════════════════════════════════
+function toDate(v) {
+  if (!v || v === '') return null;
+  if (v instanceof Date) return isNaN(v) ? null : v;
+  if (typeof v === 'string') {
+    const m = v.match(/Date\((\d+),(\d+),(\d+)\)/);
+    if (m) return new Date(+m[1], +m[2], +m[3]);
+    const d = new Date(v);
+    return isNaN(d) ? null : d;
+  }
+  return null;
+}
+
+function fmtDate(v) {
+  if (!v || v === '') return '<span class="sim-none">—</span>';
+  const d = toDate(v);
+  if (!d) return `<span class="date-cell">${esc(v)}</span>`;
+  return `<span class="date-cell">${d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'})}</span>`;
+}
+
+function simExpHtml(v) {
+  if (!v || v === '') return '<span class="sim-none">—</span>';
+  const d = toDate(v);
+  if (!d) return `<span class="sim-none">${esc(v)}</span>`;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff  = Math.ceil((d - today) / 86400000);
+  const lbl   = d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
+  if (diff < 0)  return `<span class="sim-exp">✗ ${lbl} <small>(${Math.abs(diff)}วันที่แล้ว)</small></span>`;
+  if (diff < 30) return `<span class="sim-warn">⚠ ${lbl} <small>(อีก ${diff}วัน)</small></span>`;
+  return `<span class="sim-ok">✓ ${lbl}</span>`;
+}
+
+function simWarnClass(v) {
+  if (!v || v === '') return 'none';
+  const d = toDate(v);
+  if (!d) return 'none';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff  = Math.ceil((d - today) / 86400000);
+  if (diff < 0)  return 'expired';
+  if (diff < 30) return 'soon';
+  return 'ok';
+}
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function jobBadge(s) {
+  if (s==='ส่งมอบงานแล้ว')      return `<span class="badge bdone">✓ ${esc(s)}</span>`;
+  if (s==='กำลังดำเนินการ')     return `<span class="badge binprog">● ${esc(s)}</span>`;
+  if (s==='อยู่ระหว่างติดตั้ง') return `<span class="badge binstall">⚙ ${esc(s)}</span>`;
+  return s ? `<span class="badge" style="color:var(--text2)">${esc(s)}</span>` : '<span class="sim-none">—</span>';
+}
+function pkgBadge(p) {
+  if (p==='S') return `<span class="pkg-s">S</span>`;
+  if (p==='M') return `<span class="pkg-m">M</span>`;
+  if (p==='L') return `<span class="pkg-l">L</span>`;
+  return p ? `<span style="font-size:11px;color:var(--text2)">${esc(p)}</span>` : '<span class="sim-none">—</span>';
+}
+function srcBadge(s) {
+  if (s==='TS')     return `<span class="badge bts">TS</span>`;
+  if (s==='RPD')    return `<span class="badge brpd">RPD</span>`;
+  if (s==='BangEN') return `<span class="badge bbangen">BangEN</span>`;
+  return s ? `<span class="badge bts">${esc(s)}</span>` : '<span class="sim-none">—</span>';
+}
+function tsBadge(s) {
+  if (!s||s==='') return '<span class="sim-none">—</span>';
+  if (s==='แล้วเสร็จ') return `<span class="ts-done">✓ ${esc(s)}</span>`;
+  return `<span class="ts-inprog">${esc(s)}</span>`;
+}
+function priceHtml(p) {
+  const n = parseFloat(p);
+  if (!n||n===0) return '<span class="sim-none">—</span>';
+  return `<span class="price-val">${n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`;
+}
+
+// ════════════════════════════════════════════════════════
+// DROPDOWNS
+// ════════════════════════════════════════════════════════
+function fillSel(id, arr) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  while (sel.options.length > 1) sel.remove(1);
+  [...new Set(arr)].filter(Boolean).sort().forEach(v => {
+    const o = document.createElement('option');
+    o.value = o.textContent = v;
+    if (v===cur) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function populateDropdowns() {
+  fillSel('f-status',   allData.map(r=>r.jobStatus));
+  fillSel('f-province', allData.map(r=>r.province));
+  fillSel('f-biz',      allData.map(r=>r.bizType));
+  fillSel('f-src',      allData.map(r=>r.src));
+}
+
+// ════════════════════════════════════════════════════════
+// FILTER + SORT
+// ════════════════════════════════════════════════════════
+function filtered() {
+  const fStatus   = document.getElementById('f-status').value;
+  const fProvince = document.getElementById('f-province').value;
+  const fBiz      = document.getElementById('f-biz').value;
+  const fSrc      = document.getElementById('f-src').value;
+  const fSimwarn  = document.getElementById('f-simwarn').value;
+  const fSearch   = document.getElementById('search').value.toLowerCase().trim();
+
+  let d = allData;
+  if (fStatus)   d = d.filter(r=>r.jobStatus===fStatus);
+  if (fProvince) d = d.filter(r=>r.province===fProvince);
+  if (fBiz)      d = d.filter(r=>r.bizType===fBiz);
+  if (fSrc)      d = d.filter(r=>r.src===fSrc);
+  if (fSimwarn)  d = d.filter(r=>simWarnClass(r.simExpire)===fSimwarn);
+  if (fSearch)   d = d.filter(r=>
+    ['name','province','pkg_type','bizType','jobStatus','sim_v1','sim_v2','note','quote','tsStatus']
+      .some(k=>String(r[k]||'').toLowerCase().includes(fSearch))
+  );
+
+  return d.slice().sort((a,b)=>{
+    const av=a[sortCol]||'', bv=b[sortCol]||'';
+    const an=parseFloat(av), bn=parseFloat(bv);
+    if (!isNaN(an)&&!isNaN(bn)&&av!==''&&bv!=='') return sortDir*(an-bn);
+    const ad=toDate(av), bd=toDate(bv);
+    if (ad&&bd) return sortDir*(ad-bd);
+    return sortDir*String(av).localeCompare(String(bv),'th');
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// KPI
+// ════════════════════════════════════════════════════════
+function updateKPI() {
+  document.getElementById('kpi-total').textContent   = allData.length;
+  document.getElementById('kpi-done').textContent    = allData.filter(r=>r.jobStatus==='ส่งมอบงานแล้ว').length;
+  document.getElementById('kpi-inprog').textContent  = allData.filter(r=>r.jobStatus==='กำลังดำเนินการ').length;
+  document.getElementById('kpi-install').textContent = allData.filter(r=>r.jobStatus==='อยู่ระหว่างติดตั้ง').length;
+  document.getElementById('kpi-simexp').textContent  = allData.filter(r=>['expired','soon'].includes(simWarnClass(r.simExpire))).length;
+  const total = allData.reduce((s,r)=>s+(parseFloat(r.price)||0),0);
+  document.getElementById('kpi-price').textContent   = (total/1e6).toFixed(2);
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════
+function render() {
+  const data  = filtered();
+  const tbody = document.getElementById('table-body');
+
+  if (data.length===0) {
+    tbody.innerHTML='<tr class="empty-row"><td colspan="18">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+    document.getElementById('row-count').textContent='0 รายการ';
+    return;
+  }
+
+  tbody.innerHTML = data.map(r=>`
+  <tr>
+    <td class="id-cell">${esc(r.id)}</td>
+    <td class="wrap" style="min-width:140px">${esc(r.name)}</td>
+    <td>${esc(r.province)||'—'}</td>
+    <td style="min-width:130px">${esc(r.pkg_type)||'—'}</td>
+    <td>${pkgBadge(r.pkg)}</td>
+    <td>${esc(r.bizType)||'—'}</td>
+    <td>${jobBadge(r.jobStatus)}</td>
+    <td>${tsBadge(r.tsStatus)}</td>
+    <td>${srcBadge(r.src)}</td>
+    <td>${r.sim_v1?`<span class="sim-ok">● ${esc(r.sim_v1)}</span>`:'<span class="sim-none">—</span>'}</td>
+    <td>${r.sim_v2?`<span class="sim-ok">● ${esc(r.sim_v2)}</span>`:'<span class="sim-none">—</span>'}</td>
+    <td>${fmtDate(r.serviceStart)}</td>
+    <td>${fmtDate(r.contractEnd)}</td>
+    <td>${simExpHtml(r.simExpire)}</td>
+    <td>${r.simRenew?`<span class="date-cell sim-warn">${fmtDate(r.simRenew)}</span>`:'<span class="sim-none">—</span>'}</td>
+    <td>${priceHtml(r.price)}</td>
+    <td style="font-size:11px;color:var(--text3)">${esc(r.quote)||'—'}</td>
+    <td class="wrap" style="max-width:180px">${esc(r.note)||'—'}</td>
+  </tr>`).join('');
+
+  document.getElementById('row-count').textContent=`${data.length} รายการ`;
+}
+
+// ════════════════════════════════════════════════════════
+// SORT HEADERS
+// ════════════════════════════════════════════════════════
+document.querySelectorAll('th[data-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    if(sortCol===col) sortDir=-sortDir;
+    else { sortCol=col; sortDir=1; }
+    document.querySelectorAll('th[data-col]').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+    render();
+  });
+});
+
+// ════════════════════════════════════════════════════════
+// EVENTS
+// ════════════════════════════════════════════════════════
+['f-status','f-province','f-biz','f-src','f-simwarn'].forEach(id=>
+  document.getElementById(id).addEventListener('change',render));
+document.getElementById('search').addEventListener('input',render);
+document.getElementById('btn-refresh').addEventListener('click',loadAll);
+
+// ════════════════════════════════════════════════════════
+// ERROR / DEBUG
+// ════════════════════════════════════════════════════════
+function showError(msg){
+  const b=document.getElementById('error-banner');
+  b.innerHTML=`⚠ ${esc(msg)}<br><small>ตรวจสอบ: Sheet ต้องเป็น <b>Anyone with the link → Viewer</b> และ Sheet tab ถูกต้อง</small>`;
+  b.style.display='block';
+}
+function hideError(){document.getElementById('error-banner').style.display='none';}
+function dbg(msg){
+  if(!location.search.includes('debug')) return;
+  const b=document.getElementById('debug-box');
+  b.style.display='block';
+  b.textContent+=msg+'\n';
+}
+
+// ════════════════════════════════════════════════════════
+// MAIN
+// ════════════════════════════════════════════════════════
+async function loadAll(){
+  document.getElementById('table-body').innerHTML=
+    '<tr class="loading-row"><td colspan="18"><span class="spinner"></span>กำลังโหลดข้อมูล…</td></tr>';
+  try {
+    await fetchData();
+    hideError();
+    updateKPI();
+    populateDropdowns();
+    render();
+    document.getElementById('last-update').textContent=
+      'อัพเดต: '+new Date().toLocaleTimeString('th-TH');
+  } catch(e) {
+    showError(e.message);
+    document.getElementById('table-body').innerHTML=
+      `<tr class="empty-row"><td colspan="18">❌ โหลดข้อมูลไม่สำเร็จ — ${esc(e.message)}</td></tr>`;
+    document.getElementById('last-update').textContent='Error';
+  }
+}
+
+loadAll();
+setInterval(loadAll, REFRESH_MS);
+</script>
+</body>
+</html>
