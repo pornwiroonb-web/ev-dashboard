@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIM Dashboard — EleXa by EGAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07101f;
+  --bg2:#0c1628;
+  --bg3:#111e36;
+  --card:#0f1a30;
+  --card2:#142040;
+  --border:#1a2d50;
+  --border2:#223568;
+  --accent:#00c6ff;
+  --accent2:#0072ff;
+  --green:#00e676;
+  --green2:#00a152;
+  --yellow:#ffd740;
+  --orange:#ff9100;
+  --red:#ff5252;
+  --red2:#c62828;
+  --purple:#ce93d8;
+  --text:#e2e8f0;
+  --text2:#94a3b8;
+  --text3:#4a6080;
+  --egat-blue:#005baa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;min-height:100vh;}
+
+/* ── HEADER ── */
+header{
+  background:linear-gradient(135deg,#040d1e 0%,#071428 50%,#0a1a38 100%);
+  border-bottom:1px solid var(--border2);
+  padding:0 24px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(0,0,0,0.5);
+}
+.header-inner{
+  max-width:1600px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:62px;gap:16px;
+}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo-icon{
+  width:38px;height:38px;border-radius:8px;
+  background:linear-gradient(135deg,var(--egat-blue),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;color:#fff;letter-spacing:-0.5px;
+  box-shadow:0 0 16px rgba(0,198,255,0.3);
+}
+.logo-text{line-height:1.1;}
+.logo-title{font-size:16px;font-weight:700;color:#fff;letter-spacing:0.3px;}
+.logo-sub{font-size:11px;color:var(--text2);font-weight:400;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.refresh-btn{
+  background:rgba(0,198,255,0.1);border:1px solid rgba(0,198,255,0.3);
+  color:var(--accent);padding:7px 14px;border-radius:7px;
+  font-size:13px;cursor:pointer;font-family:inherit;
+  transition:all 0.2s;display:flex;align-items:center;gap:6px;
+}
+.refresh-btn:hover{background:rgba(0,198,255,0.2);border-color:var(--accent);}
+.last-update{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ── MAIN ── */
+main{max-width:1600px;margin:0 auto;padding:24px 24px 48px;}
+
+/* ── KPI CARDS ── */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;margin-bottom:24px;
+}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:18px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent-color,var(--accent));
+}
+.kpi-card.green{--accent-color:var(--green);}
+.kpi-card.yellow{--accent-color:var(--yellow);}
+.kpi-card.orange{--accent-color:var(--orange);}
+.kpi-card.red{--accent-color:var(--red);}
+.kpi-card.purple{--accent-color:var(--purple);}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.kpi-value{font-size:32px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;line-height:1;}
+.kpi-value span{font-size:14px;font-weight:400;color:var(--text2);margin-left:4px;}
+.kpi-sub{font-size:12px;color:var(--text2);margin-top:6px;}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px 20px;
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  margin-bottom:20px;
+}
+.filter-bar label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block;}
+.filter-group{display:flex;flex-direction:column;min-width:140px;}
+.filter-group.search{flex:1;min-width:200px;}
+select,input[type=text]{
+  background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);padding:8px 12px;border-radius:7px;
+  font-size:13px;font-family:inherit;outline:none;
+  transition:border-color 0.2s;
+}
+select:focus,input:focus{border-color:var(--accent);}
+.filter-reset{
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text2);padding:8px 14px;border-radius:7px;
+  font-size:13px;cursor:pointer;font-family:inherit;
+  align-self:flex-end;transition:all 0.2s;
+}
+.filter-reset:hover{border-color:var(--red);color:var(--red);}
+
+/* ── TABLE ── */
+.table-wrap{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.table-header{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.table-title{font-size:14px;font-weight:600;color:var(--text);}
+.table-count{font-size:13px;color:var(--text2);}
+.table-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:1100px;}
+thead tr{background:var(--bg3);}
+th{
+  padding:11px 14px;text-align:left;
+  font-size:11px;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.6px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;white-space:nowrap;
+}
+th:hover{color:var(--text);}
+th .sort-icon{margin-left:4px;opacity:0.4;}
+th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--accent);}
+tbody tr{
+  border-bottom:1px solid rgba(26,45,80,0.6);
+  transition:background 0.15s;
+}
+tbody tr:hover{background:rgba(0,198,255,0.04);}
+tbody tr:last-child{border-bottom:none;}
+td{padding:11px 14px;font-size:13px;color:var(--text);vertical-align:middle;}
+td.mono{font-family:'JetBrains Mono',monospace;font-size:12px;}
+.no-data{text-align:center;padding:48px;color:var(--text3);font-size:14px;}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
+  white-space:nowrap;
+}
+.badge-green{background:rgba(0,230,118,0.12);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
+.badge-yellow{background:rgba(255,215,64,0.12);color:var(--yellow);border:1px solid rgba(255,215,64,0.25);}
+.badge-orange{background:rgba(255,145,0,0.12);color:var(--orange);border:1px solid rgba(255,145,0,0.25);}
+.badge-red{background:rgba(255,82,82,0.12);color:var(--red);border:1px solid rgba(255,82,82,0.25);}
+.badge-blue{background:rgba(0,198,255,0.12);color:var(--accent);border:1px solid rgba(0,198,255,0.25);}
+.badge-gray{background:rgba(100,116,128,0.15);color:var(--text2);border:1px solid rgba(100,116,128,0.25);}
+
+/* SIM expiry colors */
+.sim-expired{color:var(--red);font-weight:600;}
+.sim-warn{color:var(--yellow);font-weight:600;}
+.sim-ok{color:var(--green);}
+.sim-none{color:var(--text3);font-style:italic;}
+
+/* ── LOADING ── */
+#loading{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 20px;gap:16px;
+}
+.spinner{
+  width:40px;height:40px;border:3px solid var(--border2);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+#loading p{color:var(--text2);font-size:14px;}
+
+/* ── ERROR ── */
+#error-box{
+  display:none;background:rgba(255,82,82,0.08);
+  border:1px solid rgba(255,82,82,0.3);border-radius:12px;
+  padding:24px;text-align:center;margin:20px 0;color:var(--red);
+}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:20px;
+  font-size:12px;color:var(--text3);
+  border-top:1px solid var(--border);margin-top:16px;
+}
+
+@media(max-width:768px){
+  main{padding:16px 12px 32px;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .filter-bar{padding:12px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">EV</div>
+      <div class="logo-text">
+        <div class="logo-title">SIM Dashboard</div>
+        <div class="logo-sub">EleXa by EGAT · Total Solution</div>
+      </div>
+    </a>
+    <div class="header-right">
+      <span class="status-dot"></span>
+      <span class="last-update" id="lastUpdate">กำลังโหลด...</span>
+      <button class="refresh-btn" onclick="loadData()">↻ รีเฟรช</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- KPI -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card"><div class="kpi-label">ทั้งหมด</div><div class="kpi-value" id="kTotal">—</div><div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card green"><div class="kpi-label">ส่งมอบแล้ว</div><div class="kpi-value" id="kDone">—</div><div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card yellow"><div class="kpi-label">กำลังดำเนินการ</div><div class="kpi-value" id="kProg">—</div><div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">อยู่ระหว่างติดตั้ง</div><div class="kpi-value" id="kInst">—</div><div class="kpi-sub">สถานี</div></div>
+    <div class="kpi-card red"><div class="kpi-label">SIM หมดอายุ</div><div class="kpi-value" id="kExpired">—</div><div class="kpi-sub">รายการ</div></div>
+    <div class="kpi-card yellow"><div class="kpi-label">SIM เตือน &lt;30 วัน</div><div class="kpi-value" id="kWarn">—</div><div class="kpi-sub">รายการ</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">มูลค่ารวม</div><div class="kpi-value" id="kPrice">—</div><div class="kpi-sub">ล้านบาท</div></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <div class="filter-group search">
+      <label>ค้นหา</label>
+      <input type="text" id="fSearch" placeholder="ชื่อสถานี, จังหวัด, ประเภท..." oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>สถานะงาน</label>
+      <select id="fStatus" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="filter-group">
+      <label>จังหวัด</label>
+      <select id="fProvince" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="filter-group">
+      <label>ประเภทธุรกิจ</label>
+      <select id="fBiz" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="filter-group">
+      <label>สถานะ SIM</label>
+      <select id="fSim" onchange="applyFilters()">
+        <option value="">ทั้งหมด</option>
+        <option value="expired">หมดอายุ</option>
+        <option value="warn">เตือน &lt;30 วัน</option>
+        <option value="ok">ปกติ</option>
+        <option value="none">ไม่มี SIM</option>
+      </select>
+    </div>
+    <button class="filter-reset" onclick="resetFilters()">✕ ล้างตัวกรอง</button>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-box">
+    <div style="font-size:24px;margin-bottom:8px;">⚠️</div>
+    <div id="errorMsg">ไม่สามารถโหลดข้อมูลได้</div>
+    <div style="margin-top:8px;font-size:12px;color:var(--text2);">กรุณาตรวจสอบว่า Google Sheet ตั้งค่าเป็น "Anyone with the link can view"</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-title">รายการสถานีอัดประจุไฟฟ้า</span>
+      <span class="table-count" id="tableCount">—</span>
+    </div>
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูลจาก Google Sheets...</p>
+    </div>
+    <div class="table-scroll" id="tableContainer" style="display:none;">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('id')">#<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('name')">ชื่อสถานี<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('province')">จังหวัด<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('pkg_type')">ประเภทชาร์จเจอร์<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('jobStatus')">สถานะงาน<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('bizType')">ประเภทธุรกิจ<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('serviceStart')">เริ่มสัญญา<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('contractEnd')">สิ้นสุดสัญญา<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('simExpire')">SIM หมดอายุ<span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('price')">มูลค่า (บาท)<span class="sort-icon">↕</span></th>
+            <th>หมายเหตุ</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  EleXa by EGAT · SIM Dashboard · ข้อมูลจาก Google Sheets · Auto-refresh ทุก 5 นาที
+</footer>
+
+<script>
+const SHEET_ID = '1h0m20N8wnyaV2UA8VP2N-VO8LyiFS2SEtsz0hhF_Giw';
+const GID = '0';
+
+let allData = [];
+let sortCol = 'id';
+let sortDir = 1;
+
+// ── FIELD MAP: map column header label → field key
+const FIELD_MAP = {
+  'id': 'id',
+  'name': 'name',
+  'province': 'province',
+  'pkg_type': 'pkg_type',
+  'vender(1)': 'vender1',
+  'vender(2)': 'vender2',
+  'phone': 'phone',
+  'fee': 'fee',
+  'jobstatus': 'jobStatus',
+  'src': 'src',
+  'servicestart': 'serviceStart',
+  'contractend': 'contractEnd',
+  'simexpire': 'simExpire',
+  'simrenew': 'simRenew',
+  'note': 'note',
+  'quote': 'quote',
+  'year': 'year',
+  'pkg': 'pkg',
+  'detail': 'detail',
+  'price': 'price',
+  'biztype': 'bizType',
+  'tsstatus': 'tsStatus'
+};
+
+function parseDate(v) {
+  if (!v) return null;
+  // gviz date format
+  const m = String(v).match(/Date\((\d+),(\d+),(\d+)\)/);
+  if (m) return new Date(+m[1], +m[2], +m[3]);
+  // ISO string
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
+}
+
+function fmtDate(v) {
+  const d = parseDate(v);
+  if (!d) return '';
+  return d.toLocaleDateString('th-TH', {year:'numeric',month:'short',day:'numeric'});
+}
+
+function simStatus(simExpire) {
+  const d = parseDate(simExpire);
+  if (!d) return 'none';
+  const now = new Date();
+  const diff = (d - now) / 86400000;
+  if (diff < 0) return 'expired';
+  if (diff < 30) return 'warn';
+  return 'ok';
+}
+
+function simBadgeHtml(simExpire) {
+  const status = simStatus(simExpire);
+  const txt = fmtDate(simExpire);
+  if (status === 'none') return `<span class="sim-none">—</span>`;
+  if (status === 'expired') return `<span class="sim-expired">🔴 ${txt}</span>`;
+  if (status === 'warn') return `<span class="sim-warn">🟡 ${txt}</span>`;
+  return `<span class="sim-ok">🟢 ${txt}</span>`;
+}
+
+function jobBadgeHtml(status) {
+  if (!status) return '<span class="badge badge-gray">—</span>';
+  if (status.includes('ส่งมอบ') || status.includes('แล้วเสร็จ'))
+    return `<span class="badge badge-green">✓ ${status}</span>`;
+  if (status.includes('กำลังดำเนิน'))
+    return `<span class="badge badge-yellow">◐ ${status}</span>`;
+  if (status.includes('ระหว่างติดตั้ง'))
+    return `<span class="badge badge-orange">⚙ ${status}</span>`;
+  return `<span class="badge badge-gray">${status}</span>`;
+}
+
+function fmtPrice(v) {
+  const n = parseFloat(v);
+  if (!n || n === 0) return '—';
+  return n.toLocaleString('th-TH');
+}
+
+async function loadData() {
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('tableContainer').style.display = 'none';
+  document.getElementById('error-box').style.display = 'none';
+
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&_=${Date.now()}`;
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(
+      text.replace(/^\s*\/\*.*?\*\/\s*google\.visualization\.Query\.setResponse\(/, '')
+          .replace(/\);\s*$/, '')
+    );
+
+    // Build field index map from header
+    const cols = json.table.cols;
+    const fieldIdx = {};
+    cols.forEach((c, i) => {
+      const key = (c.label || c.id || '').toLowerCase().replace(/\s+/g,'');
+      const mapped = FIELD_MAP[key];
+      if (mapped) fieldIdx[mapped] = i;
+    });
+
+    // Parse rows
+    allData = (json.table.rows || []).map(row => {
+      const get = (field) => {
+        const i = fieldIdx[field];
+        if (i === undefined) return '';
+        const cell = row.c && row.c[i];
+        if (!cell || cell.v === null || cell.v === undefined) return '';
+        // date cells
+        if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) return cell.v;
+        return cell.f !== undefined && cell.f !== null ? cell.f : cell.v;
+      };
+      return {
+        id: get('id'),
+        name: get('name'),
+        province: get('province'),
+        pkg_type: get('pkg_type'),
+        vender1: get('vender1'),
+        jobStatus: get('jobStatus'),
+        bizType: get('bizType'),
+        serviceStart: get('serviceStart'),
+        contractEnd: get('contractEnd'),
+        simExpire: get('simExpire'),
+        simRenew: get('simRenew'),
+        note: get('note'),
+        price: get('price'),
+        tsStatus: get('tsStatus'),
+        src: get('src'),
+      };
+    }).filter(r => r.name && String(r.name).trim() !== '');
+
+    populateFilters();
+    updateKPIs();
+    applyFilters();
+
+    document.getElementById('lastUpdate').textContent =
+      new Date().toLocaleTimeString('th-TH');
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('tableContainer').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-box').style.display = 'block';
+    document.getElementById('errorMsg').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message;
+    console.error(e);
+  }
+}
+
+function populateFilters() {
+  const statusSet = new Set(), provinceSet = new Set(), bizSet = new Set();
+  allData.forEach(r => {
+    if (r.jobStatus) statusSet.add(r.jobStatus);
+    if (r.province) provinceSet.add(r.province);
+    if (r.bizType) bizSet.add(r.bizType);
+  });
+  fillSelect('fStatus', [...statusSet].sort());
+  fillSelect('fProvince', [...provinceSet].sort());
+  fillSelect('fBiz', [...bizSet].sort());
+}
+
+function fillSelect(id, opts) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">ทั้งหมด</option>';
+  opts.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o; opt.textContent = o;
+    sel.appendChild(opt);
+  });
+  sel.value = cur;
+}
+
+function updateKPIs() {
+  const total = allData.length;
+  const done = allData.filter(r => r.jobStatus && r.jobStatus.includes('ส่งมอบ')).length;
+  const prog = allData.filter(r => r.jobStatus && r.jobStatus.includes('กำลังดำเนิน')).length;
+  const inst = allData.filter(r => r.jobStatus && r.jobStatus.includes('ระหว่างติดตั้ง')).length;
+  const expired = allData.filter(r => simStatus(r.simExpire) === 'expired').length;
+  const warn = allData.filter(r => simStatus(r.simExpire) === 'warn').length;
+  const totalPrice = allData.reduce((s, r) => s + (parseFloat(r.price) || 0), 0);
+
+  document.getElementById('kTotal').textContent = total;
+  document.getElementById('kDone').textContent = done;
+  document.getElementById('kProg').textContent = prog;
+  document.getElementById('kInst').textContent = inst;
+  document.getElementById('kExpired').textContent = expired;
+  document.getElementById('kWarn').textContent = warn;
+  document.getElementById('kPrice').textContent = (totalPrice / 1e6).toFixed(2);
+}
+
+function applyFilters() {
+  const search = document.getElementById('fSearch').value.toLowerCase();
+  const fStatus = document.getElementById('fStatus').value;
+  const fProv = document.getElementById('fProvince').value;
+  const fBiz = document.getElementById('fBiz').value;
+  const fSim = document.getElementById('fSim').value;
+
+  let filtered = allData.filter(r => {
+    if (fStatus && r.jobStatus !== fStatus) return false;
+    if (fProv && r.province !== fProv) return false;
+    if (fBiz && r.bizType !== fBiz) return false;
+    if (fSim && simStatus(r.simExpire) !== fSim) return false;
+    if (search) {
+      const hay = [r.name, r.province, r.pkg_type, r.bizType, r.jobStatus, r.note]
+        .join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    let av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
+    if (sortCol === 'price') { av = parseFloat(av) || 0; bv = parseFloat(bv) || 0; }
+    else if (['serviceStart','contractEnd','simExpire'].includes(sortCol)) {
+      av = parseDate(av)?.getTime() || 0;
+      bv = parseDate(bv)?.getTime() || 0;
+    } else {
+      av = String(av).toLowerCase(); bv = String(bv).toLowerCase();
+    }
+    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+  });
+
+  renderTable(filtered);
+  document.getElementById('tableCount').textContent = `แสดง ${filtered.length} / ${allData.length} รายการ`;
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById('tableBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="11" class="no-data">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="mono" style="color:var(--text3)">${r.id}</td>
+      <td style="font-weight:500;max-width:220px;">${r.name}</td>
+      <td>${r.province || '—'}</td>
+      <td style="max-width:180px;font-size:12px;">${r.pkg_type || '—'}</td>
+      <td>${jobBadgeHtml(r.jobStatus)}</td>
+      <td>${r.bizType ? `<span class="badge badge-blue">${r.bizType}</span>` : '—'}</td>
+      <td class="mono" style="font-size:12px;">${fmtDate(r.serviceStart) || '—'}</td>
+      <td class="mono" style="font-size:12px;">${fmtDate(r.contractEnd) || '—'}</td>
+      <td class="mono" style="font-size:12px;">${simBadgeHtml(r.simExpire)}</td>
+      <td class="mono" style="text-align:right;">${fmtPrice(r.price)}</td>
+      <td style="font-size:12px;color:var(--text2);max-width:200px;">${r.note || ''}</td>
+    </tr>
+  `).join('');
+}
+
+function sortTable(col) {
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = 1; }
+  // Update header icons
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+  });
+  const headers = ['id','name','province','pkg_type','jobStatus','bizType',
+                   'serviceStart','contractEnd','simExpire','price'];
+  const idx = headers.indexOf(col);
+  if (idx >= 0) {
+    const ths = document.querySelectorAll('th');
+    ths[idx].classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  }
+  applyFilters();
+}
+
+function resetFilters() {
+  document.getElementById('fSearch').value = '';
+  document.getElementById('fStatus').value = '';
+  document.getElementById('fProvince').value = '';
+  document.getElementById('fBiz').value = '';
+  document.getElementById('fSim').value = '';
+  applyFilters();
+}
+
+// Load on start + auto-refresh 5 min
+loadData();
+setInterval(loadData, 5 * 60 * 1000);
+</script>
+</body>
+</html>
