@@ -3,609 +3,968 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIM Dashboard — EleXa by EGAT</title>
+<title>Total Solutions · EV Dashboard</title>
+<meta name="description" content="แดชบอร์ดสถานีอัดประจุไฟฟ้า Total Solutions · EleXa by EGAT — สถานะงาน วันหมดอายุสัญญา/SIM และแจ้งเตือน LINE">
+<meta name="theme-color" content="#0b2a55">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b2a55'/%3E%3Cpath d='M36 8 18 36h12l-4 20 20-30H34z' fill='%23e0b544'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#07101f;
-  --bg2:#0c1628;
-  --bg3:#111e36;
-  --card:#0f1a30;
-  --card2:#142040;
-  --border:#1a2d50;
-  --border2:#223568;
-  --accent:#00c6ff;
-  --accent2:#0072ff;
-  --green:#00e676;
-  --green2:#00a152;
-  --yellow:#ffd740;
-  --orange:#ff9100;
-  --red:#ff5252;
-  --red2:#c62828;
-  --purple:#ce93d8;
-  --text:#e2e8f0;
-  --text2:#94a3b8;
-  --text3:#4a6080;
-  --egat-blue:#005baa;
+:root{
+  --bg:#f3f5f9; --surface:#ffffff; --surface2:#f7f8fb; --line:#e3e7ef; --line2:#d3d9e4;
+  --text:#0f1b2d; --text2:#4a5872; --text3:#8390a6;
+  --navy:#0b2a55; --navy2:#16407d; --gold:#c89b2c; --gold2:#e0b544; --gold-soft:#fbf3de;
+  --red:#cf3b3b; --red-soft:#fdecec; --amber:#c97a0e; --amber-soft:#fdf2df;
+  --green:#18925a; --green-soft:#e4f5ec; --blue:#2c67c9; --blue-soft:#e8f0fc;
+  --violet:#6d4fc2; --violet-soft:#efeafb; --gray-soft:#eef1f6;
+  --shadow:0 1px 2px rgba(15,27,45,.05),0 4px 16px rgba(15,27,45,.05);
+  --shadow2:0 12px 40px rgba(15,27,45,.18);
+  --r:14px; --rs:9px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',sans-serif;min-height:100vh;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1220; --surface:#111c2e; --surface2:#15233a; --line:#1f2f4a; --line2:#2a3d5c;
+    --text:#e8eef8; --text2:#a4b3c9; --text3:#6b7d98;
+    --navy:#081a36; --navy2:#1c4a8c; --gold-soft:#2b2412;
+    --red-soft:#3a1a1d; --amber-soft:#35270f; --green-soft:#0f2d20; --blue-soft:#132a4c;
+    --violet-soft:#241c3f; --gray-soft:#1a2740;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); --shadow2:0 12px 40px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1220; --surface:#111c2e; --surface2:#15233a; --line:#1f2f4a; --line2:#2a3d5c;
+  --text:#e8eef8; --text2:#a4b3c9; --text3:#6b7d98;
+  --navy:#081a36; --navy2:#1c4a8c; --gold-soft:#2b2412;
+  --red-soft:#3a1a1d; --amber-soft:#35270f; --green-soft:#0f2d20; --blue-soft:#132a4c;
+  --violet-soft:#241c3f; --gray-soft:#1a2740;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); --shadow2:0 12px 40px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Sarabun',system-ui,sans-serif;font-size:14.5px;line-height:1.55;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3,.kanit{font-family:'Kanit','Sarabun',sans-serif;font-weight:500;letter-spacing:.1px}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit;font-size:14px}
+a{color:var(--blue)}
+.num{font-variant-numeric:tabular-nums}
 
-/* ── HEADER ── */
-header{
-  background:linear-gradient(135deg,#040d1e 0%,#071428 50%,#0a1a38 100%);
-  border-bottom:1px solid var(--border2);
-  padding:0 24px;
-  position:sticky;top:0;z-index:100;
-  box-shadow:0 4px 24px rgba(0,0,0,0.5);
-}
-.header-inner{
-  max-width:1600px;margin:0 auto;
-  display:flex;align-items:center;justify-content:space-between;
-  height:62px;gap:16px;
-}
-.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
-.logo-icon{
-  width:38px;height:38px;border-radius:8px;
-  background:linear-gradient(135deg,var(--egat-blue),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:15px;color:#fff;letter-spacing:-0.5px;
-  box-shadow:0 0 16px rgba(0,198,255,0.3);
-}
-.logo-text{line-height:1.1;}
-.logo-title{font-size:16px;font-weight:700;color:#fff;letter-spacing:0.3px;}
-.logo-sub{font-size:11px;color:var(--text2);font-weight:400;}
-.header-right{display:flex;align-items:center;gap:12px;}
-.refresh-btn{
-  background:rgba(0,198,255,0.1);border:1px solid rgba(0,198,255,0.3);
-  color:var(--accent);padding:7px 14px;border-radius:7px;
-  font-size:13px;cursor:pointer;font-family:inherit;
-  transition:all 0.2s;display:flex;align-items:center;gap:6px;
-}
-.refresh-btn:hover{background:rgba(0,198,255,0.2);border-color:var(--accent);}
-.last-update{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+/* ── Header ── */
+.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.top::after{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2) 60%,transparent)}
+.top-in{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:14px;height:62px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);display:grid;place-items:center;flex-shrink:0;border:1px solid rgba(255,255,255,.12)}
+.brand-t{font-family:'Kanit';font-size:17px;font-weight:500;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-t b{color:var(--gold2);font-weight:500}
+.brand-s{font-size:12px;color:rgba(255,255,255,.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sync{display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(255,255,255,.75);padding:0 6px;white-space:nowrap}
+.sync i{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 3px rgba(61,220,132,.2)}
+.sync.err i{background:#ff6b6b;box-shadow:0 0 0 3px rgba(255,107,107,.2)}
+.sync.load i{background:var(--gold2);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.3}}
+.ib{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;position:relative;transition:background .15s}
+.ib:hover{background:rgba(255,255,255,.14)}
+.ib svg{width:18px;height:18px}
+.ib .dot{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;border:2px solid var(--navy)}
+.spin svg{animation:rot .8s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
 
-/* ── MAIN ── */
-main{max-width:1600px;margin:0 auto;padding:24px 24px 48px;}
+/* ── Tabs ── */
+.tabs-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:65px;z-index:40}
+.tabs{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:13px 14px 11px;font-size:14.5px;font-weight:500;color:var(--text2);border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--navy2);border-bottom-color:var(--gold)}
+:root[data-theme="dark"] .tab.on{color:var(--gold2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tab.on{color:var(--gold2)}}
+.tab .cnt{font-size:11.5px;font-weight:700;background:var(--red);color:#fff;border-radius:10px;padding:0 7px;line-height:18px}
 
-/* ── KPI CARDS ── */
-.kpi-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:12px;margin-bottom:24px;
-}
-.kpi-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:18px 16px;
-  position:relative;overflow:hidden;
-  transition:border-color 0.2s,transform 0.2s;
-}
-.kpi-card:hover{border-color:var(--border2);transform:translateY(-2px);}
-.kpi-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--accent-color,var(--accent));
-}
-.kpi-card.green{--accent-color:var(--green);}
-.kpi-card.yellow{--accent-color:var(--yellow);}
-.kpi-card.orange{--accent-color:var(--orange);}
-.kpi-card.red{--accent-color:var(--red);}
-.kpi-card.purple{--accent-color:var(--purple);}
-.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
-.kpi-value{font-size:32px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;line-height:1;}
-.kpi-value span{font-size:14px;font-weight:400;color:var(--text2);margin-left:4px;}
-.kpi-sub{font-size:12px;color:var(--text2);margin-top:6px;}
+main{max-width:1400px;margin:0 auto;padding:22px 20px 60px}
+.panel{display:none}.panel.on{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-/* ── FILTER BAR ── */
-.filter-bar{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:16px 20px;
-  display:flex;flex-wrap:wrap;gap:12px;align-items:center;
-  margin-bottom:20px;
-}
-.filter-bar label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block;}
-.filter-group{display:flex;flex-direction:column;min-width:140px;}
-.filter-group.search{flex:1;min-width:200px;}
-select,input[type=text]{
-  background:var(--bg3);border:1px solid var(--border2);
-  color:var(--text);padding:8px 12px;border-radius:7px;
-  font-size:13px;font-family:inherit;outline:none;
-  transition:border-color 0.2s;
-}
-select:focus,input:focus{border-color:var(--accent);}
-.filter-reset{
-  background:transparent;border:1px solid var(--border2);
-  color:var(--text2);padding:8px 14px;border-radius:7px;
-  font-size:13px;cursor:pointer;font-family:inherit;
-  align-self:flex-end;transition:all 0.2s;
-}
-.filter-reset:hover{border-color:var(--red);color:var(--red);}
+/* ── Cards ── */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:10px;padding:16px 18px 0}
+.card-h h2{font-size:16px}
+.card-h .sub{font-size:12.5px;color:var(--text3)}
+.card-h .act{margin-left:auto}
+.card-b{padding:14px 18px 18px}
+.grid{display:grid;gap:16px}
+.grid>*{min-width:0}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:2fr 1fr}
+@media(max-width:980px){.g2,.g3{grid-template-columns:1fr}}
 
-/* ── TABLE ── */
-.table-wrap{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;overflow:hidden;
-}
-.table-header{
-  padding:14px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.table-title{font-size:14px;font-weight:600;color:var(--text);}
-.table-count{font-size:13px;color:var(--text2);}
-.table-scroll{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;min-width:1100px;}
-thead tr{background:var(--bg3);}
-th{
-  padding:11px 14px;text-align:left;
-  font-size:11px;font-weight:600;color:var(--text3);
-  text-transform:uppercase;letter-spacing:0.6px;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;user-select:none;white-space:nowrap;
-}
-th:hover{color:var(--text);}
-th .sort-icon{margin-left:4px;opacity:0.4;}
-th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--accent);}
-tbody tr{
-  border-bottom:1px solid rgba(26,45,80,0.6);
-  transition:background 0.15s;
-}
-tbody tr:hover{background:rgba(0,198,255,0.04);}
-tbody tr:last-child{border-bottom:none;}
-td{padding:11px 14px;font-size:13px;color:var(--text);vertical-align:middle;}
-td.mono{font-family:'JetBrains Mono',monospace;font-size:12px;}
-.no-data{text-align:center;padding:48px;color:var(--text3);font-size:14px;}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:1180px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{padding:15px 16px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow2)}
+.kpi-l{font-size:12.5px;color:var(--text2);display:flex;align-items:center;gap:7px}
+.kpi-l i{width:8px;height:8px;border-radius:3px;display:inline-block}
+.kpi-v{font-family:'Kanit';font-size:30px;font-weight:500;line-height:1.15;margin-top:6px}
+.kpi-v small{font-size:14px;color:var(--text3);font-weight:400;margin-left:3px}
+.kpi-s{font-size:12px;color:var(--text3);margin-top:2px}
+.kpi.alert{background:linear-gradient(135deg,var(--red-soft),var(--surface) 70%);border-color:color-mix(in srgb,var(--red) 30%,var(--line))}
+.kpi.alert .kpi-v{color:var(--red)}
 
-/* ── BADGES ── */
-.badge{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
-  white-space:nowrap;
-}
-.badge-green{background:rgba(0,230,118,0.12);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
-.badge-yellow{background:rgba(255,215,64,0.12);color:var(--yellow);border:1px solid rgba(255,215,64,0.25);}
-.badge-orange{background:rgba(255,145,0,0.12);color:var(--orange);border:1px solid rgba(255,145,0,0.25);}
-.badge-red{background:rgba(255,82,82,0.12);color:var(--red);border:1px solid rgba(255,82,82,0.25);}
-.badge-blue{background:rgba(0,198,255,0.12);color:var(--accent);border:1px solid rgba(0,198,255,0.25);}
-.badge-gray{background:rgba(100,116,128,0.15);color:var(--text2);border:1px solid rgba(100,116,128,0.25);}
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:20px;white-space:nowrap;line-height:1.6}
+.c-red{background:var(--red-soft);color:var(--red)}.c-amber{background:var(--amber-soft);color:var(--amber)}
+.c-green{background:var(--green-soft);color:var(--green)}.c-blue{background:var(--blue-soft);color:var(--blue)}
+.c-violet{background:var(--violet-soft);color:var(--violet)}.c-gray{background:var(--gray-soft);color:var(--text2)}
+.c-gold{background:var(--gold-soft);color:var(--gold)}
+.chip i{width:6px;height:6px;border-radius:50%;background:currentColor}
 
-/* SIM expiry colors */
-.sim-expired{color:var(--red);font-weight:600;}
-.sim-warn{color:var(--yellow);font-weight:600;}
-.sim-ok{color:var(--green);}
-.sim-none{color:var(--text3);font-style:italic;}
+/* Alert list */
+.alist{display:flex;flex-direction:column}
+.ai{display:flex;align-items:center;gap:14px;padding:11px 4px;border-top:1px solid var(--line);cursor:pointer;border-radius:8px}
+.ai:first-child{border-top:0}
+.ai:hover{background:var(--surface2)}
+.dbox{width:62px;flex-shrink:0;text-align:center;border-radius:10px;padding:6px 0 5px;line-height:1.1}
+.dbox b{display:block;font-family:'Kanit';font-size:21px;font-weight:500}
+.dbox span{font-size:11px;font-weight:600}
+.dbox.expired{background:var(--red);color:#fff}
+.dbox.critical{background:var(--red-soft);color:var(--red)}
+.dbox.warning{background:var(--amber-soft);color:var(--amber)}
+.dbox.upcoming{background:var(--blue-soft);color:var(--blue)}
+.dbox.lapsed{background:var(--gray-soft);color:var(--text2)}
+.dbox.ok{background:var(--green-soft);color:var(--green)}
+.ai-m{min-width:0;flex:1}
+.ai-n{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-d{font-size:12.5px;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:2px}
+.empty{padding:34px 10px;text-align:center;color:var(--text3)}
+.empty b{display:block;font-size:26px;margin-bottom:4px}
 
-/* ── LOADING ── */
-#loading{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:80px 20px;gap:16px;
-}
-.spinner{
-  width:40px;height:40px;border:3px solid var(--border2);
-  border-top-color:var(--accent);border-radius:50%;
-  animation:spin 0.8s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
-#loading p{color:var(--text2);font-size:14px;}
+/* Bars */
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(90px,150px) 1fr 70px;align-items:center;gap:10px;font-size:13px}
+.bar-l{color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-t{height:10px;background:var(--gray-soft);border-radius:6px;overflow:hidden}
+.bar-f{height:100%;border-radius:6px;background:var(--navy2);transition:width .6s ease}
+.bar-v{text-align:right;font-weight:600;white-space:nowrap}
 
-/* ── ERROR ── */
-#error-box{
-  display:none;background:rgba(255,82,82,0.08);
-  border:1px solid rgba(255,82,82,0.3);border-radius:12px;
-  padding:24px;text-align:center;margin:20px 0;color:var(--red);
-}
+/* Donut */
+.donut-wrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:13.5px;flex:1;min-width:170px}
+.legend div{display:flex;align-items:center;gap:9px}
+.legend i{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.legend b{margin-left:auto;font-weight:600}
 
-/* ── FOOTER ── */
-footer{
-  text-align:center;padding:20px;
-  font-size:12px;color:var(--text3);
-  border-top:1px solid var(--border);margin-top:16px;
-}
+/* Month timeline */
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:end;height:170px;padding-top:10px}
+.mcol{display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end;cursor:default}
+.mstack{width:100%;max-width:34px;display:flex;flex-direction:column-reverse;border-radius:6px;overflow:hidden;background:var(--gray-soft);min-height:4px}
+.mstack div{width:100%}
+.mcnt{font-size:12px;font-weight:700;color:var(--text2);min-height:16px}
+.mlab{font-size:11.5px;color:var(--text3);white-space:nowrap}
+.mleg{display:flex;gap:16px;font-size:12.5px;color:var(--text2);margin-top:10px}
+.mleg span{display:flex;align-items:center;gap:6px}.mleg i{width:10px;height:10px;border-radius:3px}
 
-@media(max-width:768px){
-  main{padding:16px 12px 32px;}
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .filter-bar{padding:12px;}
+/* Toolbar */
+.tool{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.search{flex:1;min-width:220px;position:relative}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--text3)}
+.search input{width:100%;padding:10px 12px 10px 38px}
+.in,.search input,select.in{background:var(--surface);border:1px solid var(--line2);border-radius:var(--rs);color:var(--text);padding:9px 12px;outline:none;transition:border .15s,box-shadow .15s}
+.in:focus,.search input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px color-mix(in srgb,var(--navy2) 15%,transparent)}
+select.in{padding-right:30px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238390a6' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.seg{display:inline-flex;background:var(--gray-soft);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:7px 13px;border-radius:8px;font-size:13.5px;color:var(--text2);font-weight:500;white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.btn{border:1px solid var(--line2);background:var(--surface);color:var(--text);padding:9px 14px;border-radius:var(--rs);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:all .15s;text-decoration:none}
+.btn:hover{border-color:var(--navy2);color:var(--navy2)}
+.btn svg{width:16px;height:16px}
+.btn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.pri:hover{background:var(--navy2);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1b1405}
+.btn.gold:hover{background:var(--gold2);color:#1b1405}
+.btn.line{background:#06c755;border-color:#06c755;color:#fff}
+.btn.line:hover{background:#05b04b;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:6px 11px;font-size:13px}
+
+/* Table */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12.5px;font-weight:600;color:var(--text3);padding:11px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface2);cursor:pointer;user-select:none;position:sticky;top:0}
+th:hover{color:var(--text)}
+th.s-asc::after{content:' ↑';color:var(--gold)}th.s-desc::after{content:' ↓';color:var(--gold)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{cursor:pointer;transition:background .1s}
+tbody tr:hover{background:var(--surface2)}
+tbody tr:last-child td{border-bottom:0}
+.t-name{font-weight:600;max-width:280px}
+.t-sub{font-size:12.5px;color:var(--text3);font-weight:400}
+.t-exp{white-space:nowrap;font-size:13.5px}
+.t-exp small{display:block;font-size:12px;font-weight:600}
+.tfoot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--text2);flex-wrap:wrap;gap:8px}
+
+/* Station cards (mobile) */
+.mlist{display:none}
+@media(max-width:760px){
+  .tw.hide-m{display:none}.mlist{display:flex;flex-direction:column}
 }
+.mc{padding:13px 16px;border-top:1px solid var(--line);cursor:pointer}
+.mc:first-child{border-top:0}
+.mc-top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.mc-row{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px;color:var(--text2);margin-top:6px}
+
+/* Expiry groups */
+.xgroups{display:flex;flex-direction:column;gap:16px}
+.xg-h{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.xg-h h3{font-size:15.5px}
+.xg-h .n{margin-left:auto;font-size:13px;color:var(--text3)}
+.xg-bar{width:4px;height:22px;border-radius:3px}
+.xg .alist{padding:6px 14px 10px}
+
+/* LINE setup */
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:14px}
+.step{display:flex;gap:14px}
+.step::before{counter-increment:s;content:counter(s);flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--navy);color:var(--gold2);font-family:'Kanit';font-weight:500;display:grid;place-items:center;font-size:14px}
+.step>div>b{display:block;margin-bottom:2px}
+.step p{color:var(--text2);font-size:13.5px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:var(--gray-soft);padding:1px 6px;border-radius:5px;word-break:break-all}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:600;color:var(--text2)}
+.field .hint{font-size:12px;color:var(--text3)}
+.rule{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}
+.rule:first-child{border-top:0}
+.rule .ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;font-size:15px}
+.mile{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+/* LINE preview */
+.lp{background:#8cabd9;border-radius:14px;padding:16px;max-width:380px}
+:root[data-theme="dark"] .lp{background:#22324d}
+.lp-b{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);color:#0f1b2d}
+.lp-h{background:#0b2a55;color:#fff;padding:14px 16px}
+.lp-h b{font-family:'Kanit';font-weight:500;font-size:15px;display:block}
+.lp-h span{font-size:12px;color:#e0b544}
+.lp-r{display:flex;gap:10px;padding:9px 14px;border-top:1px solid #eef1f6;align-items:center}
+.lp-r:first-child{border-top:0}
+.lp-r .dbox{width:52px}.lp-r .dbox b{font-size:17px}
+.lp-f{padding:10px 14px 14px}
+.lp-f div{background:#0b2a55;color:#fff;text-align:center;border-radius:8px;padding:8px;font-size:13px;font-weight:600}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:rgba(8,15,28,.45);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--surface);z-index:90;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:var(--shadow2)}
+.drawer.on{transform:none}
+.dr-h{padding:18px 20px;background:var(--navy);color:#fff;display:flex;gap:12px;align-items:flex-start}
+.dr-h h3{font-size:18px;line-height:1.35}
+.dr-h .t-sub{color:rgba(255,255,255,.65);margin-top:3px}
+.dr-h .ib{margin-left:auto;flex-shrink:0}
+.dr-b{overflow-y:auto;padding:18px 20px 30px;flex:1}
+.dr-sec{margin-bottom:20px}
+.dr-sec h4{font-family:'Kanit';font-weight:500;font-size:14px;color:var(--text3);margin-bottom:8px}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:8px 12px;font-size:14px}
+.kv dt{color:var(--text3)}
+.kv dd{font-weight:500;word-break:break-word}
+.xcard{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+
+/* Notice + toast */
+.notice{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border-radius:12px;margin-bottom:16px;font-size:13.5px}
+.notice.err{background:var(--red-soft);color:var(--red)}
+.notice.info{background:var(--blue-soft);color:var(--blue)}
+.notice b{display:block}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--text);color:var(--surface);padding:11px 18px;border-radius:10px;font-size:14px;z-index:120;opacity:0;transition:all .25s;pointer-events:none;max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.skel{background:linear-gradient(90deg,var(--gray-soft),var(--surface2),var(--gray-soft));background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px}
+@keyframes sk{to{background-position:-200% 0}}
+footer{max-width:1400px;margin:0 auto;padding:0 20px 30px;font-size:12.5px;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+@media(max-width:760px){
+  .top-in{padding:0 14px;gap:8px}.brand-s,.sync{display:none}.brand-t{font-size:15.5px}.top-r{gap:6px}.ib{width:36px;height:36px}
+  .tabs{padding:0 10px}.tabs-wrap{top:65px}
+  main{padding:16px 14px 50px}
+  .kpi-v{font-size:25px}
+  .bar{grid-template-columns:96px 1fr 74px}
+  .months{gap:3px}.mlab{font-size:10px}
+  .kv{grid-template-columns:110px 1fr}
+  footer{padding:0 16px 24px}
+}
+@media print{.top,.tabs-wrap,.tool,footer,.ib{display:none!important}.panel{display:block!important}body{background:#fff}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <a class="logo" href="#">
-      <div class="logo-icon">EV</div>
-      <div class="logo-text">
-        <div class="logo-title">SIM Dashboard</div>
-        <div class="logo-sub">EleXa by EGAT · Total Solution</div>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="brand-mark"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M13.5 2 4 14h7l-1.5 8L19 10h-7z" fill="#e0b544"/></svg></div>
+      <div style="min-width:0">
+        <div class="brand-t">Total <b>Solutions</b></div>
+        <div class="brand-s">EV Dashboard · สถานีอัดประจุไฟฟ้า กฟผ.</div>
       </div>
-    </a>
-    <div class="header-right">
-      <span class="status-dot"></span>
-      <span class="last-update" id="lastUpdate">กำลังโหลด...</span>
-      <button class="refresh-btn" onclick="loadData()">↻ รีเฟรช</button>
+    </div>
+    <div class="top-r">
+      <div class="sync load" id="sync"><i></i><span id="syncTxt">กำลังโหลด…</span></div>
+      <button class="ib" id="btnRefresh" title="รีเฟรชข้อมูล" onclick="load(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+      <a class="ib" id="btnSheet" title="เปิด Google Sheet (แก้ไขข้อมูล)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/></svg></a>
+      <button class="ib" title="สลับโหมดสว่าง/มืด" onclick="toggleTheme()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button class="ib" title="รายการที่ต้องจัดการ" onclick="go('expiry')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot" id="bell" hidden>0</span></button>
     </div>
   </div>
 </header>
 
+<nav class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-t="overview" onclick="go('overview')">ภาพรวม</button>
+    <button class="tab" data-t="stations" onclick="go('stations')">สถานีทั้งหมด</button>
+    <button class="tab" data-t="expiry" onclick="go('expiry')">วันหมดอายุ <span class="cnt" id="tabCnt" hidden>0</span></button>
+    <button class="tab" data-t="line" onclick="go('line')">แจ้งเตือน LINE</button>
+  </div>
+</nav>
+
 <main>
-  <!-- KPI -->
-  <div class="kpi-grid" id="kpiGrid">
-    <div class="kpi-card"><div class="kpi-label">ทั้งหมด</div><div class="kpi-value" id="kTotal">—</div><div class="kpi-sub">สถานี</div></div>
-    <div class="kpi-card green"><div class="kpi-label">ส่งมอบแล้ว</div><div class="kpi-value" id="kDone">—</div><div class="kpi-sub">สถานี</div></div>
-    <div class="kpi-card yellow"><div class="kpi-label">กำลังดำเนินการ</div><div class="kpi-value" id="kProg">—</div><div class="kpi-sub">สถานี</div></div>
-    <div class="kpi-card orange"><div class="kpi-label">อยู่ระหว่างติดตั้ง</div><div class="kpi-value" id="kInst">—</div><div class="kpi-sub">สถานี</div></div>
-    <div class="kpi-card red"><div class="kpi-label">SIM หมดอายุ</div><div class="kpi-value" id="kExpired">—</div><div class="kpi-sub">รายการ</div></div>
-    <div class="kpi-card yellow"><div class="kpi-label">SIM เตือน &lt;30 วัน</div><div class="kpi-value" id="kWarn">—</div><div class="kpi-sub">รายการ</div></div>
-    <div class="kpi-card purple"><div class="kpi-label">มูลค่ารวม</div><div class="kpi-value" id="kPrice">—</div><div class="kpi-sub">ล้านบาท</div></div>
-  </div>
+  <div id="notice"></div>
 
-  <!-- FILTERS -->
-  <div class="filter-bar">
-    <div class="filter-group search">
-      <label>ค้นหา</label>
-      <input type="text" id="fSearch" placeholder="ชื่อสถานี, จังหวัด, ประเภท..." oninput="applyFilters()">
+  <!-- ═════ OVERVIEW ═════ -->
+  <section class="panel on" id="p-overview">
+    <div class="kpis" id="kpis">
+      <div class="card kpi"><div class="skel" style="height:62px"></div></div><div class="card kpi"><div class="skel" style="height:62px"></div></div><div class="card kpi"><div class="skel" style="height:62px"></div></div><div class="card kpi"><div class="skel" style="height:62px"></div></div><div class="card kpi"><div class="skel" style="height:62px"></div></div><div class="card kpi"><div class="skel" style="height:62px"></div></div>
     </div>
-    <div class="filter-group">
-      <label>สถานะงาน</label>
-      <select id="fStatus" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+
+    <div class="grid g3" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>ต้องจัดการเร็ว ๆ นี้</h2><span class="sub">หมดอายุแล้ว และภายใน 90 วัน</span>
+          <button class="btn sm act" onclick="go('expiry')">ดูทั้งหมด →</button></div>
+        <div class="card-b"><div class="alist" id="urgent"><div class="skel" style="height:180px"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>สถานะงาน</h2></div>
+        <div class="card-b"><div class="donut-wrap" id="donut"></div>
+          <div id="ctrSum" style="margin-top:18px"></div></div>
+      </div>
     </div>
-    <div class="filter-group">
-      <label>จังหวัด</label>
-      <select id="fProvince" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>ปฏิทินวันหมดอายุ 12 เดือนข้างหน้า</h2><span class="sub">จำนวนรายการที่ครบกำหนดในแต่ละเดือน</span></div>
+      <div class="card-b"><div class="months" id="months"></div>
+        <div class="mleg"><span><i style="background:var(--navy2)"></i>สัญญาบริการ</span><span><i style="background:var(--gold)"></i>SIM</span></div></div>
     </div>
-    <div class="filter-group">
-      <label>ประเภทธุรกิจ</label>
-      <select id="fBiz" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+
+    <div class="grid g2">
+      <div class="card"><div class="card-h"><h2>จังหวัด</h2><span class="sub">จำนวนสถานี (10 อันดับแรก)</span></div><div class="card-b"><div class="bars" id="chProv"></div></div></div>
+      <div class="card"><div class="card-h"><h2>มูลค่าสัญญาตามประเภทธุรกิจ</h2><span class="sub">บาท (ไม่รวม VAT)</span></div><div class="card-b"><div class="bars" id="chBiz"></div></div></div>
     </div>
-    <div class="filter-group">
-      <label>สถานะ SIM</label>
-      <select id="fSim" onchange="applyFilters()">
-        <option value="">ทั้งหมด</option>
-        <option value="expired">หมดอายุ</option>
-        <option value="warn">เตือน &lt;30 วัน</option>
-        <option value="ok">ปกติ</option>
-        <option value="none">ไม่มี SIM</option>
+  </section>
+
+  <!-- ═════ STATIONS ═════ -->
+  <section class="panel" id="p-stations">
+    <div class="tool">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="ค้นหาชื่อสถานี จังหวัด ผู้รับเหมา เลขใบเสนอราคา…" oninput="renderTable()"></div>
+      <select class="in" id="fStage" onchange="renderTable()"><option value="">ทุกสถานะ</option></select>
+      <select class="in" id="fProv" onchange="renderTable()"><option value="">ทุกจังหวัด</option></select>
+      <select class="in" id="fExp" onchange="renderTable()">
+        <option value="">วันหมดอายุ: ทั้งหมด</option>
+        <option value="expired">หมดอายุแล้ว</option>
+        <option value="critical">ภายใน 30 วัน</option>
+        <option value="warning">31–90 วัน</option>
+        <option value="upcoming">91–180 วัน</option>
+        <option value="nodate">ยังไม่มีวันที่</option>
       </select>
+      <button class="btn" onclick="resetFilters()">ล้างตัวกรอง</button>
+      <button class="btn" onclick="exportCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>CSV</button>
     </div>
-    <button class="filter-reset" onclick="resetFilters()">✕ ล้างตัวกรอง</button>
-  </div>
+    <div class="card">
+      <div class="tw hide-m">
+        <table>
+          <thead><tr>
+            <th data-s="id">#</th>
+            <th data-s="name">สถานี / ลูกค้า</th>
+            <th data-s="charger">เครื่องชาร์จ</th>
+            <th data-s="stage">สถานะ</th>
+            <th data-s="serviceStart">เริ่มบริการ</th>
+            <th data-s="contractEnd">สิ้นสุดสัญญา</th>
+            <th data-s="simDate">SIM</th>
+            <th data-s="price" style="text-align:right">มูลค่า (บาท)</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="mlist" id="mlist"></div>
+      <div class="tfoot"><span id="tcount">—</span><span id="tsum"></span></div>
+    </div>
+  </section>
 
-  <!-- ERROR -->
-  <div id="error-box">
-    <div style="font-size:24px;margin-bottom:8px;">⚠️</div>
-    <div id="errorMsg">ไม่สามารถโหลดข้อมูลได้</div>
-    <div style="margin-top:8px;font-size:12px;color:var(--text2);">กรุณาตรวจสอบว่า Google Sheet ตั้งค่าเป็น "Anyone with the link can view"</div>
-  </div>
+  <!-- ═════ EXPIRY ═════ -->
+  <section class="panel" id="p-expiry">
+    <div class="tool">
+      <div class="seg" id="xType">
+        <button class="on" data-v="">ทั้งหมด</button><button data-v="contract">สัญญาบริการ</button><button data-v="sim">SIM</button>
+      </div>
+      <span style="font-size:13px;color:var(--text3)" id="xToday"></span>
+    </div>
+    <div class="xgroups" id="xgroups"></div>
+  </section>
 
-  <!-- TABLE -->
-  <div class="table-wrap">
-    <div class="table-header">
-      <span class="table-title">รายการสถานีอัดประจุไฟฟ้า</span>
-      <span class="table-count" id="tableCount">—</span>
+  <!-- ═════ LINE ═════ -->
+  <section class="panel" id="p-line">
+    <div class="grid g2" style="align-items:start">
+      <div class="grid">
+        <div class="card">
+          <div class="card-h"><h2>เชื่อมต่อ LINE</h2><span class="chip c-gray" id="lineState">ยังไม่ได้ตั้งค่า</span></div>
+          <div class="card-b">
+            <div class="field"><label for="gasUrl">Apps Script Web App URL</label>
+              <input class="in" id="gasUrl" placeholder="https://script.google.com/macros/s/……/exec">
+              <span class="hint">ได้จากขั้นตอนที่ 4 ด้านล่าง · บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น</span></div>
+            <div class="field"><label for="gasKey">API Key (ถ้าตั้งไว้)</label>
+              <input class="in" id="gasKey" placeholder="ค่า API_KEY ใน Script Properties"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn pri" onclick="saveLine()">บันทึก</button>
+              <button class="btn" onclick="gas('ping')">ตรวจการเชื่อมต่อ</button>
+              <button class="btn line" onclick="gas('test')">ส่งข้อความทดสอบ</button>
+              <button class="btn gold" onclick="gas('run')">ส่งสรุปตอนนี้</button>
+            </div>
+            <div id="gasOut" style="margin-top:12px;font-size:13px;color:var(--text2)"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>กฎการแจ้งเตือน</h2></div>
+          <div class="card-b">
+            <div class="rule"><div class="ico c-blue">⏰</div><div><b>ทุกวัน 08:00 น.</b> แจ้งเมื่อสัญญาบริการหรือ SIM เหลือเวลาครบรอบวันต่อไปนี้
+              <div class="mile"><span class="chip c-blue">90</span><span class="chip c-blue">60</span><span class="chip c-amber">30</span><span class="chip c-amber">15</span><span class="chip c-red">7</span><span class="chip c-red">3</span><span class="chip c-red">1</span><span class="chip c-red">วันนี้</span></div></div></div>
+            <div class="rule"><div class="ico c-red">📋</div><div><b>ทุกวันจันทร์</b> สรุปรายการที่หมดอายุแล้วและจะหมดภายใน 30 วันทั้งหมด</div></div>
+            <div class="rule"><div class="ico c-green">💬</div><div><b>พิมพ์ในกลุ่ม LINE</b>: <code>สรุป</code> เพื่อดูรายการเร่งด่วนทันที · <code>id</code> เพื่อดู ID ของกลุ่ม</div></div>
+            <div class="rule"><div class="ico c-gray">🔕</div><div>วันไหนไม่มีรายการเข้าเงื่อนไข ระบบจะไม่ส่งข้อความ จึงไม่รบกวนกลุ่ม</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="card-h"><h2>ตัวอย่างข้อความใน LINE</h2><span class="sub">จากข้อมูลปัจจุบัน</span></div>
+          <div class="card-b"><div class="lp" id="linePreview"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>วิธีตั้งค่า (ครั้งเดียว ~10 นาที)</h2></div>
+          <div class="card-b">
+            <div class="steps">
+              <div class="step"><div><b>สร้าง LINE Official Account + เปิด Messaging API</b><p>ที่ <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">LINE Developers Console</a> → สร้าง Provider → Channel แบบ Messaging API → แท็บ Messaging API กด Issue <b>Channel access token (long-lived)</b> แล้วคัดลอกไว้ (LINE Notify ปิดบริการแล้วตั้งแต่ 31 มี.ค. 2025 จึงต้องใช้วิธีนี้)</p></div></div>
+              <div class="step"><div><b>สร้าง Apps Script</b><p>เปิด Google Sheet → ส่วนขยาย → Apps Script → วางโค้ดจากไฟล์ <a href="https://github.com/pornwiroonb-web/ev-dashboard/blob/main/apps-script/Code.gs" target="_blank" rel="noopener"><code>apps-script/Code.gs</code></a> แทนของเดิม</p></div></div>
+              <div class="step"><div><b>ใส่ Script Properties</b><p>การตั้งค่าโปรเจกต์ (⚙️) → Script properties → เพิ่ม <code>LINE_CHANNEL_TOKEN</code> = token จากขั้นที่ 1 และ <code>API_KEY</code> = รหัสอะไรก็ได้ (กันคนอื่นกดส่ง)</p></div></div>
+              <div class="step"><div><b>Deploy เป็น Web App</b><p>Deploy → New deployment → Web app · Execute as: <b>Me</b> · Who has access: <b>Anyone</b> → คัดลอก URL มาใส่ในช่องด้านบน</p></div></div>
+              <div class="step"><div><b>ผูกกลุ่ม LINE</b><p>ใน Console ตั้ง Webhook URL = URL เดียวกัน แล้วเปิด Use webhook · เชิญบอทเข้ากลุ่ม บอทจะตอบ ID กลุ่ม → ใส่เป็น <code>LINE_TO</code> ใน Script Properties (ถ้าไม่ใส่ จะส่งแบบ broadcast ถึงเพื่อนทุกคนของบอท)</p></div></div>
+              <div class="step"><div><b>เปิดการแจ้งเตือนอัตโนมัติ</b><p>ใน Apps Script เลือกฟังก์ชัน <code>setup</code> แล้วกด Run หนึ่งครั้ง (อนุญาตสิทธิ์) ระบบจะตั้งเวลาเช็คทุกวัน 08:00 น. เวลาไทย จากนั้นกด “ส่งข้อความทดสอบ” เพื่อยืนยัน</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="loading">
-      <div class="spinner"></div>
-      <p>กำลังโหลดข้อมูลจาก Google Sheets...</p>
-    </div>
-    <div class="table-scroll" id="tableContainer" style="display:none;">
-      <table id="mainTable">
-        <thead>
-          <tr>
-            <th onclick="sortTable('id')">#<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('name')">ชื่อสถานี<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('province')">จังหวัด<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('pkg_type')">ประเภทชาร์จเจอร์<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('jobStatus')">สถานะงาน<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('bizType')">ประเภทธุรกิจ<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('serviceStart')">เริ่มสัญญา<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('contractEnd')">สิ้นสุดสัญญา<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('simExpire')">SIM หมดอายุ<span class="sort-icon">↕</span></th>
-            <th onclick="sortTable('price')">มูลค่า (บาท)<span class="sort-icon">↕</span></th>
-            <th>หมายเหตุ</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-  </div>
+  </section>
 </main>
 
 <footer>
-  EleXa by EGAT · SIM Dashboard · ข้อมูลจาก Google Sheets · Auto-refresh ทุก 5 นาที
+  <span>EleXa by EGAT · ข้อมูลจาก Google Sheet (แหล่งข้อมูลเดียว) · รีเฟรชอัตโนมัติทุก 5 นาที</span>
+  <span id="footTime"></span>
 </footer>
 
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+<div class="toast" id="toast"></div>
+
 <script>
+/* ════════════════════════════════════════════════════════════
+   CONFIG — แหล่งข้อมูลเดียว: Google Sheet
+   ════════════════════════════════════════════════════════════ */
 const SHEET_ID = '1h0m20N8wnyaV2UA8VP2N-VO8LyiFS2SEtsz0hhF_Giw';
-const GID = '0';
+const SHEET_GID = '0';
+const SIM_WARRANTY_YEARS = 2;          // ประกัน SIM 2 ปีแรกนับจากวันเริ่มบริการ (ใช้เมื่อชีตไม่มี simExpire)
+const TZ = 'Asia/Bangkok';
+const REFRESH_MS = 5 * 60 * 1000;
 
-let allData = [];
-let sortCol = 'id';
-let sortDir = 1;
+const TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const DAY = 86400000;
 
-// ── FIELD MAP: map column header label → field key
-const FIELD_MAP = {
-  'id': 'id',
-  'name': 'name',
-  'province': 'province',
-  'pkg_type': 'pkg_type',
-  'vender(1)': 'vender1',
-  'vender(2)': 'vender2',
-  'phone': 'phone',
-  'fee': 'fee',
-  'jobstatus': 'jobStatus',
-  'src': 'src',
-  'servicestart': 'serviceStart',
-  'contractend': 'contractEnd',
-  'simexpire': 'simExpire',
-  'simrenew': 'simRenew',
-  'note': 'note',
-  'quote': 'quote',
-  'year': 'year',
-  'pkg': 'pkg',
-  'detail': 'detail',
-  'price': 'price',
-  'biztype': 'bizType',
-  'tsstatus': 'tsStatus'
+/* header (normalised) → field */
+const FIELD = {
+  id:'id', name:'name', province:'province', pkgtype:'charger',
+  vender1:'vendor1', vendor1:'vendor1', vender2:'vendor2', vendor2:'vendor2',
+  phone:'phone', fee:'fee', jobstatus:'jobStatus', src:'src',
+  servicestart:'serviceStart', contractend:'contractEnd',
+  simexpire:'simExpire', simrenew:'simRenew', note:'note', quote:'quote', year:'year',
+  pkg:'pkg', detail:'detail', price:'price', biztype:'bizType', tsstatus:'tsStatus',
+  simprovider:'simProvider', simby:'simProvider', simnumber:'simNumber', simno:'simNumber',
+  podate:'poDate', electrical:'electrical'
 };
+const DATE_FIELDS = ['serviceStart','contractEnd','simExpire','simRenew','poDate'];
 
-function parseDate(v) {
-  if (!v) return null;
-  // gviz date format
-  const m = String(v).match(/Date\((\d+),(\d+),(\d+)\)/);
-  if (m) return new Date(+m[1], +m[2], +m[3]);
-  // ISO string
-  const d = new Date(v);
-  return isNaN(d) ? null : d;
+let ROWS = [], EVENTS = [], LAST_OK = null;
+let sort = {k:'id', d:1};
+let xType = '';
+
+/* ════════════ Utils ════════════ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+};
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2800); }
+
+/* วันที่ทั้งหมดเก็บเป็น "day key" = ms ของเที่ยงคืน UTC ของวันนั้น (ไม่มีปัญหา timezone/เวลาเหลื่อม) */
+function todayKey(){
+  const [y,m,d] = new Date().toLocaleDateString('en-CA',{timeZone:TZ}).split('-').map(Number);
+  return Date.UTC(y,m-1,d);
+}
+function mkKey(y,m,d){
+  if (y > 2400) y -= 543;                       // ปี พ.ศ. → ค.ศ.
+  if (y < 100) y += (y >= 60 ? 1957 : 2000);    // yy: 60–99 = พ.ศ. 25xx, 00–59 = ค.ศ. 20xx
+  const k = Date.UTC(y,m-1,d), dt = new Date(k);
+  return (dt.getUTCFullYear()===y && dt.getUTCMonth()===m-1 && dt.getUTCDate()===d) ? k : null;
+}
+function parseDay(v){
+  if (v === null || v === undefined || v === '') return null;
+  const s = String(v).trim();
+  if (!s || s === '-') return null;
+  let m;
+  if ((m = s.match(/^Date\((\d+),(\d+),(\d+)/))) return mkKey(+m[1], +m[2]+1, +m[3]);       // gviz
+  if ((m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))) return mkKey(+m[1], +m[2], +m[3]); // ISO
+  if ((m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/))) return mkKey(+m[3], +m[2], +m[1]); // dd/mm/yyyy
+  const th = s.match(/^(\d{1,2})\s*([ก-๙.]+)\s*(\d{2,4})/);                                     // 31 ส.ค. 2569
+  if (th){ const mi = TH_M.findIndex(x => x.replace(/\./g,'') === th[2].replace(/\./g,'')); if (mi>=0) return mkKey(+th[3], mi+1, +th[1]); }
+  return null;
+}
+const daysLeft = k => Math.round((k - todayKey()) / DAY);
+function fmtD(k, short){
+  if (k == null) return '—';
+  const d = new Date(k);
+  return `${d.getUTCDate()} ${TH_M[d.getUTCMonth()]} ${short ? String(d.getUTCFullYear()+543).slice(2) : d.getUTCFullYear()+543}`;
+}
+function addYears(k,n){ const d=new Date(k); const y=d.getUTCFullYear()+n, m=d.getUTCMonth(), day=d.getUTCDate();
+  const last = new Date(Date.UTC(y,m+1,0)).getUTCDate(); return Date.UTC(y,m,Math.min(day,last)); }
+const money = n => n ? Math.round(n).toLocaleString('th-TH') : '—';
+function moneyShort(n){ if(!n) return '0'; if(n>=1e6) return (n/1e6).toLocaleString('th-TH',{maximumFractionDigits:2})+' ล้าน'; return Math.round(n).toLocaleString('th-TH'); }
+function num(v){ const n = parseFloat(String(v ?? '').replace(/[, ฿]/g,'')); return isFinite(n) ? n : 0; }
+
+/* ════════════ สถานะงาน ════════════ */
+const STAGES = {
+  done:      {label:'ส่งมอบแล้ว',        color:'var(--green)',  chip:'c-green'},
+  install:   {label:'อยู่ระหว่างติดตั้ง', color:'var(--blue)',   chip:'c-blue'},
+  progress:  {label:'กำลังดำเนินการ',     color:'var(--amber)',  chip:'c-amber'},
+  waiting:   {label:'รอดำเนินการ',        color:'var(--violet)', chip:'c-violet'},
+  unknown:   {label:'ไม่ระบุ',            color:'var(--text3)',  chip:'c-gray'}
+};
+function stageOf(s){
+  s = String(s||'');
+  if (/ส่งมอบ|แล้วเสร็จ|เสร็จสิ้น/.test(s)) return 'done';
+  if (/ติดตั้ง/.test(s)) return 'install';
+  if (/กำลังดำเนิน/.test(s)) return 'progress';
+  if (/^รอ/.test(s)) return 'waiting';
+  return s ? 'progress' : 'unknown';
 }
 
-function fmtDate(v) {
-  const d = parseDate(v);
-  if (!d) return '';
-  return d.toLocaleDateString('th-TH', {year:'numeric',month:'short',day:'numeric'});
-}
+/* ════════════ ระดับความเร่งด่วน ════════════ */
+const LEVELS = {
+  expired:  {label:'หมดอายุแล้ว',     chip:'c-red',   color:'var(--red)'},
+  critical: {label:'ภายใน 30 วัน',    chip:'c-red',   color:'var(--red)'},
+  warning:  {label:'31–90 วัน',       chip:'c-amber', color:'var(--amber)'},
+  upcoming: {label:'91–180 วัน',      chip:'c-blue',  color:'var(--blue)'},
+  lapsed:   {label:'พ้นประกัน SIM',   chip:'c-gray',  color:'var(--text3)'},
+  ok:       {label:'ปกติ',            chip:'c-green', color:'var(--green)'}
+};
+function levelOf(d){ return d<0?'expired':d<=30?'critical':d<=90?'warning':d<=180?'upcoming':'ok'; }
+function dayWord(d){ return d<0 ? `เกิน ${-d} วัน` : d===0 ? 'วันนี้' : `อีก ${d} วัน`; }
 
-function simStatus(simExpire) {
-  const d = parseDate(simExpire);
-  if (!d) return 'none';
-  const now = new Date();
-  const diff = (d - now) / 86400000;
-  if (diff < 0) return 'expired';
-  if (diff < 30) return 'warn';
-  return 'ok';
-}
-
-function simBadgeHtml(simExpire) {
-  const status = simStatus(simExpire);
-  const txt = fmtDate(simExpire);
-  if (status === 'none') return `<span class="sim-none">—</span>`;
-  if (status === 'expired') return `<span class="sim-expired">🔴 ${txt}</span>`;
-  if (status === 'warn') return `<span class="sim-warn">🟡 ${txt}</span>`;
-  return `<span class="sim-ok">🟢 ${txt}</span>`;
-}
-
-function jobBadgeHtml(status) {
-  if (!status) return '<span class="badge badge-gray">—</span>';
-  if (status.includes('ส่งมอบ') || status.includes('แล้วเสร็จ'))
-    return `<span class="badge badge-green">✓ ${status}</span>`;
-  if (status.includes('กำลังดำเนิน'))
-    return `<span class="badge badge-yellow">◐ ${status}</span>`;
-  if (status.includes('ระหว่างติดตั้ง'))
-    return `<span class="badge badge-orange">⚙ ${status}</span>`;
-  return `<span class="badge badge-gray">${status}</span>`;
-}
-
-function fmtPrice(v) {
-  const n = parseFloat(v);
-  if (!n || n === 0) return '—';
-  return n.toLocaleString('th-TH');
-}
-
-async function loadData() {
-  document.getElementById('loading').style.display = 'flex';
-  document.getElementById('tableContainer').style.display = 'none';
-  document.getElementById('error-box').style.display = 'none';
-
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&_=${Date.now()}`;
-
-  try {
-    const res = await fetch(url);
-    const text = await res.text();
-    const json = JSON.parse(
-      text.replace(/^\s*\/\*.*?\*\/\s*google\.visualization\.Query\.setResponse\(/, '')
-          .replace(/\);\s*$/, '')
-    );
-
-    // Build field index map from header
-    const cols = json.table.cols;
-    const fieldIdx = {};
-    cols.forEach((c, i) => {
-      const key = (c.label || c.id || '').toLowerCase().replace(/\s+/g,'');
-      const mapped = FIELD_MAP[key];
-      if (mapped) fieldIdx[mapped] = i;
-    });
-
-    // Parse rows
-    allData = (json.table.rows || []).map(row => {
-      const get = (field) => {
-        const i = fieldIdx[field];
-        if (i === undefined) return '';
-        const cell = row.c && row.c[i];
-        if (!cell || cell.v === null || cell.v === undefined) return '';
-        // date cells
-        if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) return cell.v;
-        return cell.f !== undefined && cell.f !== null ? cell.f : cell.v;
-      };
-      return {
-        id: get('id'),
-        name: get('name'),
-        province: get('province'),
-        pkg_type: get('pkg_type'),
-        vender1: get('vender1'),
-        jobStatus: get('jobStatus'),
-        bizType: get('bizType'),
-        serviceStart: get('serviceStart'),
-        contractEnd: get('contractEnd'),
-        simExpire: get('simExpire'),
-        simRenew: get('simRenew'),
-        note: get('note'),
-        price: get('price'),
-        tsStatus: get('tsStatus'),
-        src: get('src'),
-      };
-    }).filter(r => r.name && String(r.name).trim() !== '');
-
-    populateFilters();
-    updateKPIs();
-    applyFilters();
-
-    document.getElementById('lastUpdate').textContent =
-      new Date().toLocaleTimeString('th-TH');
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('tableContainer').style.display = 'block';
-
-  } catch(e) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('error-box').style.display = 'block';
-    document.getElementById('errorMsg').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message;
+/* ════════════ Load data ════════════ */
+async function load(manual){
+  setSync('load','กำลังโหลด…'); $('btnRefresh').classList.add('spin');
+  try{
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}&headers=1&_=${Date.now()}`;
+    const res = await fetch(url, {cache:'no-store'});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const txt = await res.text();
+    const json = JSON.parse(txt.slice(txt.indexOf('(')+1, txt.lastIndexOf(')')));
+    if (json.status === 'error') throw new Error((json.errors||[]).map(e=>e.detailed_message||e.message).join(', ')||'Sheet error');
+    const rows = parseGviz(json.table);
+    if (!rows.length) throw new Error('ไม่พบข้อมูลในชีต');
+    store.set('evd-cache', JSON.stringify({t:Date.now(), rows}));
+    setRows(rows);
+    LAST_OK = new Date();
+    setSync('ok','อัปเดต '+LAST_OK.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}));
+    $('notice').innerHTML='';
+    if (manual) toast('อัปเดตข้อมูลล่าสุดแล้ว ('+rows.length+' สถานี)');
+  }catch(e){
     console.error(e);
-  }
+    const c = store.get('evd-cache');
+    let cached = null; try{ cached = c && JSON.parse(c); }catch(_){}
+    if (cached && cached.rows && !ROWS.length) setRows(cached.rows);
+    setSync('err','โหลดไม่สำเร็จ');
+    $('notice').innerHTML = `<div class="notice err"><div>⚠️</div><div><b>โหลดข้อมูลจาก Google Sheet ไม่สำเร็จ</b>${esc(e.message)} — ตรวจสอบว่าชีตแชร์แบบ “ทุกคนที่มีลิงก์ดูได้”${cached?` · กำลังแสดงข้อมูลที่บันทึกไว้เมื่อ ${new Date(cached.t).toLocaleString('th-TH')}`:''}</div></div>`;
+  }finally{ $('btnRefresh').classList.remove('spin'); }
 }
+function setSync(state, txt){ const s=$('sync'); s.className='sync'+(state==='ok'?'':' '+state); $('syncTxt').textContent=txt; }
 
-function populateFilters() {
-  const statusSet = new Set(), provinceSet = new Set(), bizSet = new Set();
-  allData.forEach(r => {
-    if (r.jobStatus) statusSet.add(r.jobStatus);
-    if (r.province) provinceSet.add(r.province);
-    if (r.bizType) bizSet.add(r.bizType);
+function parseGviz(t){
+  const idx = {};
+  t.cols.forEach((c,i)=>{
+    const key = String(c.label||c.id||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    if (FIELD[key] && idx[FIELD[key]] === undefined) idx[FIELD[key]] = i;
   });
-  fillSelect('fStatus', [...statusSet].sort());
-  fillSelect('fProvince', [...provinceSet].sort());
-  fillSelect('fBiz', [...bizSet].sort());
-}
-
-function fillSelect(id, opts) {
-  const sel = document.getElementById(id);
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">ทั้งหมด</option>';
-  opts.forEach(o => {
-    const opt = document.createElement('option');
-    opt.value = o; opt.textContent = o;
-    sel.appendChild(opt);
-  });
-  sel.value = cur;
-}
-
-function updateKPIs() {
-  const total = allData.length;
-  const done = allData.filter(r => r.jobStatus && r.jobStatus.includes('ส่งมอบ')).length;
-  const prog = allData.filter(r => r.jobStatus && r.jobStatus.includes('กำลังดำเนิน')).length;
-  const inst = allData.filter(r => r.jobStatus && r.jobStatus.includes('ระหว่างติดตั้ง')).length;
-  const expired = allData.filter(r => simStatus(r.simExpire) === 'expired').length;
-  const warn = allData.filter(r => simStatus(r.simExpire) === 'warn').length;
-  const totalPrice = allData.reduce((s, r) => s + (parseFloat(r.price) || 0), 0);
-
-  document.getElementById('kTotal').textContent = total;
-  document.getElementById('kDone').textContent = done;
-  document.getElementById('kProg').textContent = prog;
-  document.getElementById('kInst').textContent = inst;
-  document.getElementById('kExpired').textContent = expired;
-  document.getElementById('kWarn').textContent = warn;
-  document.getElementById('kPrice').textContent = (totalPrice / 1e6).toFixed(2);
-}
-
-function applyFilters() {
-  const search = document.getElementById('fSearch').value.toLowerCase();
-  const fStatus = document.getElementById('fStatus').value;
-  const fProv = document.getElementById('fProvince').value;
-  const fBiz = document.getElementById('fBiz').value;
-  const fSim = document.getElementById('fSim').value;
-
-  let filtered = allData.filter(r => {
-    if (fStatus && r.jobStatus !== fStatus) return false;
-    if (fProv && r.province !== fProv) return false;
-    if (fBiz && r.bizType !== fBiz) return false;
-    if (fSim && simStatus(r.simExpire) !== fSim) return false;
-    if (search) {
-      const hay = [r.name, r.province, r.pkg_type, r.bizType, r.jobStatus, r.note]
-        .join(' ').toLowerCase();
-      if (!hay.includes(search)) return false;
+  return (t.rows||[]).map(r=>{
+    const o = {};
+    for (const f in idx){
+      const cell = r.c && r.c[idx[f]];
+      let v = '';
+      if (cell && cell.v !== null && cell.v !== undefined){
+        if (DATE_FIELDS.includes(f)) v = (typeof cell.v==='string' && cell.v.startsWith('Date(')) ? cell.v : (cell.f ?? cell.v);
+        else if (f==='price' || f==='fee') v = cell.v;
+        else v = (cell.f ?? cell.v);
+      }
+      o[f] = typeof v === 'string' ? v.trim() : v;
     }
+    return o;
+  }).filter(o => o.name && String(o.name).trim());
+}
+
+function setRows(raw){
+  ROWS = raw.map((o,i)=>{
+    const r = {...o};
+    r.id = o.id !== '' && o.id != null ? (isNaN(+o.id) ? o.id : +o.id) : i+1;
+    r.price = num(o.price);
+    DATE_FIELDS.forEach(f => r[f] = parseDay(o[f]));
+    r.stage = stageOf(o.jobStatus);
+    r.vendors = [o.vendor1, o.vendor2].filter(v=>v && v!=='-').join(' · ');
+    /* SIM: ใช้วันจริงจากชีตก่อน (simRenew ถ้าต่ออายุแล้ว) ถ้าไม่มี ใช้ประกัน 2 ปีจากวันเริ่มบริการ */
+    const simReal = [r.simExpire, r.simRenew].filter(v=>v!=null);
+    if (simReal.length){ r.simDate = Math.max(...simReal); r.simEst = false; }
+    else if (r.serviceStart!=null){ r.simDate = addYears(r.serviceStart, SIM_WARRANTY_YEARS); r.simEst = true; }
+    else { r.simDate = null; r.simEst = false; }
+    return r;
+  });
+  buildEvents();
+  populateFilters();
+  renderAll();
+}
+
+function buildEvents(){
+  EVENTS = [];
+  const today = todayKey();
+  ROWS.forEach(r=>{
+    const contractActive = r.contractEnd==null || r.contractEnd >= today;
+    if (r.contractEnd != null){
+      const d = daysLeft(r.contractEnd);
+      EVENTS.push({row:r, type:'contract', label:'สัญญาบริการ', date:r.contractEnd, days:d, level:levelOf(d), est:false});
+    }
+    if (r.simDate != null){
+      const d = daysLeft(r.simDate);
+      let level = levelOf(d);
+      if (d < 0 && r.simEst){
+        if (!contractActive || r.contractEnd==null) return;   // สัญญาจบแล้ว ไม่ต้องเตือน SIM ประมาณการ
+        level = 'lapsed';                                      // พ้นประกัน SIM แต่สัญญายังมีผล
+      }
+      EVENTS.push({row:r, type:'sim', label: r.simEst ? 'ประกัน SIM 2 ปี' : 'SIM หมดอายุ', date:r.simDate, days:d, level, est:r.simEst});
+    }
+  });
+  EVENTS.sort((a,b)=>a.days-b.days);
+  ROWS.forEach(r=>{
+    const ev = EVENTS.filter(e=>e.row===r && e.level!=='lapsed');
+    r.worst = ev.length ? ev.reduce((a,b)=>a.days<b.days?a:b) : null;
+  });
+}
+
+/* ════════════ Render ════════════ */
+function renderAll(){
+  renderKPIs(); renderUrgent(); renderDonut(); renderCtrSum(); renderMonths(); renderBars();
+  renderTable(); renderExpiry(); renderLinePreview(); updateBadges();
+  $('footTime').textContent = 'วันนี้ ' + fmtD(todayKey()) + ' (เวลาประเทศไทย)';
+}
+function updateBadges(){
+  const n = EVENTS.filter(e=>e.level==='expired'||e.level==='critical').length;
+  [$('bell'), $('tabCnt')].forEach(el=>{ el.textContent=n; el.hidden = !n; });
+  document.title = (n?`(${n}) `:'') + 'Total Solutions · EV Dashboard';
+}
+
+function renderKPIs(){
+  const c = k => ROWS.filter(r=>r.stage===k).length;
+  const total = ROWS.reduce((s,r)=>s+r.price,0);
+  const urgent = EVENTS.filter(e=>e.level==='expired'||e.level==='critical').length;
+  const soon = EVENTS.filter(e=>e.level==='warning').length;
+  const K = [
+    {l:'สถานีทั้งหมด', v:ROWS.length, u:'แห่ง', s:`${new Set(ROWS.map(r=>r.province).filter(Boolean)).size} จังหวัด`, c:'var(--navy2)', go:()=>{resetFilters();go('stations')}},
+    {l:'ส่งมอบแล้ว', v:c('done'), u:'แห่ง', s:pct(c('done'))+' ของทั้งหมด', c:'var(--green)', go:()=>filterStage('done')},
+    {l:'อยู่ระหว่างติดตั้ง', v:c('install'), u:'แห่ง', s:'หน้างาน', c:'var(--blue)', go:()=>filterStage('install')},
+    {l:'กำลังดำเนินการ', v:c('progress')+c('waiting'), u:'แห่ง', s:'สำรวจ / เอกสาร / รออุปกรณ์', c:'var(--amber)', go:()=>filterStage('progress')},
+    {l:'มูลค่าสัญญารวม', v:moneyShort(total).replace(' ล้าน',''), u: total>=1e6?'ล้านบาท':'บาท', s:'ไม่รวม VAT', c:'var(--gold)', go:()=>{sort={k:'price',d:-1};go('stations');renderTable()}},
+    {l:'ต้องดำเนินการด่วน', v:urgent, u:'รายการ', s:`หมดแล้ว/≤30 วัน · +${soon} ใน 90 วัน`, c:'var(--red)', alert:urgent>0, go:()=>go('expiry')}
+  ];
+  $('kpis').innerHTML = K.map((k,i)=>`<div class="card kpi${k.alert?' alert':''}" data-i="${i}">
+      <div class="kpi-l"><i style="background:${k.c}"></i>${k.l}</div>
+      <div class="kpi-v num">${k.v}<small>${k.u}</small></div>
+      <div class="kpi-s">${k.s}</div></div>`).join('');
+  $('kpis').querySelectorAll('.kpi').forEach(el=>el.onclick=()=>K[+el.dataset.i].go());
+}
+const pct = n => ROWS.length ? Math.round(n/ROWS.length*100)+'%' : '0%';
+function filterStage(s){ resetFilters(); $('fStage').value=s; go('stations'); renderTable(); }
+
+function eventRow(e){
+  const r = e.row, lv = e.level;
+  const big = e.days<0 ? -e.days : e.days;
+  const top = e.days<0 ? 'เกิน' : e.days===0 ? '' : 'เหลือ';
+  return `<div class="ai" data-id="${esc(r.id)}">
+    <div class="dbox ${lv}"><span>${top}</span><b class="num">${e.days===0?'0':big}</b><span>${e.days===0?'วันนี้':'วัน'}</span></div>
+    <div class="ai-m">
+      <div class="ai-n">${esc(r.name)}</div>
+      <div class="ai-d"><span class="chip ${e.type==='sim'?'c-gold':'c-blue'}">${e.label}${e.est?' *':''}</span>
+        <span>ครบกำหนด ${fmtD(e.date)}</span><span>${esc(r.province||'')}</span></div>
+    </div></div>`;
+}
+function bindRows(root){ root.querySelectorAll('[data-id]').forEach(el=>el.onclick=()=>openDrawer(el.dataset.id)); }
+
+function renderUrgent(){
+  const list = EVENTS.filter(e=>['expired','critical','warning'].includes(e.level));
+  const shown = [...list.filter(e=>e.level!=='expired'), ...list.filter(e=>e.level==='expired').reverse()].slice(0,7);
+  // เรียง: ใกล้ถึงก่อน แล้วค่อยรายการที่เกินกำหนดล่าสุด
+  shown.sort((a,b)=> (a.days<0)-(b.days<0) || (a.days<0 ? b.days-a.days : a.days-b.days));
+  $('urgent').innerHTML = shown.length ? shown.map(eventRow).join('') + (list.length>shown.length?`<div style="padding-top:10px;font-size:13px;color:var(--text3)">และอีก ${list.length-shown.length} รายการ</div>`:'')
+    : `<div class="empty"><b>✓</b>ไม่มีรายการหมดอายุภายใน 90 วัน</div>`;
+  bindRows($('urgent'));
+}
+
+function renderDonut(){
+  const keys = ['done','install','progress','waiting','unknown'];
+  const data = keys.map(k=>({k, n:ROWS.filter(r=>r.stage===k).length})).filter(d=>d.n);
+  const total = ROWS.length || 1, R=54, C=2*Math.PI*R;
+  let off = 0;
+  const arcs = data.map(d=>{ const len=d.n/total*C; const s=`<circle r="${R}" cx="70" cy="70" fill="none" stroke="${STAGES[d.k].color}" stroke-width="20" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"/>`; off+=len; return s; }).join('');
+  $('donut').innerHTML = `<svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="สัดส่วนสถานะงาน">
+      <circle r="${R}" cx="70" cy="70" fill="none" stroke="var(--gray-soft)" stroke-width="20"/>${arcs}
+      <text x="70" y="68" text-anchor="middle" font-family="Kanit" font-size="28" fill="var(--text)">${ROWS.length}</text>
+      <text x="70" y="88" text-anchor="middle" font-size="12" fill="var(--text3)">สถานี</text></svg>
+    <div class="legend">${data.map(d=>`<div style="cursor:pointer" onclick="filterStage('${d.k}')"><i style="background:${STAGES[d.k].color}"></i>${STAGES[d.k].label}<b class="num">${d.n}</b></div>`).join('')}</div>`;
+}
+
+function renderCtrSum(){
+  const t=todayKey(), withEnd=ROWS.filter(r=>r.contractEnd!=null);
+  const act=withEnd.filter(r=>r.contractEnd>=t).length, exp=withEnd.length-act, none=ROWS.filter(r=>r.stage==='done'&&r.contractEnd==null).length;
+  const simReal=ROWS.filter(r=>r.simDate!=null&&!r.simEst).length, simEst=ROWS.filter(r=>r.simEst).length;
+  const it=(l,v,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="color:var(--text2)">${l}</span><b class="num" style="color:${c||'var(--text)'}">${v}</b></div>`;
+  $('ctrSum').innerHTML = `<h3 style="font-size:14.5px;margin-bottom:6px">สัญญาบริการ</h3>`+it('ยังมีผล',act,'var(--green)')+it('หมดอายุแล้ว (รอต่อ/อัปเดต)',exp,exp?'var(--red)':'')+it('ส่งมอบแล้วแต่ยังไม่มีวันที่สัญญา',none,none?'var(--amber)':'')+
+    `<h3 style="font-size:14.5px;margin:14px 0 6px">SIM</h3>`+it('มีวันหมดอายุจริงในชีต',simReal)+it('ประมาณจากประกัน 2 ปี',simEst,'var(--text3)');
+}
+function renderMonths(){
+  const t = new Date(todayKey()); const y0=t.getUTCFullYear(), m0=t.getUTCMonth();
+  const cols = Array.from({length:12},(_,i)=>{ const a=Date.UTC(y0,m0+i,1), b=Date.UTC(y0,m0+i+1,1);
+    const ev = EVENTS.filter(e=>e.date>=a && e.date<b && e.days>=0 && e.level!=='lapsed');
+    return {a, c:ev.filter(e=>e.type==='contract').length, s:ev.filter(e=>e.type==='sim').length, names:ev.map(e=>e.row.name+' ('+e.label+')')}; });
+  const max = Math.max(1,...cols.map(c=>c.c+c.s));
+  $('months').innerHTML = cols.map((c,i)=>{ const d=new Date(c.a); const h=(c.c+c.s)/max*110;
+    return `<div class="mcol" title="${esc(c.names.join('\n')||'ไม่มีรายการ')}">
+      <div class="mcnt num">${c.c+c.s||''}</div>
+      <div class="mstack" style="height:${Math.max(4,h)}px">${c.c?`<div style="height:${c.c/(c.c+c.s)*100}%;background:var(--navy2)"></div>`:''}${c.s?`<div style="height:${c.s/(c.c+c.s)*100}%;background:var(--gold)"></div>`:''}</div>
+      <div class="mlab">${TH_M[d.getUTCMonth()]}${i===0||d.getUTCMonth()===0?' '+String(d.getUTCFullYear()+543).slice(2):''}</div></div>`; }).join('');
+}
+
+function bars(el, items, fmt, color){
+  const max = Math.max(1,...items.map(i=>i.v));
+  $(el).innerHTML = items.length ? items.map(i=>`<div class="bar"><span class="bar-l" title="${esc(i.k)}">${esc(i.k)}</span>
+     <div class="bar-t"><div class="bar-f" style="width:${i.v/max*100}%;background:${color}"></div></div><span class="bar-v num">${fmt(i.v)}</span></div>`).join('')
+     : '<div class="empty">ยังไม่มีข้อมูล</div>';
+}
+function renderBars(){
+  const g = (f, val) => { const m={}; ROWS.forEach(r=>{ const k=r[f]; if(k) m[k]=(m[k]||0)+val(r); }); return Object.entries(m).map(([k,v])=>({k,v})).filter(x=>x.v).sort((a,b)=>b.v-a.v); };
+  bars('chProv', g('province',()=>1).slice(0,10), v=>v, 'var(--navy2)');
+  /* ใบเสนอราคาเดียวกันอาจแยกหลายจุด (เช่น EGCO) — นับมูลค่าครั้งเดียวต่อใบเสนอราคา */
+  const seen = new Set(), m = {};
+  ROWS.forEach(r=>{ if(!r.bizType||!r.price) return; const key=r.quote||('#'+r.id); if(seen.has(key)) return; seen.add(key); m[r.bizType]=(m[r.bizType]||0)+r.price; });
+  bars('chBiz', Object.entries(m).map(([k,v])=>({k,v})).sort((a,b)=>b.v-a.v).slice(0,8), v=>moneyShort(v), 'var(--gold)');
+}
+function uniqueValue(rows){ const seen=new Set(); return rows.reduce((s,r)=>{ if(!r.price) return s; const k=r.quote||('#'+r.id); if(seen.has(k)) return s; seen.add(k); return s+r.price; },0); }
+
+/* ════════════ Stations table ════════════ */
+function populateFilters(){
+  const fill = (id, opts, first) => { const el=$(id), cur=el.value; el.innerHTML=`<option value="">${first}</option>`+opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join(''); el.value=cur; };
+  fill('fStage', Object.keys(STAGES).filter(k=>ROWS.some(r=>r.stage===k)).map(k=>[k, STAGES[k].label+' ('+ROWS.filter(r=>r.stage===k).length+')']), 'ทุกสถานะ');
+  const pv = {}; ROWS.forEach(r=>{ if(r.province) pv[r.province]=(pv[r.province]||0)+1; });
+  fill('fProv', Object.keys(pv).sort((a,b)=>a.localeCompare(b,'th')).map(p=>[p, `${p} (${pv[p]})`]), 'ทุกจังหวัด');
+}
+function resetFilters(){ ['q','fStage','fProv','fExp'].forEach(id=>$(id).value=''); renderTable(); }
+function filtered(){
+  const q=$('q').value.trim().toLowerCase(), st=$('fStage').value, pv=$('fProv').value, fx=$('fExp').value;
+  return ROWS.filter(r=>{
+    if (st && !(r.stage===st || (st==='progress' && r.stage==='waiting'))) return false;
+    if (pv && r.province!==pv) return false;
+    if (fx){
+      if (fx==='nodate'){ if (r.contractEnd!=null) return false; }
+      else if (!EVENTS.some(e=>e.row===r && e.level===fx)) return false;
+    }
+    if (q && ![r.id,r.name,r.province,r.charger,r.vendors,r.jobStatus,r.bizType,r.quote,r.note,r.detail].join(' ').toLowerCase().includes(q)) return false;
     return true;
   });
-
-  // Sort
-  filtered.sort((a, b) => {
-    let av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
-    if (sortCol === 'price') { av = parseFloat(av) || 0; bv = parseFloat(bv) || 0; }
-    else if (['serviceStart','contractEnd','simExpire'].includes(sortCol)) {
-      av = parseDate(av)?.getTime() || 0;
-      bv = parseDate(bv)?.getTime() || 0;
-    } else {
-      av = String(av).toLowerCase(); bv = String(bv).toLowerCase();
-    }
-    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+}
+function expCell(k, est){
+  if (k==null) return '<span style="color:var(--text3)">—</span>';
+  const d=daysLeft(k), lv=levelOf(d);
+  const col = lv==='ok' ? 'var(--text3)' : (est && d<0 ? 'var(--text3)' : LEVELS[lv].color);
+  return `<div class="t-exp">${fmtD(k,true)}${est?' <span class="t-sub" title="ประมาณการจากประกัน SIM 2 ปี">*</span>':''}<small style="color:${col}">${est&&d<0?'พ้นประกัน':dayWord(d)}</small></div>`;
+}
+function renderTable(){
+  const rows = filtered().sort((a,b)=>{
+    let x=a[sort.k], y=b[sort.k];
+    if (sort.k==='stage'){ const o=['done','install','progress','waiting','unknown']; x=o.indexOf(x); y=o.indexOf(y); }
+    const nx = x==null||x==='', ny = y==null||y==='';
+    if (nx||ny) return nx&&ny?0:nx?1:-1;                    // ค่าว่างไว้ท้ายเสมอ
+    if (typeof x==='number' && typeof y==='number') return (x-y)*sort.d;
+    return String(x).localeCompare(String(y),'th',{numeric:true})*sort.d;
   });
-
-  renderTable(filtered);
-  document.getElementById('tableCount').textContent = `แสดง ${filtered.length} / ${allData.length} รายการ`;
-}
-
-function renderTable(rows) {
-  const tbody = document.getElementById('tableBody');
-  if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="11" class="no-data">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
-    return;
+  document.querySelectorAll('th[data-s]').forEach(th=>{ th.className = th.dataset.s===sort.k ? (sort.d>0?'s-asc':'s-desc') : ''; });
+  const tb=$('tbody');
+  if (!rows.length){ tb.innerHTML=`<tr><td colspan="8"><div class="empty"><b>🔍</b>ไม่พบสถานีที่ตรงกับเงื่อนไข</div></td></tr>`; $('mlist').innerHTML='<div class="empty"><b>🔍</b>ไม่พบสถานี</div>'; }
+  else {
+    tb.innerHTML = rows.map(r=>`<tr data-id="${esc(r.id)}">
+      <td class="num" style="color:var(--text3)">${esc(r.id)}</td>
+      <td class="t-name">${esc(r.name)}<div class="t-sub">${esc([r.province, r.bizType].filter(Boolean).join(' · '))}</div></td>
+      <td style="font-size:13.5px">${esc(r.charger||'—')}<div class="t-sub">${esc(r.vendors)}</div></td>
+      <td><span class="chip ${STAGES[r.stage].chip}"><i></i>${esc(r.jobStatus||STAGES[r.stage].label)}</span></td>
+      <td class="t-exp">${fmtD(r.serviceStart,true)}</td>
+      <td>${expCell(r.contractEnd)}</td>
+      <td>${expCell(r.simDate, r.simEst)}</td>
+      <td class="num" style="text-align:right;font-weight:600">${money(r.price)}</td></tr>`).join('');
+    $('mlist').innerHTML = rows.map(r=>{ const w=r.worst;
+      return `<div class="mc" data-id="${esc(r.id)}"><div class="mc-top"><div class="t-name">${esc(r.name)}</div><span class="chip ${STAGES[r.stage].chip}">${STAGES[r.stage].label}</span></div>
+      <div class="mc-row"><span>📍 ${esc(r.province||'—')}</span><span>⚡ ${esc(r.charger||'—')}</span>${r.price?`<span>฿ ${money(r.price)}</span>`:''}</div>
+      ${w && w.level!=='ok'?`<div class="mc-row"><span class="chip ${LEVELS[w.level].chip}">${w.label} · ${dayWord(w.days)}</span></div>`:''}</div>`; }).join('');
   }
-  tbody.innerHTML = rows.map(r => `
-    <tr>
-      <td class="mono" style="color:var(--text3)">${r.id}</td>
-      <td style="font-weight:500;max-width:220px;">${r.name}</td>
-      <td>${r.province || '—'}</td>
-      <td style="max-width:180px;font-size:12px;">${r.pkg_type || '—'}</td>
-      <td>${jobBadgeHtml(r.jobStatus)}</td>
-      <td>${r.bizType ? `<span class="badge badge-blue">${r.bizType}</span>` : '—'}</td>
-      <td class="mono" style="font-size:12px;">${fmtDate(r.serviceStart) || '—'}</td>
-      <td class="mono" style="font-size:12px;">${fmtDate(r.contractEnd) || '—'}</td>
-      <td class="mono" style="font-size:12px;">${simBadgeHtml(r.simExpire)}</td>
-      <td class="mono" style="text-align:right;">${fmtPrice(r.price)}</td>
-      <td style="font-size:12px;color:var(--text2);max-width:200px;">${r.note || ''}</td>
-    </tr>
-  `).join('');
+  bindRows(tb); bindRows($('mlist'));
+  $('tcount').textContent = `แสดง ${rows.length} จาก ${ROWS.length} สถานี`;
+  const v = uniqueValue(rows); $('tsum').innerHTML = v ? `มูลค่ารวม <b class="num">${money(v)}</b> บาท` : '';
+}
+document.querySelectorAll('th[data-s]').forEach(th=>th.onclick=()=>{ const k=th.dataset.s; sort = sort.k===k ? {k, d:-sort.d} : {k, d:1}; renderTable(); });
+
+function exportCSV(){
+  const rows = filtered();
+  const H = ['id','สถานี','จังหวัด','เครื่องชาร์จ','ผู้รับเหมา','สถานะงาน','เริ่มบริการ','สิ้นสุดสัญญา','เหลือ(วัน)','SIM ครบกำหนด','SIM ประมาณการ','มูลค่า','ประเภทธุรกิจ','ใบเสนอราคา','หมายเหตุ'];
+  const iso = k => k==null ? '' : new Date(k).toISOString().slice(0,10);
+  const lines = [H, ...rows.map(r=>[r.id,r.name,r.province,r.charger,r.vendors,r.jobStatus,iso(r.serviceStart),iso(r.contractEnd),r.contractEnd!=null?daysLeft(r.contractEnd):'',iso(r.simDate),r.simEst?'ใช่':'',r.price||'',r.bizType,r.quote,r.note])]
+    .map(a=>a.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+  const blob = new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`ev-stations-${new Date(todayKey()).toISOString().slice(0,10)}.csv`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
-function sortTable(col) {
-  if (sortCol === col) sortDir *= -1;
-  else { sortCol = col; sortDir = 1; }
-  // Update header icons
-  document.querySelectorAll('th').forEach(th => {
-    th.classList.remove('sort-asc','sort-desc');
-  });
-  const headers = ['id','name','province','pkg_type','jobStatus','bizType',
-                   'serviceStart','contractEnd','simExpire','price'];
-  const idx = headers.indexOf(col);
-  if (idx >= 0) {
-    const ths = document.querySelectorAll('th');
-    ths[idx].classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
-  }
-  applyFilters();
+/* ════════════ Expiry page ════════════ */
+$('xType').querySelectorAll('button').forEach(b=>b.onclick=()=>{ xType=b.dataset.v; $('xType').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderExpiry(); });
+function renderExpiry(){
+  $('xToday').textContent = 'นับจากวันนี้ ' + fmtD(todayKey()) + ' · * = ประมาณจากประกัน SIM 2 ปี (ชีตยังไม่มีวันหมดอายุ SIM จริง)';
+  const ev = EVENTS.filter(e=>!xType || e.type===xType);
+  const G = [
+    {k:'critical', t:'ภายใน 30 วัน', d:'ต้องประสานต่อสัญญา / ต่ออายุ SIM ทันที'},
+    {k:'expired',  t:'หมดอายุแล้ว', d:'ถ้าต่อสัญญาแล้ว ให้อัปเดตวันที่ใน Google Sheet'},
+    {k:'warning',  t:'31–90 วัน', d:'เตรียมเสนอต่อสัญญา'},
+    {k:'upcoming', t:'91–180 วัน', d:'ติดตาม'},
+    {k:'lapsed',   t:'พ้นประกัน SIM (สัญญายังมีผล)', d:'ค่า SIM หลังปีที่ 2 — ตรวจสอบผู้รับผิดชอบค่าบริการ'}
+  ];
+  const html = G.map(g=>{
+    let list = ev.filter(e=>e.level===g.k);
+    if (g.k==='expired' || g.k==='lapsed') list = list.slice().sort((a,b)=>b.days-a.days);
+    if (!list.length) return '';
+    return `<div class="card xg"><div class="xg-h"><div class="xg-bar" style="background:${LEVELS[g.k].color}"></div>
+      <div><h3>${g.t}</h3><div class="t-sub">${g.d}</div></div><span class="n">${list.length} รายการ</span></div>
+      <div class="alist">${list.map(eventRow).join('')}</div></div>`;
+  }).join('');
+  $('xgroups').innerHTML = html || `<div class="card"><div class="empty"><b>✓</b>ไม่มีรายการที่ต้องติดตามใน 180 วัน</div></div>`;
+  bindRows($('xgroups'));
 }
 
-function resetFilters() {
-  document.getElementById('fSearch').value = '';
-  document.getElementById('fStatus').value = '';
-  document.getElementById('fProvince').value = '';
-  document.getElementById('fBiz').value = '';
-  document.getElementById('fSim').value = '';
-  applyFilters();
+/* ════════════ Drawer ════════════ */
+function openDrawer(id){
+  const r = ROWS.find(x=>String(x.id)===String(id)); if(!r) return;
+  const ev = EVENTS.filter(e=>e.row===r);
+  const kv = (k,v) => v!=null && v!=='' && v!=='—' ? `<dt>${k}</dt><dd>${v}</dd>` : '';
+  $('drawer').innerHTML = `<div class="dr-h"><div style="min-width:0"><div class="t-sub" style="color:var(--gold2)">สถานี #${esc(r.id)}</div><h3>${esc(r.name)}</h3>
+      <div class="t-sub">${esc([r.province,r.bizType].filter(Boolean).join(' · '))}</div></div>
+      <button class="ib" onclick="closeDrawer()" aria-label="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div class="dr-b">
+      <div class="dr-sec"><span class="chip ${STAGES[r.stage].chip}"><i></i>${esc(r.jobStatus||STAGES[r.stage].label)}</span>
+        ${r.tsStatus?` <span class="chip c-gray">TS: ${esc(r.tsStatus)}</span>`:''} ${r.src?` <span class="chip c-gray">${esc(r.src)}</span>`:''}</div>
+      <div class="dr-sec"><h4>วันหมดอายุ</h4>
+        ${ev.length ? ev.map(e=>`<div class="xcard"><div class="dbox ${e.level}"><span>${e.days<0?'เกิน':e.days===0?'':'เหลือ'}</span><b class="num">${Math.abs(e.days)}</b><span>วัน</span></div>
+          <div><b>${e.label}</b><div class="t-sub">ครบกำหนด ${fmtD(e.date)}${e.est?' · ประมาณการจากวันเริ่มบริการ + 2 ปี':''}</div>
+          <span class="chip ${LEVELS[e.level].chip}" style="margin-top:4px">${LEVELS[e.level].label}</span></div></div>`).join('')
+          : '<div class="t-sub">ยังไม่มีวันเริ่ม/สิ้นสุดสัญญาในชีต</div>'}
+      </div>
+      <div class="dr-sec"><h4>รายละเอียด</h4><dl class="kv">
+        ${kv('เครื่องชาร์จ', esc(r.charger))}${kv('อุปกรณ์ในสัญญา', esc(r.detail))}${kv('ผู้รับเหมา', esc(r.vendors))}
+        ${kv('Package', esc(r.pkg))}${kv('มูลค่า', r.price?money(r.price)+' บาท':'')}${kv('ใบเสนอราคา', esc(r.quote))}${kv('ปีงบ', esc(r.year))}
+        ${kv('วันลงนาม PO', r.poDate!=null?fmtD(r.poDate):'')}${kv('เริ่มบริการ', r.serviceStart!=null?fmtD(r.serviceStart):'')}${kv('สิ้นสุดสัญญา', r.contractEnd!=null?fmtD(r.contractEnd):'')}
+        ${kv('SIM หมดอายุ', r.simExpire!=null?fmtD(r.simExpire):'')}${kv('SIM ต่ออายุถึง', r.simRenew!=null?fmtD(r.simRenew):'')}
+        ${kv('SIM โดย', esc(r.simProvider))}${kv('เบอร์ SIM', esc(r.simNumber))}${kv('โทร', esc(r.phone))}${kv('หมายเหตุ', esc(r.note))}
+      </dl></div>
+      <a class="btn" href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${SHEET_GID}" target="_blank" rel="noopener">แก้ไขใน Google Sheet ↗</a>
+    </div>`;
+  $('drawer').classList.add('on'); $('scrim').classList.add('on'); $('drawer').setAttribute('aria-hidden','false');
+}
+function closeDrawer(){ $('drawer').classList.remove('on'); $('scrim').classList.remove('on'); $('drawer').setAttribute('aria-hidden','true'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+
+/* ════════════ LINE ════════════ */
+function lineCfg(){ return {url:(store.get('evd-gas-url')||'').trim(), key:(store.get('evd-gas-key')||'').trim()}; }
+function saveLine(){
+  const url=$('gasUrl').value.trim(), key=$('gasKey').value.trim();
+  if (url && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(url)){ toast('URL ไม่ถูกต้อง — ต้องลงท้ายด้วย /exec'); return; }
+  store.set('evd-gas-url',url); store.set('evd-gas-key',key); showLineState(); toast('บันทึกแล้ว');
+}
+function showLineState(ok){
+  const c=lineCfg(), el=$('lineState');
+  if (!c.url){ el.className='chip c-gray'; el.textContent='ยังไม่ได้ตั้งค่า'; }
+  else if (ok===true){ el.className='chip c-green'; el.innerHTML='<i></i>เชื่อมต่อแล้ว'; }
+  else if (ok===false){ el.className='chip c-red'; el.innerHTML='<i></i>เชื่อมต่อไม่ได้'; }
+  else { el.className='chip c-blue'; el.textContent='ตั้งค่าแล้ว'; }
+}
+function gas(action){
+  const c=lineCfg(), out=$('gasOut');
+  if (!c.url){ toast('กรุณาใส่ Web App URL แล้วกดบันทึกก่อน'); $('gasUrl').focus(); return; }
+  out.textContent='กำลังเชื่อมต่อ…';
+  const cb='__gas'+Date.now(), s=document.createElement('script');
+  const done=()=>{ clearTimeout(tm); delete window[cb]; s.remove(); };
+  const tm=setTimeout(()=>{ done(); out.innerHTML='<span style="color:var(--red)">หมดเวลา — ตรวจว่า Deploy แบบ Who has access: Anyone แล้ว</span>'; showLineState(false); },25000);
+  window[cb]=d=>{ done(); showLineState(!!d.ok);
+    out.innerHTML = d.ok ? `<span style="color:var(--green)">✓ ${esc(d.message||'สำเร็จ')}</span>` : `<span style="color:var(--red)">✗ ${esc(d.error||'ผิดพลาด')}</span>`; };
+  s.onerror=()=>{ done(); out.innerHTML='<span style="color:var(--red)">เรียก Web App ไม่ได้</span>'; showLineState(false); };
+  s.src=`${c.url}?action=${action}&key=${encodeURIComponent(c.key)}&callback=${cb}`;
+  document.head.appendChild(s);
+}
+function renderLinePreview(){
+  const list = EVENTS.filter(e=>e.level==='expired'||e.level==='critical');
+  const cur = list.filter(e=>e.days>=0), past = list.filter(e=>e.days<0).sort((a,b)=>b.days-a.days);
+  const items = [...cur, ...past].slice(0,6);
+  const row = e=>`<div class="lp-r"><div class="dbox ${e.level}"><span>${e.days<0?'เกิน':'เหลือ'}</span><b>${Math.abs(e.days)}</b><span>วัน</span></div>
+      <div style="min-width:0"><div style="font-weight:700;font-size:13.5px">${esc(e.row.name)}</div><div style="font-size:12px;color:#4a5872">${e.label} · ${fmtD(e.date)}</div></div></div>`;
+  $('linePreview').innerHTML = `<div class="lp-b"><div class="lp-h"><b>📋 สรุปวันหมดอายุ · Total Solutions</b><span>${fmtD(todayKey())} · ${list.length} รายการต้องดำเนินการ</span></div>
+    ${items.length?items.map(row).join(''):'<div class="lp-r" style="color:#4a5872">ไม่มีรายการเร่งด่วน ✓</div>'}
+    ${list.length>items.length?`<div class="lp-r" style="font-size:12px;color:#8390a6">และอีก ${list.length-items.length} รายการ</div>`:''}
+    <div class="lp-f"><div>เปิด Dashboard</div></div></div>`;
 }
 
-// Load on start + auto-refresh 5 min
-loadData();
-setInterval(loadData, 5 * 60 * 1000);
+/* ════════════ Nav / theme ════════════ */
+function go(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+t));
+  if (location.hash!=='#'+t) history.replaceState(null,'','#'+t);
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function toggleTheme(){
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  const nx = cur==='dark'?'light':'dark'; document.documentElement.dataset.theme=nx; store.set('evd-theme',nx);
+}
+
+/* ════════════ Init ════════════ */
+(function init(){
+  const th = store.get('evd-theme'); if (th) document.documentElement.dataset.theme = th;
+  $('btnSheet').href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${SHEET_GID}`;
+  const c = lineCfg(); $('gasUrl').value=c.url; $('gasKey').value=c.key; showLineState();
+  const h = location.hash.slice(1); if (['overview','stations','expiry','line'].includes(h)) go(h);
+  load();
+  setInterval(()=>load(), REFRESH_MS);
+  /* ข้ามวัน (เปิดทิ้งไว้ข้ามเที่ยงคืน) → คำนวณวันคงเหลือใหม่ */
+  let lastDay = todayKey();
+  setInterval(()=>{ if (todayKey()!==lastDay && ROWS.length){ lastDay=todayKey(); buildEvents(); renderAll(); } }, 60000);
+})();
 </script>
 </body>
 </html>
