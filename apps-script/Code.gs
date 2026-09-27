@@ -16,6 +16,7 @@
 const CONFIG = {
   SHEET_ID: '1h0m20N8wnyaV2UA8VP2N-VO8LyiFS2SEtsz0hhF_Giw',
   SHEET_GID: 0,
+  BASE_URL: 'https://pornwiroonb-web.github.io/ev-dashboard/',
   DASHBOARD_URL: 'https://pornwiroonb-web.github.io/ev-dashboard/#expiry',
   TZ: 'Asia/Bangkok',
   RUN_HOUR: 8,                              // เวลาเช็คทุกวัน (เวลาไทย)
@@ -30,8 +31,10 @@ const DAY = 86400000;
 const FIELD = {
   id:'id', name:'name', province:'province', pkgtype:'charger', jobstatus:'jobStatus',
   servicestart:'serviceStart', contractend:'contractEnd', simexpire:'simExpire', simrenew:'simRenew',
-  note:'note', quote:'quote'
+  note:'note', quote:'quote', vender1:'vendor1', vender2:'vendor2', price:'price', biztype:'bizType'
 };
+const Y = '#FFC72C', BK = '#0E0E0E', TILE = '#1C1C1E';
+const QUICK = [['⚡ สรุปด่วน','สรุป'],['⏰ ใกล้หมดอายุ','หมดอายุ'],['📊 สถานะงาน','สถานะ'],['🔍 ค้นหา','ค้นหา'],['☰ เมนู','เมนู']];
 
 /* ═══════════════ ตั้งค่าครั้งแรก ═══════════════ */
 function setup() {
@@ -103,22 +106,55 @@ function doPost(e) {
   try {
     const body = JSON.parse(e.postData.contents || '{}');
     (body.events || []).forEach(ev => {
-      const src = ev.source || {};
-      const id = src.groupId || src.roomId || src.userId || '';
-      const text = ev.type === 'message' && ev.message && ev.message.type === 'text' ? ev.message.text.trim().toLowerCase() : '';
-      if (ev.type === 'join' || text === 'id' || text === 'ไอดี') {
-        PropertiesService.getScriptProperties().setProperty('LAST_SOURCE_ID', id);
-        reply_(ev.replyToken, [{ type: 'text', text: 'สวัสดีครับ 👋 Total Solutions Bot\nID ของห้องนี้:\n' + id + '\n\nนำไปใส่ใน Script properties ชื่อ LINE_TO เพื่อรับแจ้งเตือนวันหมดอายุในห้องนี้\nพิมพ์ "สรุป" เพื่อดูรายการเร่งด่วน' }]);
-      } else if (text === 'สรุป' || text === 'status' || text === 'summary') {
-        const list = urgentList_(buildEvents_(readRows_()).filter(x => x.level !== 'lapsed'));
-        reply_(ev.replyToken, [list.length ? flex_('📋 สรุปวันหมดอายุ', `${list.length} รายการหมดแล้ว/ภายใน 30 วัน`, list)
-                                           : { type: 'text', text: '✅ ไม่มีรายการหมดอายุหรือใกล้หมดภายใน 30 วัน' }]);
-      }
+      try { handleEvent_(ev); } catch (err) { console.error(err); }
     });
   } catch (err) {
     console.error(err);
   }
   return ContentService.createTextOutput('OK');
+}
+
+function handleEvent_(ev) {
+  const src = ev.source || {};
+  const id = src.groupId || src.roomId || src.userId || '';
+  if (ev.type === 'join' || ev.type === 'follow') {
+    PropertiesService.getScriptProperties().setProperty('LAST_SOURCE_ID', id);
+    return reply_(ev.replyToken, [
+      { type: 'text', text: 'สวัสดีครับ 👋 Total Solutions Bot\nID ของห้องนี้:\n' + id + '\n\nนำไปใส่ใน Script properties ชื่อ LINE_TO เพื่อรับแจ้งเตือนวันหมดอายุในห้องนี้' },
+      withQuick_(menuFlex_())
+    ]);
+  }
+  if (ev.type === 'postback') {
+    const data = (ev.postback && ev.postback.data) || '';
+    if (data === 'action=search') return;                    // Rich menu เปิดคีย์บอร์ด "ค้นหา " ให้พิมพ์ต่อเอง
+    return;
+  }
+  if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text') return;
+  const raw = ev.message.text.trim();
+  const text = raw.toLowerCase();
+
+  if (text === 'id' || text === 'ไอดี') {
+    PropertiesService.getScriptProperties().setProperty('LAST_SOURCE_ID', id);
+    return reply_(ev.replyToken, [{ type: 'text', text: 'ID ของห้องนี้:\n' + id }]);
+  }
+  if (['เมนู', 'menu', 'เมนู total solutions'].indexOf(text) >= 0) return reply_(ev.replyToken, [withQuick_(menuFlex_())]);
+  if (['สรุป', 'สรุปด่วน', 'summary'].indexOf(text) >= 0) {
+    const list = urgentList_(buildEvents_(readRows_()).filter(x => x.level !== 'lapsed'));
+    return reply_(ev.replyToken, [withQuick_(list.length ? flex_('⚡ สรุปด่วน', `${list.length} รายการหมดแล้ว/ภายใน 30 วัน`, list)
+                                                     : { type: 'text', text: '✅ ไม่มีรายการหมดอายุหรือใกล้หมดภายใน 30 วัน' })]);
+  }
+  if (['หมดอายุ', 'ใกล้หมดอายุ', 'expiring'].indexOf(text) >= 0) {
+    const list = buildEvents_(readRows_()).filter(x => x.days >= 0 && x.days <= 90);
+    return reply_(ev.replyToken, [withQuick_(list.length ? flex_('⏰ ใกล้หมดอายุ', `${list.length} รายการภายใน 90 วัน`, list)
+                                                     : { type: 'text', text: '✅ ไม่มีรายการที่จะหมดอายุภายใน 90 วัน' })]);
+  }
+  if (['สถานะ', 'สถานะงาน', 'status'].indexOf(text) >= 0) return reply_(ev.replyToken, [withQuick_(statusFlex_(readRows_()))]);
+  if (text === 'ค้นหา' || text === 'search') {
+    return reply_(ev.replyToken, [withQuick_({ type: 'text', text: '🔍 พิมพ์ "ค้นหา" ตามด้วยชื่อสถานี จังหวัด หรือผู้รับเหมา\nเช่น  ค้นหา EGCO\n       ค้นหา ชลบุรี\n       ค้นหา Innopower' })]);
+  }
+  const m = raw.match(/^(?:ค้นหา|search)\s+(.+)$/i);
+  if (m) return reply_(ev.replyToken, [withQuick_(searchFlex_(readRows_(), m[1].trim()))]);
+  if (['ช่วยเหลือ', 'help', '?'].indexOf(text) >= 0) return reply_(ev.replyToken, [withQuick_(helpFlex_())]);
 }
 
 /* ═══════════════ อ่านชีต ═══════════════ */
@@ -242,14 +278,9 @@ function flex_(title, subtitle, items) {
     altText: title + ' — ' + subtitle,
     contents: {
       type: 'bubble', size: 'mega',
-      header: { type: 'box', layout: 'vertical', backgroundColor: '#0b2a55', paddingAll: '16px', contents: [
-        { type: 'text', text: title + ' · Total Solutions', color: '#ffffff', weight: 'bold', size: 'md', wrap: true },
-        { type: 'text', text: thDate_(todayKey_()) + ' · ' + subtitle, color: '#e0b544', size: 'xs', margin: 'sm', wrap: true }
-      ] },
+      header: header_(title, subtitle),
       body: { type: 'box', layout: 'vertical', paddingAll: '14px', contents: rows },
-      footer: { type: 'box', layout: 'vertical', paddingAll: '12px', contents: [
-        { type: 'button', style: 'primary', color: '#0b2a55', height: 'sm', action: { type: 'uri', label: 'เปิด Dashboard', uri: CONFIG.DASHBOARD_URL } }
-      ] }
+      footer: footer_()
     }
   };
 }
@@ -260,15 +291,18 @@ function token_() {
   if (!t) throw new Error('ยังไม่ได้ใส่ LINE_CHANNEL_TOKEN ใน Script properties');
   return t;
 }
-function call_(path, payload) {
-  const res = UrlFetchApp.fetch('https://api.line.me/v2/bot/message/' + path, {
-    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-    headers: { Authorization: 'Bearer ' + token_() },
-    payload: JSON.stringify(payload)
-  });
+function call_(path, payload) { return api_('https://api.line.me/v2/bot/message/' + path, 'post', payload); }
+function api_(url, method, payload, contentType) {
+  const opt = { method: method || 'post', muteHttpExceptions: true, headers: { Authorization: 'Bearer ' + token_() } };
+  if (payload !== undefined) {
+    opt.contentType = contentType || 'application/json';
+    opt.payload = contentType ? payload : JSON.stringify(payload);
+  }
+  const res = UrlFetchApp.fetch(url, opt);
   const code = res.getResponseCode();
   if (code >= 300) throw new Error('LINE API ' + code + ': ' + res.getContentText());
-  return res;
+  const t = res.getContentText();
+  return t ? JSON.parse(t) : {};
 }
 function sendLine_(messages) {
   const to = PropertiesService.getScriptProperties().getProperty('LINE_TO');
@@ -288,4 +322,191 @@ function testSend() { sendLine_([{ type: 'text', text: '✅ ทดสอบ Tota
 function previewEvents() {
   buildEvents_(readRows_()).filter(e => e.level !== 'ok').forEach(e =>
     Logger.log('%s | %s | %s | %s วัน | %s', e.level, e.label, e.name, e.days, thDate_(e.date)));
+}
+
+/* ═══════════════ ส่วนประกอบ Flex (โทน EGAT EV ดำ-เหลือง) ═══════════════ */
+function header_(title, subtitle) {
+  return { type: 'box', layout: 'vertical', backgroundColor: BK, paddingAll: '16px', contents: [
+    { type: 'box', layout: 'horizontal', contents: [
+      { type: 'text', text: title, color: '#ffffff', weight: 'bold', size: 'md', wrap: true, flex: 1 },
+      { type: 'text', text: 'TOTAL SOLUTIONS', color: Y, size: 'xxs', weight: 'bold', align: 'end', gravity: 'center', flex: 0 }
+    ] },
+    { type: 'text', text: thDate_(todayKey_()) + ' · ' + subtitle, color: Y, size: 'xs', margin: 'sm', wrap: true },
+    { type: 'box', layout: 'vertical', height: '3px', backgroundColor: Y, margin: 'md', cornerRadius: '2px', contents: [] }
+  ] };
+}
+function footer_() {
+  return { type: 'box', layout: 'horizontal', spacing: 'sm', paddingAll: '12px', contents: [
+    { type: 'button', style: 'primary', color: BK, height: 'sm', action: { type: 'uri', label: 'เปิด Dashboard', uri: CONFIG.DASHBOARD_URL } },
+    { type: 'button', style: 'primary', color: Y, height: 'sm', flex: 0, action: { type: 'message', label: '☰ เมนู', text: 'เมนู' } }
+  ] };
+}
+function withQuick_(msg) {
+  msg.quickReply = { items: QUICK.map(q => ({ type: 'action', action: { type: 'message', label: q[0], text: q[1] } })) };
+  return msg;
+}
+function stageOf_(s) {
+  s = String(s || '');
+  if (/ส่งมอบ|แล้วเสร็จ|เสร็จสิ้น/.test(s)) return 'done';
+  if (/ติดตั้ง/.test(s)) return 'install';
+  if (/กำลังดำเนิน/.test(s)) return 'progress';
+  if (/^รอ/.test(s)) return 'waiting';
+  return s ? 'progress' : 'unknown';
+}
+const STAGE_LABEL = { done: 'ส่งมอบแล้ว', install: 'อยู่ระหว่างติดตั้ง', progress: 'กำลังดำเนินการ', waiting: 'รอดำเนินการ', unknown: 'ไม่ระบุ' };
+const STAGE_COLOR = { done: '#18925a', install: '#2c67c9', progress: '#c97a0e', waiting: '#6d4fc2', unknown: '#8390a6' };
+
+/** การ์ดเมนูหลัก 6 ปุ่ม — ใช้ในกลุ่มได้ (Rich menu แสดงเฉพาะแชท 1:1) */
+function menuFlex_() {
+  const ev = buildEvents_(readRows_()).filter(e => e.level !== 'lapsed');
+  const urgent = ev.filter(e => e.level === 'expired' || e.level === 'critical').length;
+  const soon = ev.filter(e => e.days >= 0 && e.days <= 90).length;
+  const icon = n => CONFIG.BASE_URL + 'assets/icons/' + n + '.png';
+  const tile = (t) => ({
+    type: 'box', layout: 'vertical', flex: 1, cornerRadius: '14px', paddingAll: '10px', paddingTop: '14px', paddingBottom: '12px',
+    backgroundColor: t.hl ? Y : TILE, spacing: 'xs', action: t.action,
+    contents: [
+      { type: 'image', url: icon(t.icon), size: '44px', aspectMode: 'fit' },
+      { type: 'text', text: t.th, weight: 'bold', size: 'sm', align: 'center', color: t.hl ? BK : '#ffffff', margin: 'sm' },
+      { type: 'text', text: t.sub, size: 'xxs', align: 'center', color: t.hl ? '#4a3a05' : '#b9a56a', wrap: true }
+    ]
+  });
+  const T = [
+    { icon: 'siren-k', th: 'สรุปด่วน', sub: urgent + ' รายการ', hl: true, action: { type: 'message', label: 'สรุป', text: 'สรุป' } },
+    { icon: 'calendar-clock-y', th: 'ใกล้หมดอายุ', sub: soon + ' ใน 90 วัน', action: { type: 'message', label: 'หมดอายุ', text: 'หมดอายุ' } },
+    { icon: 'chart-column-y', th: 'สถานะงาน', sub: 'STATUS', action: { type: 'message', label: 'สถานะ', text: 'สถานะ' } },
+    { icon: 'search-y', th: 'ค้นหาสถานี', sub: 'SEARCH', action: { type: 'message', label: 'ค้นหา', text: 'ค้นหา' } },
+    { icon: 'layout-dashboard-y', th: 'Dashboard', sub: 'OPEN WEB', action: { type: 'uri', label: 'Dashboard', uri: CONFIG.BASE_URL } },
+    { icon: 'circle-help-y', th: 'ช่วยเหลือ', sub: 'HELP', action: { type: 'message', label: 'ช่วยเหลือ', text: 'ช่วยเหลือ' } }
+  ];
+  return {
+    type: 'flex', altText: 'เมนู Total Solutions — แตะเพื่อเลือก',
+    contents: { type: 'bubble', size: 'mega',
+      styles: { body: { backgroundColor: BK } },
+      body: { type: 'box', layout: 'vertical', paddingAll: '12px', spacing: 'sm', contents: [
+        { type: 'box', layout: 'horizontal', paddingStart: '4px', paddingEnd: '4px', paddingBottom: '6px', contents: [
+          { type: 'text', text: '⚡ TOTAL SOLUTIONS', color: Y, weight: 'bold', size: 'sm', flex: 1 },
+          { type: 'text', text: 'EV · กฟผ.', color: '#8a8a8e', size: 'xs', align: 'end', gravity: 'center', flex: 0 }
+        ] },
+        { type: 'box', layout: 'horizontal', spacing: 'sm', contents: T.slice(0, 3).map(tile) },
+        { type: 'box', layout: 'horizontal', spacing: 'sm', contents: T.slice(3).map(tile) }
+      ] }
+    }
+  };
+}
+
+function statusFlex_(rows) {
+  const today = todayKey_();
+  const cnt = { done: 0, install: 0, progress: 0, waiting: 0, unknown: 0 };
+  let active = 0, expired = 0, value = 0; const seen = {};
+  rows.forEach(r => {
+    cnt[stageOf_(r.jobStatus)]++;
+    const end = parseDay_(r.contractEnd);
+    if (end !== null) { if (end >= today) active++; else expired++; }
+    const price = parseFloat(String(r.price || '').replace(/[, ]/g, '')) || 0;
+    const key = String(r.quote || '') || ('#' + r.id);
+    if (price && !seen[key]) { seen[key] = 1; value += price; }
+  });
+  const total = rows.length || 1;
+  const bar = k => ({ type: 'box', layout: 'vertical', margin: 'md', contents: [
+    { type: 'box', layout: 'horizontal', contents: [
+      { type: 'text', text: STAGE_LABEL[k], size: 'sm', color: '#0f1b2d', flex: 1 },
+      { type: 'text', text: String(cnt[k]), size: 'sm', weight: 'bold', color: '#0f1b2d', align: 'end', flex: 0 } ] },
+    { type: 'box', layout: 'vertical', height: '8px', backgroundColor: '#eef1f6', cornerRadius: '4px', margin: 'xs', contents: [
+      { type: 'box', layout: 'vertical', height: '8px', width: Math.max(2, Math.round(cnt[k] / total * 100)) + '%', backgroundColor: STAGE_COLOR[k], cornerRadius: '4px', contents: [] } ] }
+  ] });
+  const kv = (l, v, c) => ({ type: 'box', layout: 'horizontal', margin: 'sm', contents: [
+    { type: 'text', text: l, size: 'sm', color: '#4a5872', flex: 1 },
+    { type: 'text', text: v, size: 'sm', weight: 'bold', color: c || '#0f1b2d', align: 'end', flex: 0 } ] });
+  const stages = ['done', 'install', 'progress', 'waiting', 'unknown'].filter(k => cnt[k]);
+  return { type: 'flex', altText: `สถานะงาน · ${rows.length} สถานี`,
+    contents: { type: 'bubble', size: 'mega', header: header_('📊 สถานะงาน', rows.length + ' สถานี'),
+      body: { type: 'box', layout: 'vertical', paddingAll: '16px', contents: stages.map(bar).concat([
+        { type: 'separator', margin: 'lg' },
+        { type: 'text', text: 'สัญญาบริการ', weight: 'bold', size: 'sm', margin: 'lg', color: '#0f1b2d' },
+        kv('ยังมีผล', String(active), '#18925a'),
+        kv('หมดอายุแล้ว (รอต่อ/อัปเดต)', String(expired), expired ? '#cf3b3b' : null),
+        kv('มูลค่าสัญญารวม', (value / 1e6).toFixed(2) + ' ล้านบาท')
+      ]) },
+      footer: footer_() } };
+}
+
+function searchFlex_(rows, q) {
+  const k = q.toLowerCase();
+  const found = rows.filter(r => [r.id, r.name, r.province, r.charger, r.vendor1, r.vendor2, r.quote, r.bizType]
+    .join(' ').toLowerCase().indexOf(k) >= 0);
+  if (!found.length) return { type: 'text', text: `🔍 ไม่พบสถานีที่ตรงกับ "${q}"\nลองพิมพ์คำสั้นลง เช่น ชื่อจังหวัด หรือชื่อบริษัท` };
+  const today = todayKey_();
+  const shown = found.slice(0, 8), items = [];
+  shown.forEach((r, i) => {
+    const st = stageOf_(r.jobStatus), end = parseDay_(r.contractEnd);
+    let endTxt = 'ยังไม่มีวันสิ้นสุดสัญญา', endCol = '#8390a6';
+    if (end !== null) {
+      const d = Math.round((end - today) / DAY);
+      endTxt = 'สัญญาถึง ' + thDate_(end) + (d < 0 ? ` · เกิน ${-d} วัน` : ` · อีก ${d} วัน`);
+      endCol = d < 0 ? '#cf3b3b' : d <= 30 ? '#cf3b3b' : d <= 90 ? '#c97a0e' : '#4a5872';
+    }
+    if (i) items.push({ type: 'separator', margin: 'md', color: '#eef1f6' });
+    items.push({ type: 'box', layout: 'vertical', margin: 'md', contents: [
+      { type: 'text', text: String(r.name), weight: 'bold', size: 'sm', wrap: true, color: '#0f1b2d' },
+      { type: 'text', text: [r.province, r.charger].filter(String).join(' · ') || '-', size: 'xs', color: '#4a5872', wrap: true },
+      { type: 'box', layout: 'horizontal', margin: 'xs', spacing: 'sm', contents: [
+        { type: 'text', text: '● ' + (r.jobStatus || STAGE_LABEL[st]), size: 'xs', color: STAGE_COLOR[st], flex: 0 },
+        { type: 'text', text: endTxt, size: 'xs', color: endCol, wrap: true, flex: 1 } ] }
+    ] });
+  });
+  if (found.length > shown.length) items.push({ type: 'text', text: `และอีก ${found.length - shown.length} รายการ — ดูทั้งหมดใน Dashboard`, size: 'xs', color: '#8390a6', margin: 'lg', wrap: true });
+  return { type: 'flex', altText: `ผลค้นหา "${q}" · ${found.length} สถานี`,
+    contents: { type: 'bubble', size: 'mega', header: header_('🔍 ผลค้นหา', `"${q}" · ${found.length} สถานี`),
+      body: { type: 'box', layout: 'vertical', paddingAll: '16px', contents: items }, footer: footer_() } };
+}
+
+function helpFlex_() {
+  const row = (cmd, desc) => ({ type: 'box', layout: 'horizontal', margin: 'md', spacing: 'md', contents: [
+    { type: 'box', layout: 'vertical', flex: 0, width: '84px', backgroundColor: BK, cornerRadius: '6px', paddingAll: '5px',
+      contents: [{ type: 'text', text: cmd, size: 'xs', color: Y, weight: 'bold', align: 'center' }] },
+    { type: 'text', text: desc, size: 'xs', color: '#4a5872', wrap: true, flex: 1, gravity: 'center' } ] });
+  return { type: 'flex', altText: 'วิธีใช้ Total Solutions Bot',
+    contents: { type: 'bubble', size: 'mega', header: header_('❓ ช่วยเหลือ', 'คำสั่งที่พิมพ์ในแชทได้'),
+      body: { type: 'box', layout: 'vertical', paddingAll: '16px', contents: [
+        row('เมนู', 'เปิดเมนูปุ่มกด'),
+        row('สรุป', 'รายการหมดอายุแล้ว + ภายใน 30 วัน'),
+        row('หมดอายุ', 'สัญญา/SIM ที่จะหมดใน 90 วัน'),
+        row('สถานะ', 'จำนวนสถานีแยกตามสถานะงาน'),
+        row('ค้นหา xxx', 'ค้นหาสถานีจากชื่อ จังหวัด ผู้รับเหมา'),
+        { type: 'separator', margin: 'lg' },
+        { type: 'text', text: `แจ้งเตือนอัตโนมัติทุกวัน ${CONFIG.RUN_HOUR}:00 น. เมื่อเหลือ 90/60/30/15/7/3/1 วัน และสรุปทุกวันจันทร์ · แก้ข้อมูลที่ Google Sheet ได้ทันที`, size: 'xxs', color: '#8390a6', wrap: true, margin: 'lg' }
+      ] },
+      footer: { type: 'box', layout: 'horizontal', spacing: 'sm', paddingAll: '12px', contents: [
+        { type: 'button', style: 'primary', color: BK, height: 'sm', action: { type: 'uri', label: 'Dashboard', uri: CONFIG.BASE_URL } },
+        { type: 'button', style: 'secondary', height: 'sm', action: { type: 'uri', label: 'Google Sheet', uri: 'https://docs.google.com/spreadsheets/d/' + CONFIG.SHEET_ID + '/edit' } }
+      ] } } };
+}
+
+/* ═══════════════ Rich Menu (แชท 1:1 กับบอท) — Run ครั้งเดียว ═══════════════ */
+function setupRichMenu() {
+  const props = PropertiesService.getScriptProperties();
+  const old = props.getProperty('RICHMENU_ID');
+  const W = 2500, H = 1686, cw = [833, 834, 833], rh = [843, 843];
+  const actions = [
+    { type: 'message', label: 'สรุปด่วน', text: 'สรุป' },
+    { type: 'message', label: 'ใกล้หมดอายุ', text: 'หมดอายุ' },
+    { type: 'message', label: 'สถานะงาน', text: 'สถานะ' },
+    { type: 'postback', label: 'ค้นหาสถานี', data: 'action=search', inputOption: 'openKeyboard', fillInText: 'ค้นหา ' },
+    { type: 'uri', label: 'Dashboard', uri: CONFIG.BASE_URL },
+    { type: 'message', label: 'ช่วยเหลือ', text: 'ช่วยเหลือ' }
+  ];
+  const areas = actions.map((a, i) => {
+    const c = i % 3, r = Math.floor(i / 3);
+    return { bounds: { x: cw.slice(0, c).reduce((s, v) => s + v, 0), y: r * rh[0], width: cw[c], height: rh[r] }, action: a };
+  });
+  const created = api_('https://api.line.me/v2/bot/richmenu', 'post',
+    { size: { width: W, height: H }, selected: true, name: 'Total Solutions Menu', chatBarText: 'เมนู Total', areas: areas });
+  const id = created.richMenuId;
+  const img = UrlFetchApp.fetch(CONFIG.BASE_URL + 'assets/richmenu.png').getBlob().getBytes();
+  api_('https://api-data.line.me/v2/bot/richmenu/' + id + '/content', 'post', img, 'image/png');
+  api_('https://api.line.me/v2/bot/user/all/richmenu/' + id, 'post');
+  props.setProperty('RICHMENU_ID', id);
+  if (old && old !== id) { try { api_('https://api.line.me/v2/bot/richmenu/' + old, 'delete'); } catch (e) { Logger.log('ลบเมนูเก่าไม่ได้: ' + e); } }
+  Logger.log('ตั้ง Rich menu สำเร็จ: %s', id);
 }
